@@ -6,7 +6,7 @@ export default defineConfig({
   manifest: {
     name: "Footballay",
     description: "Compact live football stats overlay for streaming pages.",
-    permissions: ["storage"],
+    permissions: ["storage", "activeTab"],
     host_permissions: [
       "https://api.footballay.com/*",
       "https://www.coupangplay.com/*",

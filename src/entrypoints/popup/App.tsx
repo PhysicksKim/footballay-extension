@@ -4,12 +4,14 @@ import type { LiveMatchOverlayData } from "@/features/live-match/types";
 import type { ExtensionSettings, OverlayPosition } from "@/features/overlay/overlayTypes";
 import { overlayPositions } from "@/features/overlay/position";
 import { defaultSettings } from "@/shared/constants";
-import type { RuntimeMessage } from "@/shared/messages";
+import type { PageOverlayState, RuntimeMessage, RuntimeResponse } from "@/shared/messages";
 import { sendRuntimeMessage } from "@/shared/messages";
+import { isSupportedStreamingUrl } from "@/shared/url";
 
 export function App() {
   const [settings, setSettings] = useState<ExtensionSettings>(defaultSettings);
   const [data, setData] = useState<LiveMatchOverlayData | null>(null);
+  const [pageOverlayState, setPageOverlayState] = useState<PageOverlayState | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,6 +41,8 @@ export function App() {
     if (dataResponse.ok && "data" in dataResponse) {
       setData(dataResponse.data);
     }
+
+    await refreshPageOverlayState();
   }
 
   async function updateSettings(patch: Partial<ExtensionSettings>) {
@@ -71,6 +75,79 @@ export function App() {
     }
   }
 
+  async function refreshPageOverlayState() {
+    const tabResponse = await sendActiveTabMessage({ type: "GET_PAGE_OVERLAY_STATE" });
+    if (tabResponse?.ok && "pageOverlayState" in tabResponse) {
+      setPageOverlayState(tabResponse.pageOverlayState);
+      return;
+    }
+
+    const activeTab = await getActiveTab();
+    setPageOverlayState(
+      activeTab?.url
+        ? {
+            isSupportedPage: isSupportedStreamingUrl(activeTab.url),
+            manualVisible: false,
+            visible: false,
+            url: activeTab.url
+          }
+        : null
+    );
+  }
+
+  async function showOverlayOnCurrentPage() {
+    setError(null);
+
+    if (!settings.overlayEnabled) {
+      await updateSettings({ overlayEnabled: true });
+    }
+
+    const response = await sendActiveTabMessage({ type: "SHOW_PAGE_OVERLAY" });
+    if (response?.ok && "pageOverlayState" in response) {
+      setPageOverlayState(response.pageOverlayState);
+      return;
+    }
+
+    setError("This page cannot run the overlay");
+  }
+
+  async function hideOverlayOnCurrentPage() {
+    setError(null);
+    const response = await sendActiveTabMessage({ type: "HIDE_PAGE_OVERLAY" });
+    if (response?.ok && "pageOverlayState" in response) {
+      setPageOverlayState(response.pageOverlayState);
+    }
+  }
+
+  async function sendActiveTabMessage(message: RuntimeMessage): Promise<RuntimeResponse | null> {
+    const activeTab = await getActiveTab();
+    if (!activeTab?.id) {
+      return null;
+    }
+
+    try {
+      return (await chrome.tabs.sendMessage(activeTab.id, message)) as RuntimeResponse;
+    } catch {
+      return null;
+    }
+  }
+
+  async function getActiveTab(): Promise<chrome.tabs.Tab | null> {
+    const [activeTab] = await chrome.tabs.query({
+      active: true,
+      currentWindow: true
+    });
+
+    return activeTab ?? null;
+  }
+
+  const canControlCurrentPage = pageOverlayState?.url.startsWith("http") ?? false;
+  const currentPageLabel = pageOverlayState?.isSupportedPage
+    ? "Auto overlay page"
+    : pageOverlayState
+      ? "Manual overlay page"
+      : "Unavailable page";
+
   return (
     <main className="footballay-popup">
       <header className="footballay-popup__header">
@@ -87,6 +164,21 @@ export function App() {
           <span />
         </label>
       </header>
+
+      <section className="footballay-popup-card">
+        <span>Current Page</span>
+        <strong>{currentPageLabel}</strong>
+        <button
+          className="footballay-popup-button"
+          disabled={!canControlCurrentPage}
+          type="button"
+          onClick={() =>
+            void (pageOverlayState?.visible ? hideOverlayOnCurrentPage() : showOverlayOnCurrentPage())
+          }
+        >
+          {pageOverlayState?.visible ? "Hide on this page" : "Show on this page"}
+        </button>
+      </section>
 
       <section className="footballay-popup-section">
         <MatchSelector selectedFixtureId={settings.selectedFixtureId} onSelectFixture={selectFixture} />

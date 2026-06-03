@@ -6,12 +6,13 @@ import type { LiveMatchOverlayData } from "@/features/live-match/types";
 import type { ExtensionSettings } from "@/features/overlay/overlayTypes";
 import { getOverlayPositionClass } from "@/features/overlay/position";
 import { defaultSettings } from "@/shared/constants";
-import type { RuntimeMessage } from "@/shared/messages";
+import type { PageOverlayState, RuntimeMessage, RuntimeResponse } from "@/shared/messages";
 import { sendRuntimeMessage } from "@/shared/messages";
+import { isSupportedStreamingUrl } from "@/shared/url";
 import "@/styles/overlay.css";
 
 export default defineContentScript({
-  matches: ["https://www.coupangplay.com/*", "https://www.spotvnow.co.kr/*"],
+  matches: ["http://*/*", "https://*/*"],
   main(ctx) {
     const rootElement = document.createElement("div");
     rootElement.id = "footballay-overlay-root";
@@ -30,11 +31,20 @@ export default defineContentScript({
 function FootballayOverlayApp() {
   const [settings, setSettings] = useState<ExtensionSettings>(defaultSettings);
   const [data, setData] = useState<LiveMatchOverlayData | null>(null);
+  const [manualVisible, setManualVisible] = useState(false);
+  const isSupportedPage = useMemo(() => isSupportedStreamingUrl(window.location.href), []);
+  const shouldRenderControl = isSupportedPage || manualVisible;
 
   useEffect(() => {
     void loadInitialState();
+  }, []);
 
-    const listener = (message: RuntimeMessage) => {
+  useEffect(() => {
+    const listener = (
+      message: RuntimeMessage,
+      _sender: chrome.runtime.MessageSender,
+      sendResponse: (response?: RuntimeResponse) => void
+    ) => {
       if (message.type === "SETTINGS_UPDATED") {
         setSettings(message.payload);
       }
@@ -42,11 +52,36 @@ function FootballayOverlayApp() {
       if (message.type === "LIVE_MATCH_DATA_UPDATED") {
         setData(message.payload);
       }
+
+      if (message.type === "GET_PAGE_OVERLAY_STATE") {
+        sendResponse({ ok: true, pageOverlayState: getPageOverlayState() });
+        return true;
+      }
+
+      if (message.type === "SHOW_PAGE_OVERLAY") {
+        setManualVisible(true);
+        sendResponse({
+          ok: true,
+          pageOverlayState: getPageOverlayState({ manualVisible: true })
+        });
+        return true;
+      }
+
+      if (message.type === "HIDE_PAGE_OVERLAY") {
+        setManualVisible(false);
+        sendResponse({
+          ok: true,
+          pageOverlayState: getPageOverlayState({ manualVisible: false })
+        });
+        return true;
+      }
+
+      return undefined;
     };
 
     chrome.runtime.onMessage.addListener(listener);
     return () => chrome.runtime.onMessage.removeListener(listener);
-  }, []);
+  }, [isSupportedPage, manualVisible, settings.overlayEnabled]);
 
   const shellClassName = useMemo(
     () => `footballay-overlay-shell ${getOverlayPositionClass(settings.overlayPosition)}`,
@@ -65,11 +100,28 @@ function FootballayOverlayApp() {
     }
   }
 
+  function getPageOverlayState(override?: Partial<PageOverlayState>): PageOverlayState {
+    const nextManualVisible = override?.manualVisible ?? manualVisible;
+    const nextVisible = settings.overlayEnabled && (isSupportedPage || nextManualVisible);
+
+    return {
+      isSupportedPage,
+      manualVisible: nextManualVisible,
+      visible: nextVisible,
+      url: window.location.href,
+      ...override
+    };
+  }
+
   async function updateOverlaySettings(patch: Partial<ExtensionSettings>) {
     const response = await sendRuntimeMessage({ type: "UPDATE_SETTINGS", payload: patch });
     if (response.ok && "settings" in response) {
       setSettings(response.settings);
     }
+  }
+
+  if (!shouldRenderControl) {
+    return null;
   }
 
   return (
@@ -82,7 +134,14 @@ function FootballayOverlayApp() {
         <OverlayPanel
           data={data}
           onCollapse={() => void updateOverlaySettings({ overlayCollapsed: true })}
-          onDisable={() => void updateOverlaySettings({ overlayEnabled: false, overlayCollapsed: true })}
+          onDisable={() => {
+            if (isSupportedPage) {
+              void updateOverlaySettings({ overlayEnabled: false, overlayCollapsed: true });
+              return;
+            }
+
+            setManualVisible(false);
+          }}
         />
       )}
     </div>

@@ -21,6 +21,11 @@ select {
   font: inherit;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
+}
+
 .footballay-popup {
   display: grid;
   gap: 16px;
@@ -130,6 +135,16 @@ select {
 
 .footballay-popup-card strong {
   font-size: 16px;
+}
+
+.footballay-popup-button {
+  min-height: 36px;
+  border: 1px solid #2fdbc0;
+  border-radius: 8px;
+  color: #071713;
+  background: #7de2c6;
+  cursor: pointer;
+  font-weight: 800;
 }
 
 .footballay-popup-error {
