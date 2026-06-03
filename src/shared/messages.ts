@@ -1,4 +1,4 @@
-import type { LiveMatchOverlayData } from "@/features/live-match/types";
+import type { AvailableLeague, FixtureLookupMode, FixtureSummary, LiveMatchOverlayData } from "@/features/live-match/types";
 import type { ExtensionSettings } from "@/features/overlay/overlayTypes";
 
 export type PageOverlayState = {
@@ -11,7 +11,26 @@ export type PageOverlayState = {
 export type RuntimeMessage =
   | { type: "GET_SETTINGS" }
   | { type: "UPDATE_SETTINGS"; payload: Partial<ExtensionSettings> }
-  | { type: "SELECT_FIXTURE"; payload: { fixtureId: number } }
+  | { type: "GET_AVAILABLE_LEAGUES" }
+  | {
+      type: "GET_FIXTURES_BY_LEAGUE";
+      payload: {
+        leagueUid: string;
+        date?: string;
+        mode: FixtureLookupMode;
+        timezone: string;
+      };
+    }
+  | {
+      type: "SELECT_LEAGUE";
+      payload: {
+        leagueUid: string;
+        date?: string;
+        mode: FixtureLookupMode;
+        timezone: string;
+      };
+    }
+  | { type: "SELECT_FIXTURE"; payload: { fixtureUid: string } }
   | { type: "START_POLLING" }
   | { type: "STOP_POLLING" }
   | { type: "GET_LATEST_MATCH_DATA" }
@@ -24,6 +43,9 @@ export type RuntimeMessage =
 export type RuntimeResponse =
   | { ok: true; settings: ExtensionSettings }
   | { ok: true; data: LiveMatchOverlayData | null }
+  | { ok: true; leagues: AvailableLeague[] }
+  | { ok: true; fixtures: FixtureSummary[] }
+  | { ok: true; settings: ExtensionSettings; fixtures: FixtureSummary[] }
   | { ok: true; pageOverlayState: PageOverlayState }
   | { ok: true }
   | { ok: false; error: string };

@@ -6,7 +6,10 @@ export type OverlayPosition =
   | "bottom-center";
 
 export type ExtensionSettings = {
-  selectedFixtureId?: number;
+  selectedLeagueUid?: string;
+  selectedFixtureUid?: string;
+  fixtureDate?: string;
+  fixtureLookupMode: "previous" | "exact" | "nearest";
   overlayEnabled: boolean;
   overlayCollapsed: boolean;
   overlayPosition: OverlayPosition;

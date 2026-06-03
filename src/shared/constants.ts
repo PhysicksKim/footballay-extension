@@ -1,6 +1,7 @@
 import type { ExtensionSettings } from "@/features/overlay/overlayTypes";
 
 export const defaultSettings: ExtensionSettings = {
+  fixtureLookupMode: "nearest",
   overlayEnabled: true,
   overlayCollapsed: true,
   overlayPosition: "bottom-right",

@@ -1,10 +1,12 @@
-import { fetchLiveMatchOverlayData } from "@/features/live-match/api";
-import type { LiveMatchOverlayData } from "@/features/live-match/types";
+import { fetchAvailableLeagues, fetchFixturesByLeague, fetchLiveMatchOverlayData } from "@/features/live-match/api";
+import type { AvailableLeague, FixtureSummary, LiveMatchOverlayData } from "@/features/live-match/types";
 import type { ExtensionSettings } from "@/features/overlay/overlayTypes";
 import type { RuntimeMessage, RuntimeResponse } from "@/shared/messages";
 import { readSettings, writeSettings } from "@/shared/storage";
 
 let latestMatchData: LiveMatchOverlayData | null = null;
+let availableLeagues: AvailableLeague[] = [];
+let latestFixtures: FixtureSummary[] = [];
 let pollingTimer: ReturnType<typeof setInterval> | undefined;
 
 export default defineBackground(() => {
@@ -35,9 +37,37 @@ async function handleRuntimeMessage(message: RuntimeMessage): Promise<RuntimeRes
         const settings = await updateSettings(message.payload);
         return { ok: true, settings };
       }
+      case "GET_AVAILABLE_LEAGUES": {
+        availableLeagues = await fetchAvailableLeagues();
+        return { ok: true, leagues: availableLeagues };
+      }
+      case "GET_FIXTURES_BY_LEAGUE": {
+        latestFixtures = await fetchFixturesByLeague(message.payload.leagueUid, {
+          date: message.payload.date,
+          mode: message.payload.mode,
+          timezone: message.payload.timezone
+        });
+        return { ok: true, fixtures: latestFixtures };
+      }
+      case "SELECT_LEAGUE": {
+        const settings = await updateSettings({
+          selectedLeagueUid: message.payload.leagueUid,
+          selectedFixtureUid: undefined,
+          fixtureDate: message.payload.date,
+          fixtureLookupMode: message.payload.mode
+        });
+        latestMatchData = null;
+        latestFixtures = await fetchFixturesByLeague(message.payload.leagueUid, {
+          date: message.payload.date,
+          mode: message.payload.mode,
+          timezone: message.payload.timezone
+        });
+        broadcast({ type: "LIVE_MATCH_DATA_UPDATED", payload: latestMatchData });
+        return { ok: true, settings, fixtures: latestFixtures };
+      }
       case "SELECT_FIXTURE": {
         const settings = await updateSettings({
-          selectedFixtureId: message.payload.fixtureId
+          selectedFixtureUid: message.payload.fixtureUid
         });
         await pollOnce(settings);
         return { ok: true, settings };
@@ -110,7 +140,7 @@ function stopPolling(): void {
 
 async function pollOnce(existingSettings?: ExtensionSettings): Promise<void> {
   const settings = existingSettings ?? (await readSettings());
-  latestMatchData = await fetchLiveMatchOverlayData(settings.selectedFixtureId);
+  latestMatchData = await fetchLiveMatchOverlayData(settings.selectedFixtureUid);
   broadcast({ type: "LIVE_MATCH_DATA_UPDATED", payload: latestMatchData });
 }
 

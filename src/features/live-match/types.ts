@@ -17,7 +17,7 @@ export type TopPlayer = {
 };
 
 export type LiveMatchOverlayData = {
-  fixtureId: number;
+  fixtureUid: string;
   homeTeamName: string;
   awayTeamName: string;
   homeScore: number;
@@ -28,4 +28,26 @@ export type LiveMatchOverlayData = {
   awayStats?: TeamStats;
   topPlayers?: TopPlayer[];
   updatedAt: string;
+};
+
+export type AvailableLeague = {
+  uid: string;
+  name: string;
+  nameKo?: string | null;
+};
+
+export type FixtureLookupMode = "previous" | "exact" | "nearest";
+
+export type FixtureSummary = {
+  uid: string;
+  kickoff?: string | null;
+  round: string;
+  homeTeamName: string;
+  awayTeamName: string;
+  statusShort: string;
+  statusLong: string;
+  elapsed?: number | null;
+  homeScore?: number | null;
+  awayScore?: number | null;
+  available: boolean;
 };

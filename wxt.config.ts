@@ -11,6 +11,10 @@ export default defineConfig({
       "https://api.footballay.com/*",
       "https://www.coupangplay.com/*",
       "https://www.spotvnow.co.kr/*"
-    ]
+    ],
+    content_security_policy: {
+      extension_pages:
+        "script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; object-src 'self';"
+    }
   }
 });

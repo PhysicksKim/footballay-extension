@@ -1,61 +1,90 @@
-import { mapApiLiveMatchToOverlayData } from "./mapper";
-import type { LiveMatchOverlayData } from "./types";
+import type {
+  AvailableLeagueResponse,
+  FixtureByLeagueResponse,
+  FixtureInfoResponse,
+  FixtureLiveStatusResponse,
+  FixtureStatisticsResponse
+} from "./backendTypes";
+import { mapAvailableLeague, mapFixtureLiveData, mapFixtureSummary } from "./mapper";
+import type { AvailableLeague, FixtureLookupMode, FixtureSummary, LiveMatchOverlayData } from "./types";
 
-const MOCK_FIXTURE_ID = 1001;
+const DEFAULT_API_BASE_URL = "https://api.footballay.com";
 
-export async function fetchLiveMatchOverlayData(
-  fixtureId = MOCK_FIXTURE_ID
-): Promise<LiveMatchOverlayData> {
-  const apiBaseUrl = import.meta.env.VITE_FOOTBALLAY_API_BASE_URL?.trim();
+type FixtureQuery = {
+  date?: string;
+  mode: FixtureLookupMode;
+  timezone: string;
+};
 
-  if (!apiBaseUrl) {
-    return getMockLiveMatchData(fixtureId);
+export async function fetchAvailableLeagues(): Promise<AvailableLeague[]> {
+  const response = await fetchFootballayJson<AvailableLeagueResponse[]>("/v1/football/leagues/available");
+  return response.map(mapAvailableLeague);
+}
+
+export async function fetchFixturesByLeague(
+  leagueUid: string,
+  query: FixtureQuery
+): Promise<FixtureSummary[]> {
+  const searchParams = new URLSearchParams({
+    mode: query.mode,
+    timezone: query.timezone
+  });
+
+  if (query.date) {
+    searchParams.set("date", query.date);
   }
 
-  const endpoint = new URL(`/fixtures/${fixtureId}/overlay`, apiBaseUrl);
-  const response = await fetch(endpoint, {
+  const response = await fetchFootballayJson<FixtureByLeagueResponse[]>(
+    `/v1/football/leagues/${leagueUid}/fixtures?${searchParams.toString()}`
+  );
+
+  return response.map(mapFixtureSummary);
+}
+
+export async function fetchLiveMatchOverlayData(
+  fixtureUid?: string
+): Promise<LiveMatchOverlayData | null> {
+  if (!fixtureUid) {
+    return null;
+  }
+
+  const [info, status, statistics] = await Promise.all([
+    fetchFixtureInfo(fixtureUid),
+    fetchFixtureStatus(fixtureUid),
+    fetchFixtureStatistics(fixtureUid)
+  ]);
+
+  return mapFixtureLiveData(info, status, statistics);
+}
+
+export function fetchFixtureInfo(fixtureUid: string): Promise<FixtureInfoResponse> {
+  return fetchFootballayJson(`/v1/football/fixtures/${fixtureUid}/info`);
+}
+
+export function fetchFixtureStatus(fixtureUid: string): Promise<FixtureLiveStatusResponse> {
+  return fetchFootballayJson(`/v1/football/fixtures/${fixtureUid}/status`);
+}
+
+export function fetchFixtureStatistics(fixtureUid: string): Promise<FixtureStatisticsResponse> {
+  return fetchFootballayJson(`/v1/football/fixtures/${fixtureUid}/statistics`);
+}
+
+function fetchFootballayJson<T>(path: string): Promise<T> {
+  const endpoint = new URL(path, getApiBaseUrl());
+
+  return fetch(endpoint, {
     headers: {
       Accept: "application/json"
     }
+  }).then(async (response) => {
+    if (!response.ok) {
+      throw new Error(`Footballay API request failed: ${response.status}`);
+    }
+
+    return response.json() as Promise<T>;
   });
-
-  if (!response.ok) {
-    throw new Error(`Footballay API request failed: ${response.status}`);
-  }
-
-  return mapApiLiveMatchToOverlayData(await response.json(), fixtureId);
 }
 
-function getMockLiveMatchData(fixtureId: number): LiveMatchOverlayData {
-  const elapsed = 64 + (Math.floor(Date.now() / 30000) % 8);
-
-  return {
-    fixtureId,
-    homeTeamName: "TOT",
-    awayTeamName: "CHE",
-    homeScore: 2,
-    awayScore: 1,
-    elapsed,
-    statusShort: "LIVE",
-    homeStats: {
-      shotsTotal: 11,
-      shotsOnGoal: 5,
-      possession: "54%",
-      yellowCards: 1,
-      redCards: 0
-    },
-    awayStats: {
-      shotsTotal: 8,
-      shotsOnGoal: 3,
-      possession: "46%",
-      yellowCards: 2,
-      redCards: 0
-    },
-    topPlayers: [
-      { name: "Son", teamName: "TOT", rating: 8.1, goals: 1, shots: 3 },
-      { name: "Palmer", teamName: "CHE", rating: 7.5, assists: 1 },
-      { name: "Maddison", teamName: "TOT", rating: 7.3, passes: "43/48" }
-    ],
-    updatedAt: new Date().toISOString()
-  };
+function getApiBaseUrl(): string {
+  return import.meta.env.VITE_FOOTBALLAY_API_BASE_URL?.trim() || DEFAULT_API_BASE_URL;
 }
