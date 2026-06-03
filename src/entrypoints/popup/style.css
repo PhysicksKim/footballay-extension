@@ -1,0 +1,138 @@
+:root {
+  color: #f7fafc;
+  background: #111418;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 320px;
+  min-height: 360px;
+  margin: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.footballay-popup {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+}
+
+.footballay-popup__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.footballay-popup__header h1 {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.footballay-popup__header p {
+  margin: 4px 0 0;
+  color: #a8b3c1;
+}
+
+.footballay-switch {
+  position: relative;
+  display: inline-flex;
+  width: 48px;
+  height: 28px;
+}
+
+.footballay-switch input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.footballay-switch span {
+  width: 100%;
+  border-radius: 999px;
+  background: #3a424d;
+  transition: background 140ms ease;
+}
+
+.footballay-switch span::before {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  content: "";
+  transition: transform 140ms ease;
+}
+
+.footballay-switch input:checked + span {
+  background: #1ba784;
+}
+
+.footballay-switch input:checked + span::before {
+  transform: translateX(20px);
+}
+
+.footballay-popup-section {
+  display: grid;
+  gap: 12px;
+}
+
+.footballay-popup-field {
+  display: grid;
+  gap: 6px;
+  color: #c9d4e2;
+}
+
+.footballay-popup-field input,
+.footballay-popup-field select {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #f7fafc;
+  background: #191f26;
+}
+
+.footballay-popup-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #d7dee8;
+}
+
+.footballay-popup-card {
+  display: grid;
+  gap: 6px;
+  border: 1px solid #27313c;
+  border-radius: 8px;
+  padding: 12px;
+  background: #171d24;
+}
+
+.footballay-popup-card span {
+  color: #a8b3c1;
+  font-size: 12px;
+}
+
+.footballay-popup-card strong {
+  font-size: 16px;
+}
+
+.footballay-popup-error {
+  margin: 0;
+  color: #ffb4a8;
+}

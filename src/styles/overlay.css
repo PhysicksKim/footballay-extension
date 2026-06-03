@@ -1,0 +1,170 @@
+#footballay-overlay-root {
+  all: initial;
+}
+
+#footballay-overlay-root *,
+#footballay-overlay-root *::before,
+#footballay-overlay-root *::after {
+  box-sizing: border-box;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.footballay-overlay-shell {
+  position: fixed;
+  z-index: 2147483647;
+  color: #f7fafc;
+}
+
+.footballay-overlay-shell--top-left {
+  top: 16px;
+  left: 16px;
+}
+
+.footballay-overlay-shell--top-right {
+  top: 16px;
+  right: 16px;
+}
+
+.footballay-overlay-shell--bottom-left {
+  bottom: 16px;
+  left: 16px;
+}
+
+.footballay-overlay-shell--bottom-right {
+  right: 16px;
+  bottom: 16px;
+}
+
+.footballay-overlay-shell--bottom-center {
+  right: 50%;
+  bottom: 16px;
+  transform: translateX(50%);
+}
+
+.footballay-overlay-button {
+  min-width: 44px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  padding: 0 14px;
+  color: #f7fafc;
+  background: rgba(17, 20, 24, 0.86);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.32);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  backdrop-filter: blur(10px);
+}
+
+.footballay-overlay-button:hover {
+  background: rgba(27, 167, 132, 0.92);
+}
+
+.footballay-overlay-button--muted {
+  color: #b8c4d1;
+  background: rgba(17, 20, 24, 0.56);
+}
+
+.footballay-panel {
+  width: min(292px, calc(100vw - 32px));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 12px;
+  color: #f7fafc;
+  background: rgba(17, 20, 24, 0.9);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(12px);
+}
+
+.footballay-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.footballay-panel__brand {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.footballay-panel__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.footballay-panel__actions button {
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 6px;
+  color: #f7fafc;
+  background: rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+}
+
+.footballay-score {
+  display: grid;
+  grid-template-columns: minmax(42px, 1fr) auto minmax(42px, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 13px;
+}
+
+.footballay-score strong {
+  font-size: 18px;
+}
+
+.footballay-score em {
+  color: #7de2c6;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.footballay-stats {
+  display: grid;
+  gap: 7px;
+  padding: 10px 0;
+}
+
+.footballay-stat-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: #d5dde8;
+  font-size: 12px;
+}
+
+.footballay-stat-line strong {
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.footballay-top-players {
+  display: grid;
+  gap: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 10px;
+}
+
+.footballay-top-players span {
+  color: #9ca9b8;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.footballay-top-players p,
+.footballay-empty {
+  margin: 0;
+  color: #e5edf7;
+  font-size: 12px;
+  line-height: 1.35;
+}
