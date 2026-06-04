@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import type { AvailableLeague, FixtureSummary, LiveMatchOverlayData } from "@/features/live-match/types";
-import type { ExtensionSettings, OverlayPosition } from "@/features/overlay/overlayTypes";
-import { overlayPositions } from "@/features/overlay/position";
+import type { AvailableLeague, FixtureSummary, LiveMatchOverlayData } from "@/domain/live-match/types";
+import type { ExtensionSettings, OverlayPosition } from "@/shared/overlay/types";
+import { overlayPositions } from "@/shared/overlay/position";
 import { defaultSettings } from "@/shared/constants";
 import type { PageOverlayState, RuntimeMessage, RuntimeResponse } from "@/shared/messages";
 import { sendRuntimeMessage } from "@/shared/messages";

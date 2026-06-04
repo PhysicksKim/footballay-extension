@@ -1,5 +1,5 @@
 import { storage } from "wxt/utils/storage";
-import type { ExtensionSettings } from "@/features/overlay/overlayTypes";
+import type { ExtensionSettings } from "@/shared/overlay/types";
 import { defaultSettings } from "./constants";
 
 const SETTINGS_KEY = "local:footballay-settings";

@@ -1,4 +1,4 @@
-import type { LiveMatchOverlayData } from "@/features/live-match/types";
+import type { LiveMatchOverlayData } from "@/domain/live-match/types";
 import { StatLine } from "./StatLine";
 
 type OverlayPanelProps = {

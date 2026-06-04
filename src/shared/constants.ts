@@ -1,4 +1,4 @@
-import type { ExtensionSettings } from "@/features/overlay/overlayTypes";
+import type { ExtensionSettings } from "@/shared/overlay/types";
 
 export const defaultSettings: ExtensionSettings = {
   fixtureLookupMode: "nearest",

@@ -1,4 +1,4 @@
-import type { OverlayPosition } from "./overlayTypes";
+import type { OverlayPosition } from "./types";
 
 export const overlayPositions: OverlayPosition[] = [
   "top-left",

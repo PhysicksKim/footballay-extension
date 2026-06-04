@@ -1,5 +1,5 @@
-import type { AvailableLeague, FixtureLookupMode, FixtureSummary, LiveMatchOverlayData } from "@/features/live-match/types";
-import type { ExtensionSettings } from "@/features/overlay/overlayTypes";
+import type { AvailableLeague, FixtureLookupMode, FixtureSummary, LiveMatchOverlayData } from "@/domain/live-match/types";
+import type { ExtensionSettings } from "@/shared/overlay/types";
 
 export type PageOverlayState = {
   isSupportedPage: boolean;
