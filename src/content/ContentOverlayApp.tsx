@@ -15,10 +15,25 @@ export function ContentOverlayApp() {
   const [manualVisible, setManualVisible] = useState(false);
   const isSupportedPage = useMemo(() => isSupportedStreamingUrl(window.location.href), []);
   const shouldRenderControl = isSupportedPage || manualVisible;
+  const shouldRegisterOverlay = shouldRenderControl && settings.overlayEnabled;
 
   useEffect(() => {
     void loadInitialState();
   }, []);
+
+  useEffect(() => {
+    if (!shouldRegisterOverlay) {
+      void sendRuntimeMessage({ type: "UNREGISTER_CONTENT_OVERLAY" });
+      return undefined;
+    }
+
+    void sendRuntimeMessage({ type: "REGISTER_CONTENT_OVERLAY" });
+    void refreshLatestMatchData();
+
+    return () => {
+      void sendRuntimeMessage({ type: "UNREGISTER_CONTENT_OVERLAY" });
+    };
+  }, [shouldRegisterOverlay]);
 
   useEffect(() => {
     const listener = (
@@ -75,6 +90,10 @@ export function ContentOverlayApp() {
       setSettings(settingsResponse.settings);
     }
 
+    await refreshLatestMatchData();
+  }
+
+  async function refreshLatestMatchData() {
     const dataResponse = await sendRuntimeMessage({ type: "GET_LATEST_MATCH_DATA" });
     if (dataResponse.ok && "data" in dataResponse) {
       setData(dataResponse.data);

@@ -16,6 +16,39 @@ export type TopPlayer = {
   passes?: string;
 };
 
+export type MatchEvent = {
+  sequence: number;
+  elapsed: number;
+  extraTime?: number | null;
+  teamName: string;
+  playerName?: string;
+  assistName?: string;
+  type: string;
+  detail: string;
+  comments?: string | null;
+};
+
+export type MatchLineup = {
+  home?: TeamLineup;
+  away?: TeamLineup;
+};
+
+export type TeamLineup = {
+  teamName: string;
+  formation?: string | null;
+  players: LineupPlayer[];
+  substitutes: LineupPlayer[];
+};
+
+export type LineupPlayer = {
+  matchPlayerUid: string;
+  name: string;
+  number?: number | null;
+  position?: string | null;
+  grid?: string | null;
+  substitute: boolean;
+};
+
 export type LiveMatchOverlayData = {
   fixtureUid: string;
   homeTeamName: string;
@@ -27,6 +60,8 @@ export type LiveMatchOverlayData = {
   homeStats?: TeamStats;
   awayStats?: TeamStats;
   topPlayers?: TopPlayer[];
+  events?: MatchEvent[];
+  lineup?: MatchLineup;
   updatedAt: string;
 };
 

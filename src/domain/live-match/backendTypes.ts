@@ -75,6 +75,68 @@ export type FixtureStatisticsResponse = {
   away?: TeamWithStatistics | null;
 };
 
+export type FixtureEventsResponse = {
+  fixtureUid: string;
+  events: FixtureEventInfoResponse[];
+};
+
+export type FixtureEventInfoResponse = {
+  sequence: number;
+  elapsed: number;
+  extraTime?: number | null;
+  team: FixtureEventTeamInfoResponse;
+  player?: FixtureEventPlayerInfoResponse | null;
+  assist?: FixtureEventPlayerInfoResponse | null;
+  type: string;
+  detail: string;
+  comments?: string | null;
+};
+
+export type FixtureEventTeamInfoResponse = {
+  teamUid: string;
+  name: string;
+  koreanName?: string | null;
+  playerColor?: UniformColorDto | null;
+};
+
+export type FixtureEventPlayerInfoResponse = {
+  matchPlayerUid: string;
+  playerUid?: string | null;
+  name: string;
+  koreanName?: string | null;
+  number?: number | null;
+};
+
+export type FixtureLineupResponse = {
+  fixtureUid: string;
+  lineup: {
+    home?: FixtureStartLineupResponse | null;
+    away?: FixtureStartLineupResponse | null;
+  };
+};
+
+export type FixtureStartLineupResponse = {
+  teamUid: string;
+  teamName: string;
+  teamKoreanName?: string | null;
+  formation?: string | null;
+  players: FixtureLineupPlayerResponse[];
+  substitutes: FixtureLineupPlayerResponse[];
+  playerColor?: UniformColorDto | null;
+};
+
+export type FixtureLineupPlayerResponse = {
+  matchPlayerUid: string;
+  playerUid?: string | null;
+  name: string;
+  koreanName?: string | null;
+  number?: number | null;
+  photo?: string | null;
+  position?: string | null;
+  grid?: string | null;
+  substitute: boolean;
+};
+
 export type TeamWithStatistics = {
   team: FixtureInfoTeam;
   teamStatistics: TeamStatistics;

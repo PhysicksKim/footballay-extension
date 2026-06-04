@@ -5,17 +5,21 @@ const liveMatchController = createLiveMatchBackgroundController();
 
 export default defineBackground(() => {
   chrome.runtime.onInstalled.addListener(() => {
-    void liveMatchController.startPolling();
+    void liveMatchController.initialize();
   });
 
   chrome.runtime.onStartup.addListener(() => {
-    void liveMatchController.startPolling();
+    void liveMatchController.initialize();
   });
 
-  chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResponse) => {
-    void liveMatchController.handleRuntimeMessage(message).then(sendResponse);
+  chrome.runtime.onMessage.addListener((message: RuntimeMessage, sender, sendResponse) => {
+    void liveMatchController.handleRuntimeMessage(message, sender).then(sendResponse);
     return true;
   });
 
-  void liveMatchController.startPolling();
+  chrome.tabs.onRemoved.addListener((tabId) => {
+    liveMatchController.handleTabRemoved(tabId);
+  });
+
+  void liveMatchController.initialize();
 });

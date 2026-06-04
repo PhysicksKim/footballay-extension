@@ -34,6 +34,8 @@ export type RuntimeMessage =
   | { type: "START_POLLING" }
   | { type: "STOP_POLLING" }
   | { type: "GET_LATEST_MATCH_DATA" }
+  | { type: "REGISTER_CONTENT_OVERLAY" }
+  | { type: "UNREGISTER_CONTENT_OVERLAY" }
   | { type: "GET_PAGE_OVERLAY_STATE" }
   | { type: "SHOW_PAGE_OVERLAY" }
   | { type: "HIDE_PAGE_OVERLAY" }

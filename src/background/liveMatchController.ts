@@ -1,145 +1,166 @@
-import { fetchAvailableLeagues, fetchFixturesByLeague, fetchLiveMatchOverlayData } from "@/domain/live-match/api";
-import type { AvailableLeague, FixtureSummary, LiveMatchOverlayData } from "@/domain/live-match/types";
-import type { ExtensionSettings } from "@/shared/overlay/types";
-import type { RuntimeMessage, RuntimeResponse } from "@/shared/messages";
-import { readSettings, writeSettings } from "@/shared/storage";
+import { fetchAvailableLeagues, fetchFixturesByLeague } from '@/domain/live-match/api';
+import type { AvailableLeague, FixtureSummary } from '@/domain/live-match/types';
+import type { ExtensionSettings } from '@/shared/overlay/types';
+import type { RuntimeMessage, RuntimeResponse } from '@/shared/messages';
+import { readSettings, writeSettings } from '@/shared/storage';
+import { createLiveMatchPollingService } from './liveMatchPolling';
 
 export type LiveMatchBackgroundController = {
-  handleRuntimeMessage: (message: RuntimeMessage) => Promise<RuntimeResponse>;
-  startPolling: (existingSettings?: ExtensionSettings) => Promise<void>;
-  stopPolling: () => void;
+    handleRuntimeMessage: (message: RuntimeMessage, sender?: chrome.runtime.MessageSender) => Promise<RuntimeResponse>;
+    handleTabRemoved: (tabId: number) => void;
+    initialize: () => Promise<void>;
+    startMatchPollingIfNeed: (existingSettings?: ExtensionSettings) => Promise<void>;
+    stopPolling: () => void;
 };
 
 export function createLiveMatchBackgroundController(): LiveMatchBackgroundController {
-  let latestMatchData: LiveMatchOverlayData | null = null;
-  let availableLeagues: AvailableLeague[] = [];
-  let latestFixtures: FixtureSummary[] = [];
-  let pollingTimer: ReturnType<typeof setInterval> | undefined;
+    let availableLeagues: AvailableLeague[] = [];
+    let latestFixtures: FixtureSummary[] = [];
+    const contentOverlayTabIds = new Set<number>();
+    const pollingService = createLiveMatchPollingService({ broadcast });
 
-  async function handleRuntimeMessage(message: RuntimeMessage): Promise<RuntimeResponse> {
-    try {
-      switch (message.type) {
-        case "GET_SETTINGS": {
-          return { ok: true, settings: await readSettings() };
+    async function handleRuntimeMessage(
+        message: RuntimeMessage,
+        sender?: chrome.runtime.MessageSender,
+    ): Promise<RuntimeResponse> {
+        try {
+            switch (message.type) {
+                case 'GET_SETTINGS': {
+                    return { ok: true, settings: await readSettings() };
+                }
+                case 'UPDATE_SETTINGS': {
+                    const settings = await updateSettings(message.payload);
+                    return { ok: true, settings };
+                }
+                case 'GET_AVAILABLE_LEAGUES': {
+                    availableLeagues = await fetchAvailableLeagues();
+                    return { ok: true, leagues: availableLeagues };
+                }
+                case 'GET_FIXTURES_BY_LEAGUE': {
+                    latestFixtures = await fetchFixturesByLeague(message.payload.leagueUid, {
+                        date: message.payload.date,
+                        mode: message.payload.mode,
+                        timezone: message.payload.timezone,
+                    });
+                    return { ok: true, fixtures: latestFixtures };
+                }
+                case 'SELECT_LEAGUE': {
+                    const settings = await updateSettings({
+                        selectedLeagueUid: message.payload.leagueUid,
+                        selectedFixtureUid: undefined,
+                        fixtureDate: message.payload.date,
+                        fixtureLookupMode: message.payload.mode,
+                    });
+                    pollingService.clearLatestMatchData();
+                    latestFixtures = await fetchFixturesByLeague(message.payload.leagueUid, {
+                        date: message.payload.date,
+                        mode: message.payload.mode,
+                        timezone: message.payload.timezone,
+                    });
+                    return { ok: true, settings, fixtures: latestFixtures };
+                }
+                case 'SELECT_FIXTURE': {
+                    const settings = await updateSettings({
+                        selectedFixtureUid: message.payload.fixtureUid,
+                    });
+                    return { ok: true, settings };
+                }
+                case 'START_POLLING': {
+                    await startMatchPollingIfNeed();
+                    return { ok: true };
+                }
+                case 'STOP_POLLING': {
+                    pollingService.stop();
+                    return { ok: true };
+                }
+                case 'GET_LATEST_MATCH_DATA': {
+                    return { ok: true, data: await pollingService.getLatestMatchData() };
+                }
+                case 'REGISTER_CONTENT_OVERLAY': {
+                    registerContentOverlay(sender);
+                    return { ok: true };
+                }
+                case 'UNREGISTER_CONTENT_OVERLAY': {
+                    unregisterContentOverlay(sender);
+                    return { ok: true };
+                }
+                case 'SETTINGS_UPDATED':
+                case 'LIVE_MATCH_DATA_UPDATED': {
+                    return { ok: true };
+                }
+                default: {
+                    return { ok: false, error: 'Unknown message type' };
+                }
+            }
+        } catch (error) {
+            return {
+                ok: false,
+                error: error instanceof Error ? error.message : 'Unknown runtime error',
+            };
         }
-        case "UPDATE_SETTINGS": {
-          const settings = await updateSettings(message.payload);
-          return { ok: true, settings };
-        }
-        case "GET_AVAILABLE_LEAGUES": {
-          availableLeagues = await fetchAvailableLeagues();
-          return { ok: true, leagues: availableLeagues };
-        }
-        case "GET_FIXTURES_BY_LEAGUE": {
-          latestFixtures = await fetchFixturesByLeague(message.payload.leagueUid, {
-            date: message.payload.date,
-            mode: message.payload.mode,
-            timezone: message.payload.timezone
-          });
-          return { ok: true, fixtures: latestFixtures };
-        }
-        case "SELECT_LEAGUE": {
-          const settings = await updateSettings({
-            selectedLeagueUid: message.payload.leagueUid,
-            selectedFixtureUid: undefined,
-            fixtureDate: message.payload.date,
-            fixtureLookupMode: message.payload.mode
-          });
-          latestMatchData = null;
-          latestFixtures = await fetchFixturesByLeague(message.payload.leagueUid, {
-            date: message.payload.date,
-            mode: message.payload.mode,
-            timezone: message.payload.timezone
-          });
-          broadcast({ type: "LIVE_MATCH_DATA_UPDATED", payload: latestMatchData });
-          return { ok: true, settings, fixtures: latestFixtures };
-        }
-        case "SELECT_FIXTURE": {
-          const settings = await updateSettings({
-            selectedFixtureUid: message.payload.fixtureUid
-          });
-          await pollOnce(settings);
-          return { ok: true, settings };
-        }
-        case "START_POLLING": {
-          await startPolling();
-          return { ok: true };
-        }
-        case "STOP_POLLING": {
-          stopPolling();
-          return { ok: true };
-        }
-        case "GET_LATEST_MATCH_DATA": {
-          if (!latestMatchData) {
-            await pollOnce(await readSettings());
-          }
-          return { ok: true, data: latestMatchData };
-        }
-        case "SETTINGS_UPDATED":
-        case "LIVE_MATCH_DATA_UPDATED": {
-          return { ok: true };
-        }
-        default: {
-          return { ok: false, error: "Unknown message type" };
-        }
-      }
-    } catch (error) {
-      return {
-        ok: false,
-        error: error instanceof Error ? error.message : "Unknown runtime error"
-      };
-    }
-  }
-
-  async function updateSettings(patch: Partial<ExtensionSettings>): Promise<ExtensionSettings> {
-    const settings = await writeSettings(patch);
-    broadcast({ type: "SETTINGS_UPDATED", payload: settings });
-
-    if (settings.overlayEnabled) {
-      await startPolling(settings);
-    } else {
-      stopPolling();
     }
 
-    return settings;
-  }
-
-  async function startPolling(existingSettings?: ExtensionSettings): Promise<void> {
-    const settings = existingSettings ?? (await readSettings());
-
-    if (!settings.overlayEnabled) {
-      stopPolling();
-      return;
+    function registerContentOverlay(sender?: chrome.runtime.MessageSender): void {
+        const tabId = sender?.tab?.id;
+        if (typeof tabId === 'number') {
+            contentOverlayTabIds.add(tabId);
+        }
     }
 
-    stopPolling();
-    await pollOnce(settings);
-
-    pollingTimer = setInterval(() => {
-      void pollOnce();
-    }, settings.pollingIntervalMs);
-  }
-
-  function stopPolling(): void {
-    if (pollingTimer) {
-      clearInterval(pollingTimer);
-      pollingTimer = undefined;
+    function unregisterContentOverlay(sender?: chrome.runtime.MessageSender): void {
+        const tabId = sender?.tab?.id;
+        if (typeof tabId === 'number') {
+            contentOverlayTabIds.delete(tabId);
+        }
     }
-  }
 
-  async function pollOnce(existingSettings?: ExtensionSettings): Promise<void> {
-    const settings = existingSettings ?? (await readSettings());
-    latestMatchData = await fetchLiveMatchOverlayData(settings.selectedFixtureUid);
-    broadcast({ type: "LIVE_MATCH_DATA_UPDATED", payload: latestMatchData });
-  }
+    function handleTabRemoved(tabId: number): void {
+        contentOverlayTabIds.delete(tabId);
+    }
 
-  function broadcast(message: RuntimeMessage): void {
-    void chrome.runtime.sendMessage(message).catch(() => undefined);
-  }
+    async function updateSettings(patch: Partial<ExtensionSettings>): Promise<ExtensionSettings> {
+        const settings = await writeSettings(patch);
+        broadcast({ type: 'SETTINGS_UPDATED', payload: settings });
 
-  return {
-    handleRuntimeMessage,
-    startPolling,
-    stopPolling
-  };
+        await startMatchPollingIfNeed(settings);
+
+        return settings;
+    }
+
+    async function initialize(): Promise<void> {
+        await startMatchPollingIfNeed();
+    }
+
+    async function startMatchPollingIfNeed(existingSettings?: ExtensionSettings): Promise<void> {
+        await pollingService.startMatchPollingIfNeeded(existingSettings);
+    }
+
+    function stopPolling(): void {
+        pollingService.stop();
+    }
+
+    function broadcast(message: RuntimeMessage): void {
+        void chrome.runtime.sendMessage(message).catch(() => undefined);
+        void broadcastToRegisteredContentOverlays(message);
+    }
+
+    async function broadcastToRegisteredContentOverlays(message: RuntimeMessage): Promise<void> {
+        await Promise.all(
+            [...contentOverlayTabIds].map(async (tabId) => {
+                try {
+                    await chrome.tabs.sendMessage(tabId, message);
+                } catch {
+                    contentOverlayTabIds.delete(tabId);
+                }
+            }),
+        );
+    }
+
+    return {
+        handleRuntimeMessage,
+        handleTabRemoved,
+        initialize,
+        startMatchPollingIfNeed,
+        stopPolling,
+    };
 }
