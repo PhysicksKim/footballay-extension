@@ -9,7 +9,8 @@ describe("content overlay store", () => {
       isSupportedPage: false,
       manualVisible: false,
       pageUrl: "https://example.com/watch",
-      settings: defaultSettings
+      settings: defaultSettings,
+      viewMode: "compact"
     });
   });
 
@@ -101,5 +102,11 @@ describe("content overlay store", () => {
 
     expect(selectShouldRenderOverlayControl(useContentOverlayStore.getState())).toBe(true);
     expect(selectShouldRegisterContentOverlay(useContentOverlayStore.getState())).toBe(false);
+  });
+
+  it("updates overlay view mode", () => {
+    useContentOverlayStore.getState().setViewMode("expanded");
+
+    expect(useContentOverlayStore.getState().viewMode).toBe("expanded");
   });
 });
