@@ -12,6 +12,7 @@ type ContentOverlayState = {
   manualVisible: boolean;
   pageUrl: string;
   settings: ExtensionSettings;
+  viewMode: OverlayViewMode;
 };
 
 type ContentOverlayActions = {
@@ -20,10 +21,13 @@ type ContentOverlayActions = {
   loadInitialState: () => Promise<void>;
   refreshLatestMatchData: () => Promise<void>;
   setManualVisible: (manualVisible: boolean) => void;
+  setViewMode: (viewMode: OverlayViewMode) => void;
   updateOverlaySettings: (patch: Partial<ExtensionSettings>) => Promise<void>;
 };
 
 type ContentOverlayStore = ContentOverlayState & ContentOverlayActions;
+
+export type OverlayViewMode = "compact" | "expanded";
 
 const initialPageUrl = typeof window === "undefined" ? "" : window.location.href;
 
@@ -33,6 +37,7 @@ export const useContentOverlayStore = create<ContentOverlayStore>((set, get) => 
   manualVisible: false,
   pageUrl: initialPageUrl,
   settings: defaultSettings,
+  viewMode: "compact",
 
   getPageOverlayState(override) {
     const state = get();
@@ -100,6 +105,10 @@ export const useContentOverlayStore = create<ContentOverlayStore>((set, get) => 
 
   setManualVisible(manualVisible) {
     set({ manualVisible });
+  },
+
+  setViewMode(viewMode) {
+    set({ viewMode });
   },
 
   async updateOverlaySettings(patch) {

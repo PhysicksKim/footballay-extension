@@ -8,15 +8,8 @@ type LeaguePickerProps = {
 };
 
 export function LeaguePicker({ leagues, selectedLeagueUid, onSelectLeague }: LeaguePickerProps) {
-  const selectedLeague = leagues.find((league) => league.uid === selectedLeagueUid);
-
   return (
-    <>
-      <div className="footballay-section-title">
-        <span>League</span>
-        <strong>{selectedLeague ? getLeagueLabel(selectedLeague) : "Select one"}</strong>
-      </div>
-
+    <section className="footballay-league-section">
       <div className="footballay-league-strip" role="listbox" aria-label="Leagues">
         {leagues.map((league) => {
           const selected = league.uid === selectedLeagueUid;
@@ -34,6 +27,6 @@ export function LeaguePicker({ leagues, selectedLeagueUid, onSelectLeague }: Lea
           );
         })}
       </div>
-    </>
+    </section>
   );
 }

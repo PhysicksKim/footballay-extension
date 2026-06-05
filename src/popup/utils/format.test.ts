@@ -36,7 +36,7 @@ describe("popup format utils", () => {
   });
 
   it("formats selected date", () => {
-    expect(formatSelectedDate("2026-05-25")).toBe("5.25 Mon");
+    expect(formatSelectedDate("2026-05-25")).toBe("05.25 (월)");
   });
 });
 

@@ -22,9 +22,9 @@ export function formatSelectedDate(date?: string): string {
   const selectedDate = new Date(`${date ?? getTodayDateInputValue()}T00:00:00`);
   const month = selectedDate.getMonth() + 1;
   const day = selectedDate.getDate();
-  const weekday = new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(selectedDate);
+  const weekday = new Intl.DateTimeFormat("ko-KR", { weekday: "short" }).format(selectedDate);
 
-  return `${month}.${String(day).padStart(2, "0")} ${weekday}`;
+  return `${String(month).padStart(2, "0")}.${String(day).padStart(2, "0")} (${weekday})`;
 }
 
 export function formatKickoffTime(kickoff?: string | null): string {
@@ -32,9 +32,10 @@ export function formatKickoffTime(kickoff?: string | null): string {
     return "--:--";
   }
 
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat("en-GB", {
     hour: "2-digit",
-    minute: "2-digit"
+    minute: "2-digit",
+    hour12: false
   }).format(new Date(kickoff));
 }
 

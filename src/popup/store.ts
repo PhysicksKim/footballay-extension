@@ -12,13 +12,16 @@ import {
 } from "./utils/date";
 
 type FixtureDateDirection = "previous" | "next";
+export type PopupTab = "fixtures" | "settings";
 
 type PopupStoreState = {
+  activeTab: PopupTab;
   settings: ExtensionSettings;
   data: LiveMatchOverlayData | null;
   leagues: AvailableLeague[];
   fixtures: FixtureSummary[];
   pageOverlayState: PageOverlayState | null;
+  pageOverlayStateLoading: boolean;
   loadingText: string | null;
   fixtureQueryLoading: boolean;
   error: string | null;
@@ -32,6 +35,7 @@ type PopupStoreActions = {
   refreshPageOverlayState: () => Promise<void>;
   selectFixture: (fixtureUid: string) => Promise<void>;
   selectLeague: (leagueUid: string) => Promise<void>;
+  setActiveTab: (activeTab: PopupTab) => void;
   showOverlayOnCurrentPage: () => Promise<void>;
   updateFixtureQuery: (
     patch: Partial<Pick<ExtensionSettings, "fixtureDate" | "fixtureLookupMode">>
@@ -42,11 +46,13 @@ type PopupStoreActions = {
 type PopupStore = PopupStoreState & PopupStoreActions;
 
 export const usePopupStore = create<PopupStore>((set, get) => ({
+  activeTab: "fixtures",
   settings: defaultSettings,
   data: null,
   leagues: [],
   fixtures: [],
   pageOverlayState: null,
+  pageOverlayStateLoading: true,
   loadingText: null,
   fixtureQueryLoading: false,
   error: null,
@@ -59,6 +65,10 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
     if (message.type === "LIVE_MATCH_DATA_UPDATED") {
       set({ data: message.payload });
     }
+  },
+
+  setActiveTab(activeTab) {
+    set({ activeTab });
   },
 
   async loadState() {
@@ -155,8 +165,15 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
   async selectFixture(fixtureUid) {
     set({ error: null });
 
+    if (fixtureUid === get().settings.selectedFixtureUid) {
+      await get().updateSettings({ selectedFixtureUid: undefined });
+      set({ data: null });
+      return;
+    }
+
     if (!fixtureUid) {
       await get().updateSettings({ selectedFixtureUid: undefined });
+      set({ data: null });
       return;
     }
 
@@ -208,23 +225,29 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
   },
 
   async refreshPageOverlayState() {
-    const tabResponse = await sendActiveTabMessage({ type: "GET_PAGE_OVERLAY_STATE" });
-    if (tabResponse?.ok && "pageOverlayState" in tabResponse) {
-      set({ pageOverlayState: tabResponse.pageOverlayState });
-      return;
-    }
+    set({ pageOverlayStateLoading: true });
 
-    const activeTab = await getActiveTab();
-    set({
-      pageOverlayState: activeTab?.url
-        ? {
-            isSupportedPage: isSupportedStreamingUrl(activeTab.url),
-            manualVisible: false,
-            visible: false,
-            url: activeTab.url
-          }
-        : null
-    });
+    try {
+      const tabResponse = await sendActiveTabMessage({ type: "GET_PAGE_OVERLAY_STATE" });
+      if (tabResponse?.ok && "pageOverlayState" in tabResponse) {
+        set({ pageOverlayState: tabResponse.pageOverlayState });
+        return;
+      }
+
+      const activeTab = await getActiveTab();
+      set({
+        pageOverlayState: activeTab?.url
+          ? {
+              isSupportedPage: isSupportedStreamingUrl(activeTab.url),
+              manualVisible: false,
+              visible: false,
+              url: activeTab.url
+            }
+          : null
+      });
+    } finally {
+      set({ pageOverlayStateLoading: false });
+    }
   },
 
   async showOverlayOnCurrentPage() {
@@ -240,11 +263,19 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
       return;
     }
 
+    await get().refreshPageOverlayState();
     set({ error: "This page cannot run the overlay" });
   },
 
   async hideOverlayOnCurrentPage() {
     set({ error: null });
+
+    if (get().pageOverlayState?.isSupportedPage) {
+      await get().updateSettings({ overlayEnabled: false });
+      await get().refreshPageOverlayState();
+      return;
+    }
+
     const response = await sendActiveTabMessage({ type: "HIDE_PAGE_OVERLAY" });
     if (response?.ok && "pageOverlayState" in response) {
       set({ pageOverlayState: response.pageOverlayState });

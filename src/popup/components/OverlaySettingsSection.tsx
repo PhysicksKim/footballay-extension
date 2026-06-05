@@ -13,7 +13,7 @@ export function OverlaySettingsSection({
   onChangeSettings
 }: OverlaySettingsSectionProps) {
   return (
-    <section className="footballay-popup-section">
+    <section className="footballay-settings">
       <label className="footballay-popup-field">
         <span>Position</span>
         <select
@@ -30,13 +30,13 @@ export function OverlaySettingsSection({
         </select>
       </label>
 
-      <label className="footballay-popup-check">
+      <label className="footballay-settings-row">
+        <span>Collapsed by default</span>
         <input
           checked={overlayCollapsed}
           type="checkbox"
           onChange={(event) => onChangeSettings({ overlayCollapsed: event.currentTarget.checked })}
         />
-        <span>Collapsed</span>
       </label>
     </section>
   );

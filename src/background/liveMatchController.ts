@@ -122,6 +122,10 @@ export function createLiveMatchBackgroundController(): LiveMatchBackgroundContro
         const settings = await writeSettings(patch);
         broadcast({ type: 'SETTINGS_UPDATED', payload: settings });
 
+        if ('selectedFixtureUid' in patch && !settings.selectedFixtureUid) {
+            pollingService.clearLatestMatchData();
+        }
+
         await startMatchPollingIfNeed(settings);
 
         return settings;

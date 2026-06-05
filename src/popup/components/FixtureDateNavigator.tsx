@@ -1,3 +1,4 @@
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { getTodayDateInputValue } from "../utils/date";
 import { formatSelectedDate } from "../utils/format";
 
@@ -24,10 +25,12 @@ export function FixtureDateNavigator({
         disabled={disabled}
         onClick={() => onNavigate("previous")}
       >
-        &lt;
+        <ChevronLeft aria-hidden size={24} strokeWidth={3} />
       </button>
       <label className={`footballay-date-picker${disabled ? " footballay-date-picker--loading" : ""}`}>
-        <span>{disabled ? "Loading fixtures" : formatSelectedDate(fixtureDate)}</span>
+        <span>{formatSelectedDate(fixtureDate)}</span>
+        {disabled ? <i aria-hidden className="footballay-date-spinner" /> : null}
+        <CalendarDays aria-hidden size={22} strokeWidth={2.4} />
         <input
           type="date"
           disabled={disabled}
@@ -41,7 +44,7 @@ export function FixtureDateNavigator({
         disabled={disabled}
         onClick={() => onNavigate("next")}
       >
-        &gt;
+        <ChevronRight aria-hidden size={24} strokeWidth={3} />
       </button>
     </div>
   );
