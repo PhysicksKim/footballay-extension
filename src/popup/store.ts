@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import type { AvailableLeague, FixtureLookupMode, FixtureSummary, LiveMatchOverlayData } from "@/domain/live-match/types";
 import { defaultSettings } from "@/shared/constants";
-import type { PageOverlayState, RuntimeMessage, RuntimeResponse } from "@/shared/messages";
+import type { PageOverlayState, RuntimeMessage, RuntimeResponse, RuntimeSettingsPatch } from "@/shared/messages";
 import { sendRuntimeMessage } from "@/shared/messages";
 import type { ExtensionSettings } from "@/shared/overlay/types";
 import { isSupportedStreamingUrl } from "@/shared/url";
@@ -40,7 +40,7 @@ type PopupStoreActions = {
   updateFixtureQuery: (
     patch: Partial<Pick<ExtensionSettings, "fixtureDate" | "fixtureLookupMode">>
   ) => Promise<void>;
-  updateSettings: (patch: Partial<ExtensionSettings>) => Promise<void>;
+  updateSettings: (patch: RuntimeSettingsPatch) => Promise<void>;
 };
 
 type PopupStore = PopupStoreState & PopupStoreActions;
@@ -121,7 +121,7 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
 
     if (!leagueUid) {
       set({ fixtures: [] });
-      await get().updateSettings({ selectedLeagueUid: undefined, selectedFixtureUid: undefined });
+      await get().updateSettings({ selectedLeagueUid: null, selectedFixtureUid: null });
       set({ loadingText: null });
       return;
     }
@@ -166,13 +166,13 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
     set({ error: null });
 
     if (fixtureUid === get().settings.selectedFixtureUid) {
-      await get().updateSettings({ selectedFixtureUid: undefined });
+      await get().updateSettings({ selectedFixtureUid: null });
       set({ data: null });
       return;
     }
 
     if (!fixtureUid) {
-      await get().updateSettings({ selectedFixtureUid: undefined });
+      await get().updateSettings({ selectedFixtureUid: null });
       set({ data: null });
       return;
     }
@@ -213,11 +213,11 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
         await get().updateSettings({
           ...patch,
           fixtureDate: resolvedDate,
-          selectedFixtureUid: undefined
+          selectedFixtureUid: null
         });
         set({ data: null });
       } else {
-        await get().updateSettings({ ...patch, selectedFixtureUid: undefined });
+        await get().updateSettings({ ...patch, selectedFixtureUid: null });
       }
     } finally {
       set({ fixtureQueryLoading: false });

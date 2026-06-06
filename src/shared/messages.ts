@@ -1,6 +1,14 @@
 import type { AvailableLeague, FixtureLookupMode, FixtureSummary, LiveMatchOverlayData } from "@/domain/live-match/types";
 import type { ExtensionSettings } from "@/shared/overlay/types";
 
+export type RuntimeSettingsPatch = Partial<
+  Omit<ExtensionSettings, "fixtureDate" | "selectedFixtureUid" | "selectedLeagueUid">
+> & {
+  fixtureDate?: string | null;
+  selectedFixtureUid?: string | null;
+  selectedLeagueUid?: string | null;
+};
+
 export type PageOverlayState = {
   isSupportedPage: boolean;
   manualVisible: boolean;
@@ -10,7 +18,7 @@ export type PageOverlayState = {
 
 export type RuntimeMessage =
   | { type: "GET_SETTINGS" }
-  | { type: "UPDATE_SETTINGS"; payload: Partial<ExtensionSettings> }
+  | { type: "UPDATE_SETTINGS"; payload: RuntimeSettingsPatch }
   | { type: "GET_AVAILABLE_LEAGUES" }
   | {
       type: "GET_FIXTURES_BY_LEAGUE";
