@@ -2,9 +2,10 @@ import type { AvailableLeague, FixtureLookupMode, FixtureSummary, LiveMatchOverl
 import type { ExtensionSettings } from "@/shared/overlay/types";
 
 export type RuntimeSettingsPatch = Partial<
-  Omit<ExtensionSettings, "fixtureDate" | "selectedFixtureUid" | "selectedLeagueUid">
+  Omit<ExtensionSettings, "fixtureDate" | "selectedFixtureDate" | "selectedFixtureUid" | "selectedLeagueUid">
 > & {
   fixtureDate?: string | null;
+  selectedFixtureDate?: string | null;
   selectedFixtureUid?: string | null;
   selectedLeagueUid?: string | null;
 };
@@ -38,7 +39,7 @@ export type RuntimeMessage =
         timezone: string;
       };
     }
-  | { type: "SELECT_FIXTURE"; payload: { fixtureUid: string } }
+  | { type: "SELECT_FIXTURE"; payload: { fixtureDate?: string; fixtureUid: string } }
   | { type: "START_POLLING" }
   | { type: "STOP_POLLING" }
   | { type: "GET_LATEST_MATCH_DATA" }

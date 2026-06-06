@@ -7,6 +7,7 @@ import type { ExtensionSettings } from "@/shared/overlay/types";
 import { isSupportedStreamingUrl } from "@/shared/url";
 import {
   addDaysToDateInputValue,
+  getFixtureDate,
   getFixtureDateFromFixtures,
   getTodayDateInputValue
 } from "./utils/date";
@@ -33,6 +34,7 @@ type PopupStoreActions = {
   loadState: () => Promise<void>;
   navigateFixtureDate: (direction: FixtureDateDirection) => Promise<void>;
   refreshPageOverlayState: () => Promise<void>;
+  returnToSelectedFixtureDate: () => Promise<void>;
   selectFixture: (fixtureUid: string) => Promise<void>;
   selectLeague: (leagueUid: string) => Promise<void>;
   setActiveTab: (activeTab: PopupTab) => void;
@@ -121,7 +123,7 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
 
     if (!leagueUid) {
       set({ fixtures: [] });
-      await get().updateSettings({ selectedLeagueUid: null, selectedFixtureUid: null });
+      await get().updateSettings({ selectedLeagueUid: null, selectedFixtureDate: null, selectedFixtureUid: null });
       set({ loadingText: null });
       return;
     }
@@ -166,20 +168,22 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
     set({ error: null });
 
     if (fixtureUid === get().settings.selectedFixtureUid) {
-      await get().updateSettings({ selectedFixtureUid: null });
+      await get().updateSettings({ selectedFixtureDate: null, selectedFixtureUid: null });
       set({ data: null });
       return;
     }
 
     if (!fixtureUid) {
-      await get().updateSettings({ selectedFixtureUid: null });
+      await get().updateSettings({ selectedFixtureDate: null, selectedFixtureUid: null });
       set({ data: null });
       return;
     }
 
+    const selectedFixture = get().fixtures.find((fixture) => fixture.uid === fixtureUid);
+    const selectedFixtureDate = selectedFixture ? getFixtureDate(selectedFixture) ?? getQueryDate(get().settings) : undefined;
     const response = await sendRuntimeMessage({
       type: "SELECT_FIXTURE",
-      payload: { fixtureUid }
+      payload: { fixtureUid, fixtureDate: selectedFixtureDate }
     });
 
     if (response.ok && "settings" in response) {
@@ -187,6 +191,18 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
     } else if (!response.ok) {
       set({ error: response.error });
     }
+  },
+
+  async returnToSelectedFixtureDate() {
+    const selectedFixtureDate = get().settings.selectedFixtureDate;
+    if (!selectedFixtureDate) {
+      return;
+    }
+
+    await get().updateFixtureQuery({
+      fixtureDate: selectedFixtureDate,
+      fixtureLookupMode: "exact"
+    });
   },
 
   async updateFixtureQuery(patch) {

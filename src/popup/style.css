@@ -267,6 +267,7 @@ button:disabled {
 }
 
 .footballay-date-nav {
+    position: relative;
     display: grid;
     grid-template-columns: 32px 1fr 32px;
     align-items: center;
@@ -285,6 +286,19 @@ button:disabled {
     color: #f7f8ff;
     background: rgba(31, 39, 72, 0.78);
     cursor: pointer;
+}
+
+.footballay-date-nav > .footballay-date-return {
+    position: absolute;
+    left: calc(50% + 72px);
+    top: 50%;
+    width: 24px;
+    height: 24px;
+    border: 1px solid rgba(129, 142, 255, 0.34);
+    border-radius: 8px;
+    color: #cfd5ff;
+    background: rgba(31, 39, 72, 0.7);
+    transform: translateY(-50%);
 }
 
 .footballay-date-picker {

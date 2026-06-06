@@ -21,6 +21,7 @@ export function App() {
     navigateFixtureDate,
     pageOverlayState,
     pageOverlayStateLoading,
+    returnToSelectedFixtureDate,
     selectFixture,
     selectLeague,
     setActiveTab,
@@ -65,7 +66,9 @@ export function App() {
           <FixtureDateNavigator
             disabled={fixtureQueryLoading}
             fixtureDate={settings.fixtureDate}
+            selectedFixtureDate={settings.selectedFixtureDate}
             onNavigate={(direction) => void navigateFixtureDate(direction)}
+            onReturnToSelectedFixtureDate={() => void returnToSelectedFixtureDate()}
             onSelectDate={(fixtureDate) =>
               void updateFixtureQuery({
                 fixtureDate,

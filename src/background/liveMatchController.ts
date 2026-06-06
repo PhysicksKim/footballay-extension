@@ -48,6 +48,7 @@ export function createLiveMatchBackgroundController(): LiveMatchBackgroundContro
                     const settings = await updateSettings({
                         selectedLeagueUid: message.payload.leagueUid,
                         selectedFixtureUid: undefined,
+                        selectedFixtureDate: undefined,
                         fixtureDate: message.payload.date,
                         fixtureLookupMode: message.payload.mode,
                     });
@@ -62,6 +63,7 @@ export function createLiveMatchBackgroundController(): LiveMatchBackgroundContro
                 case 'SELECT_FIXTURE': {
                     const settings = await updateSettings({
                         selectedFixtureUid: message.payload.fixtureUid,
+                        selectedFixtureDate: message.payload.fixtureDate,
                     });
                     return { ok: true, settings };
                 }

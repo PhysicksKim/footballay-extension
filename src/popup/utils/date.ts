@@ -14,6 +14,14 @@ export function getFixtureDateFromFixtures(fixtures: FixtureSummary[]): string |
   return toDateInputValue(new Date(kickoff));
 }
 
+export function getFixtureDate(fixture: FixtureSummary): string | undefined {
+  if (!fixture.kickoff) {
+    return undefined;
+  }
+
+  return toDateInputValue(new Date(fixture.kickoff));
+}
+
 export function toDateInputValue(date: Date): string {
   const timezoneOffsetMs = date.getTimezoneOffset() * 60 * 1000;
   return new Date(date.getTime() - timezoneOffsetMs).toISOString().slice(0, 10);

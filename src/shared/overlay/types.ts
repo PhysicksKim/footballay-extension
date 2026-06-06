@@ -8,6 +8,7 @@ export type OverlayPosition =
 export type ExtensionSettings = {
   selectedLeagueUid?: string;
   selectedFixtureUid?: string;
+  selectedFixtureDate?: string;
   fixtureDate?: string;
   fixtureLookupMode: "previous" | "exact" | "nearest";
   overlayEnabled: boolean;
