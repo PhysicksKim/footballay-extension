@@ -194,8 +194,7 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
 
     const nextSettings = {
       ...get().settings,
-      ...patch,
-      selectedFixtureUid: undefined
+      ...patch
     };
 
     try {
@@ -212,12 +211,10 @@ export const usePopupStore = create<PopupStore>((set, get) => ({
 
         await get().updateSettings({
           ...patch,
-          fixtureDate: resolvedDate,
-          selectedFixtureUid: null
+          fixtureDate: resolvedDate
         });
-        set({ data: null });
       } else {
-        await get().updateSettings({ ...patch, selectedFixtureUid: null });
+        await get().updateSettings(patch);
       }
     } finally {
       set({ fixtureQueryLoading: false });
