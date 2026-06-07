@@ -312,6 +312,37 @@ describe("popup components", () => {
     expect(onChangeSettings).toHaveBeenCalledWith({ overlayPosition: "top-left" });
   });
 
+  it("renders all localized overlay position options", () => {
+    render(
+      <OverlaySettingsSection
+        overlayPosition="bottom-right"
+        onChangeSettings={vi.fn()}
+      />
+    );
+
+    expect(screen.getByRole("option", { name: "왼쪽 상단" }).getAttribute("value")).toBe("top-left");
+    expect(screen.getByRole("option", { name: "오른쪽 상단" }).getAttribute("value")).toBe("top-right");
+    expect(screen.getByRole("option", { name: "왼쪽 하단" }).getAttribute("value")).toBe("bottom-left");
+    expect(screen.getByRole("option", { name: "오른쪽 하단" }).getAttribute("value")).toBe("bottom-right");
+    expect(screen.getByRole("option", { name: "하단 중앙" }).getAttribute("value")).toBe("bottom-center");
+  });
+
+  it("renders settings contact links", () => {
+    render(
+      <OverlaySettingsSection
+        overlayPosition="bottom-right"
+        onChangeSettings={vi.fn()}
+      />
+    );
+
+    expect(screen.getByRole("link", { name: "GitHub" }).getAttribute("href")).toBe(
+      "https://github.com/PhysicksKim"
+    );
+    expect(screen.getByRole("link", { name: "physickskim@gmail.com" }).getAttribute("href")).toBe(
+      "mailto:physickskim@gmail.com"
+    );
+  });
+
   it("navigates fixture dates and opens selected-date actions", async () => {
     const user = userEvent.setup();
     const onNavigate = vi.fn();
