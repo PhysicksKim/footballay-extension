@@ -10,6 +10,8 @@ import { LeaguePicker } from "./LeaguePicker";
 import { OverlaySettingsSection } from "./OverlaySettingsSection";
 import { PopupTabBar } from "./PopupTabBar";
 import { toDateInputValue } from "../utils/date";
+import { PopupView } from "../PopupView";
+import { defaultSettings } from "@/shared/constants";
 
 const fixtures: FixtureSummary[] = [
   {
@@ -55,6 +57,113 @@ afterEach(() => {
 });
 
 describe("popup components", () => {
+  it("renders popup fixtures view and forwards primary actions", async () => {
+    const user = userEvent.setup();
+    const onChangeTab = vi.fn();
+    const onSelectLeague = vi.fn();
+    const onSelectFixture = vi.fn();
+    const onNavigateFixtureDate = vi.fn();
+    const onShowOverlayOnCurrentPage = vi.fn();
+
+    render(
+      <PopupView
+        activeTab="fixtures"
+        error={null}
+        fixtureQueryLoading={false}
+        fixtures={fixtures}
+        leagues={[
+          { name: "Premier League", nameKo: "프리미어리그", uid: "league-1" },
+          { name: "World Cup", uid: "league-2" }
+        ]}
+        loadingText={null}
+        pageOverlayState={{
+          isSupportedPage: false,
+          manualVisible: false,
+          url: "https://example.com/watch",
+          visible: false
+        }}
+        pageOverlayStateLoading={false}
+        settings={{
+          ...defaultSettings,
+          fixtureDate: "2026-05-20",
+          selectedFixtureUid: "fixture-1",
+          selectedLeagueUid: "league-1"
+        }}
+        onChangeTab={onChangeTab}
+        onHideOverlayOnCurrentPage={vi.fn()}
+        onNavigateFixtureDate={onNavigateFixtureDate}
+        onReturnToSelectedFixtureDate={vi.fn()}
+        onSelectFixture={onSelectFixture}
+        onSelectFixtureDate={vi.fn()}
+        onSelectLeague={onSelectLeague}
+        onShowOverlayOnCurrentPage={onShowOverlayOnCurrentPage}
+        onUpdateSettings={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("Footballay")).toBeTruthy();
+    expect(screen.getByText("프리미어리그")).toBeTruthy();
+    expect(screen.getByText("Bournemouth")).toBeTruthy();
+
+    await user.click(screen.getByRole("button", { name: "World Cup" }));
+    await user.click(screen.getByRole("button", { name: "Next fixture date" }));
+    await user.click(screen.getByRole("checkbox", { name: "Toggle page overlay" }));
+    await user.click(screen.getByRole("button", { name: "Open settings" }));
+
+    const unselectedFixtureButton = screen.getAllByRole("button", { name: "Select fixture" })[0];
+    if (!unselectedFixtureButton) {
+      throw new Error("Expected an unselected fixture button");
+    }
+    await user.click(unselectedFixtureButton);
+
+    expect(onSelectLeague).toHaveBeenCalledWith("league-2");
+    expect(onNavigateFixtureDate).toHaveBeenCalledWith("next");
+    expect(onShowOverlayOnCurrentPage).toHaveBeenCalledTimes(1);
+    expect(onChangeTab).toHaveBeenCalledWith("settings");
+    expect(onSelectFixture).toHaveBeenCalledWith("fixture-2");
+  });
+
+  it("renders popup settings view and error state", async () => {
+    const user = userEvent.setup();
+    const onChangeTab = vi.fn();
+    const onUpdateSettings = vi.fn();
+
+    render(
+      <PopupView
+        activeTab="settings"
+        error="문제가 발생했습니다"
+        fixtureQueryLoading={false}
+        fixtures={[]}
+        leagues={[]}
+        loadingText={null}
+        pageOverlayState={null}
+        pageOverlayStateLoading={false}
+        settings={{
+          ...defaultSettings,
+          overlayPosition: "bottom-right"
+        }}
+        onChangeTab={onChangeTab}
+        onHideOverlayOnCurrentPage={vi.fn()}
+        onNavigateFixtureDate={vi.fn()}
+        onReturnToSelectedFixtureDate={vi.fn()}
+        onSelectFixture={vi.fn()}
+        onSelectFixtureDate={vi.fn()}
+        onSelectLeague={vi.fn()}
+        onShowOverlayOnCurrentPage={vi.fn()}
+        onUpdateSettings={onUpdateSettings}
+      />
+    );
+
+    expect(screen.getByText("Setting")).toBeTruthy();
+    expect(screen.getByText("문제가 발생했습니다")).toBeTruthy();
+
+    await user.selectOptions(screen.getByRole("combobox", { name: "표시 위치" }), "top-left");
+    await user.click(screen.getByRole("button", { name: "Close settings" }));
+
+    expect(onUpdateSettings).toHaveBeenCalledWith({ overlayPosition: "top-left" });
+    expect(onChangeTab).toHaveBeenCalledWith("fixtures");
+  });
+
   it("switches popup tab bar between fixtures and settings", async () => {
     const user = userEvent.setup();
     const onChangeTab = vi.fn();
