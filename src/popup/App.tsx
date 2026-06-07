@@ -1,9 +1,5 @@
 import { useEffect } from "react";
-import { FixtureDateNavigator } from "./components/FixtureDateNavigator";
-import { FixtureList } from "./components/FixtureList";
-import { LeaguePicker } from "./components/LeaguePicker";
-import { OverlaySettingsSection } from "./components/OverlaySettingsSection";
-import { PopupTabBar } from "./components/PopupTabBar";
+import { PopupView } from "./PopupView";
 import { usePopupStore } from "./store";
 import type { RuntimeMessage } from "@/shared/messages";
 
@@ -43,56 +39,30 @@ export function App() {
   }, [handleRuntimeMessage, loadState]);
 
   return (
-    <main className="footballay-popup">
-      <PopupTabBar
-        activeTab={activeTab}
-        canControlPageOverlay={pageOverlayState?.url.startsWith("http") ?? false}
-        pageOverlayPending={pageOverlayStateLoading}
-        pageOverlayVisible={pageOverlayState?.visible ?? false}
-        onChangeTab={setActiveTab}
-        onTogglePageOverlay={(visible) =>
-          void (visible ? showOverlayOnCurrentPage() : hideOverlayOnCurrentPage())
-        }
-      />
-
-      {activeTab === "fixtures" ? (
-        <section className="footballay-picker">
-          <LeaguePicker
-            leagues={leagues}
-            selectedLeagueUid={settings.selectedLeagueUid}
-            onSelectLeague={(leagueUid) => void selectLeague(leagueUid)}
-          />
-
-          <FixtureDateNavigator
-            disabled={fixtureQueryLoading}
-            fixtureDate={settings.fixtureDate}
-            selectedFixtureDate={settings.selectedFixtureDate}
-            onNavigate={(direction) => void navigateFixtureDate(direction)}
-            onReturnToSelectedFixtureDate={() => void returnToSelectedFixtureDate()}
-            onSelectDate={(fixtureDate) =>
-              void updateFixtureQuery({
-                fixtureDate,
-                fixtureLookupMode: "exact"
-              })
-            }
-          />
-
-          <FixtureList
-            fixtures={fixtures}
-            loadingText={loadingText}
-            selectedFixtureUid={settings.selectedFixtureUid}
-            selectedLeagueUid={settings.selectedLeagueUid}
-            onSelectFixture={(fixtureUid) => void selectFixture(fixtureUid)}
-          />
-        </section>
-      ) : (
-        <OverlaySettingsSection
-          overlayPosition={settings.overlayPosition}
-          onChangeSettings={(patch) => void updateSettings(patch)}
-        />
-      )}
-
-      {error ? <p className="footballay-popup-error">{error}</p> : null}
-    </main>
+    <PopupView
+      activeTab={activeTab}
+      error={error}
+      fixtureQueryLoading={fixtureQueryLoading}
+      fixtures={fixtures}
+      leagues={leagues}
+      loadingText={loadingText}
+      pageOverlayState={pageOverlayState}
+      pageOverlayStateLoading={pageOverlayStateLoading}
+      settings={settings}
+      onChangeTab={setActiveTab}
+      onHideOverlayOnCurrentPage={() => void hideOverlayOnCurrentPage()}
+      onNavigateFixtureDate={(direction) => void navigateFixtureDate(direction)}
+      onReturnToSelectedFixtureDate={() => void returnToSelectedFixtureDate()}
+      onSelectFixture={(fixtureUid) => void selectFixture(fixtureUid)}
+      onSelectFixtureDate={(fixtureDate) =>
+        void updateFixtureQuery({
+          fixtureDate,
+          fixtureLookupMode: "exact"
+        })
+      }
+      onSelectLeague={(leagueUid) => void selectLeague(leagueUid)}
+      onShowOverlayOnCurrentPage={() => void showOverlayOnCurrentPage()}
+      onUpdateSettings={(patch) => void updateSettings(patch)}
+    />
   );
 }
