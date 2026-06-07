@@ -87,7 +87,6 @@ export function App() {
         </section>
       ) : (
         <OverlaySettingsSection
-          overlayCollapsed={settings.overlayCollapsed}
           overlayPosition={settings.overlayPosition}
           onChangeSettings={(patch) => void updateSettings(patch)}
         />

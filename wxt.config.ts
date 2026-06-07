@@ -6,6 +6,20 @@ export default defineConfig({
     manifest: {
         name: 'Footballay',
         description: 'Compact live football stats overlay for streaming pages.',
+        icons: {
+            16: 'footballay_icon.png',
+            32: 'footballay_icon.png',
+            48: 'footballay_icon.png',
+            128: 'footballay_icon.png',
+        },
+        action: {
+            default_icon: {
+                16: 'footballay_icon.png',
+                32: 'footballay_icon.png',
+                48: 'footballay_icon.png',
+                128: 'footballay_icon.png',
+            },
+        },
         permissions: ['storage', 'activeTab', 'tabs'],
         host_permissions: [
             'https://api.footballay.com/*',

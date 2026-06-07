@@ -669,7 +669,8 @@ button:disabled {
 }
 
 .footballay-settings {
-    align-content: start;
+    align-content: stretch;
+    grid-template-rows: auto minmax(0, 1fr) auto;
 }
 
 .footballay-settings-card,
@@ -713,10 +714,47 @@ button:disabled {
     align-items: center;
 }
 
+.footballay-settings-row--select select {
+    width: 150px;
+    min-height: 34px;
+    border: 1px solid rgba(130, 140, 208, 0.36);
+    border-radius: 9px;
+    padding: 7px 10px;
+    color: #f7f8ff;
+    background: rgba(8, 13, 31, 0.92);
+}
+
 .footballay-settings-row input {
     width: 18px;
     height: 18px;
     accent-color: #666dff;
+}
+
+.footballay-settings-spacer {
+    min-height: 0;
+}
+
+.footballay-settings-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    border-top: 1px solid rgba(105, 116, 168, 0.28);
+    padding-top: 10px;
+    color: #8f96b6;
+}
+
+.footballay-settings-footer a {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    gap: 5px;
+    color: #b7bee2;
+    text-decoration: none;
+}
+
+.footballay-settings-footer a:hover {
+    color: #ffffff;
 }
 
 .footballay-popup-button {
