@@ -31,6 +31,21 @@ const baseFixture: FixtureSummary = {
   uid: "fixture-1"
 };
 
+const baseLeague = {
+  name: "Premier League",
+  nameKo: "프리미어리그",
+  uid: "league-1"
+};
+
+const latestMatchData = {
+  awayScore: 1,
+  awayTeamName: "Away",
+  fixtureUid: "fixture-1",
+  homeScore: 2,
+  homeTeamName: "Home",
+  updatedAt: "2026-05-20T12:00:00.000Z"
+};
+
 function resetStore() {
   usePopupStore.setState({
     activeTab: "fixtures",
@@ -69,6 +84,19 @@ function mockRuntimeResponses(fixtures: FixtureSummary[] = []) {
       };
     }
 
+    if (message.type === "SELECT_LEAGUE") {
+      return {
+        fixtures,
+        ok: true,
+        settings: {
+          ...usePopupStore.getState().settings,
+          fixtureDate: message.payload.date,
+          fixtureLookupMode: message.payload.mode,
+          selectedLeagueUid: message.payload.leagueUid
+        }
+      };
+    }
+
     if (message.type === "SELECT_FIXTURE") {
       return {
         ok: true,
@@ -84,10 +112,141 @@ function mockRuntimeResponses(fixtures: FixtureSummary[] = []) {
   });
 }
 
+function mockInitialLoadResponses(fixtures: FixtureSummary[] = []) {
+  sendRuntimeMessageMock.mockImplementation(async (message: RuntimeMessage): Promise<RuntimeResponse> => {
+    if (message.type === "GET_SETTINGS") {
+      return {
+        ok: true,
+        settings: {
+          ...defaultSettings,
+          fixtureDate: "2026-05-20",
+          selectedLeagueUid: "league-1"
+        }
+      };
+    }
+
+    if (message.type === "GET_LATEST_MATCH_DATA") {
+      return {
+        data: latestMatchData,
+        ok: true
+      };
+    }
+
+    if (message.type === "GET_AVAILABLE_LEAGUES") {
+      return {
+        leagues: [baseLeague],
+        ok: true
+      };
+    }
+
+    if (message.type === "GET_FIXTURES_BY_LEAGUE") {
+      return {
+        fixtures,
+        ok: true
+      };
+    }
+
+    return { ok: true };
+  });
+}
+
+function mockActiveTab(url: string | null = "https://example.com/watch") {
+  globalThis.chrome = {
+    tabs: {
+      query: vi.fn().mockResolvedValue(url ? [{ id: 1, url }] : []),
+      sendMessage: vi.fn().mockRejectedValue(new Error("No content script"))
+    }
+  } as unknown as typeof chrome;
+}
+
 describe("popup store", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     resetStore();
+    mockActiveTab();
+  });
+
+  it("loads settings, latest match data, leagues, fixtures, and page overlay state", async () => {
+    mockInitialLoadResponses([baseFixture]);
+
+    await usePopupStore.getState().loadState();
+
+    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({ type: "GET_SETTINGS" });
+    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({ type: "GET_LATEST_MATCH_DATA" });
+    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({ type: "GET_AVAILABLE_LEAGUES" });
+    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({
+      type: "GET_FIXTURES_BY_LEAGUE",
+      payload: {
+        date: "2026-05-20",
+        leagueUid: "league-1",
+        mode: "nearest",
+        timezone: expect.any(String)
+      }
+    });
+    expect(usePopupStore.getState()).toMatchObject({
+      data: latestMatchData,
+      fixtures: [baseFixture],
+      leagues: [baseLeague],
+      loadingText: null,
+      pageOverlayState: {
+        isSupportedPage: false,
+        manualVisible: false,
+        url: "https://example.com/watch",
+        visible: false
+      },
+      pageOverlayStateLoading: false,
+      settings: {
+        fixtureDate: "2026-05-20",
+        selectedLeagueUid: "league-1"
+      }
+    });
+  });
+
+  it("applies runtime setting and match data broadcasts", () => {
+    usePopupStore.getState().handleRuntimeMessage({
+      payload: {
+        ...defaultSettings,
+        overlayEnabled: false
+      },
+      type: "SETTINGS_UPDATED"
+    });
+    usePopupStore.getState().handleRuntimeMessage({
+      payload: latestMatchData,
+      type: "LIVE_MATCH_DATA_UPDATED"
+    });
+
+    expect(usePopupStore.getState().settings.overlayEnabled).toBe(false);
+    expect(usePopupStore.getState().data).toEqual(latestMatchData);
+  });
+
+  it("selects a league with nearest lookup and syncs the resolved fixture date", async () => {
+    mockRuntimeResponses([baseFixture]);
+
+    await usePopupStore.getState().selectLeague("league-1");
+
+    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({
+      type: "SELECT_LEAGUE",
+      payload: {
+        date: expect.stringMatching(/^\d{4}-\d{2}-\d{2}$/),
+        leagueUid: "league-1",
+        mode: "nearest",
+        timezone: expect.any(String)
+      }
+    });
+    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({
+      type: "UPDATE_SETTINGS",
+      payload: {
+        fixtureDate: "2026-05-20"
+      }
+    });
+    expect(usePopupStore.getState()).toMatchObject({
+      fixtures: [baseFixture],
+      loadingText: null,
+      settings: {
+        fixtureDate: "2026-05-20",
+        selectedLeagueUid: "league-1"
+      }
+    });
   });
 
   it("keeps the selected fixture while browsing another date", async () => {
