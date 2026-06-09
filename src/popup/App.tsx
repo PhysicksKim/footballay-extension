@@ -1,68 +1,42 @@
 import { useEffect } from "react";
 import { PopupView } from "./PopupView";
-import { usePopupStore } from "./store";
+import { useFixtureScheduleState } from "./hooks/useFixtureScheduleState";
+import { useFixtureSelectionState } from "./hooks/useFixtureSelectionState";
+import { useLeaguePickerState } from "./hooks/useLeaguePickerState";
+import { useOverlaySettingsState } from "./hooks/useOverlaySettingsState";
+import { usePageOverlayControl } from "./hooks/usePageOverlayControl";
+import { usePopupLifecycle } from "./hooks/usePopupLifecycle";
+import { usePopupShell } from "./hooks/usePopupShell";
 import type { RuntimeMessage } from "@/shared/messages";
 
 export function App() {
-  const {
-    activeTab,
-    error,
-    fixtureQueryLoading,
-    fixtures,
-    handleRuntimeMessage,
-    hideOverlayOnCurrentPage,
-    leagues,
-    loadingText,
-    loadState,
-    navigateFixtureDate,
-    pageOverlayState,
-    pageOverlayStateLoading,
-    returnToSelectedFixtureDate,
-    selectFixture,
-    selectLeague,
-    setActiveTab,
-    settings,
-    showOverlayOnCurrentPage,
-    updateFixtureQuery,
-    updateSettings
-  } = usePopupStore();
+  const lifecycle = usePopupLifecycle();
+  const shell = usePopupShell();
+  const leaguePicker = useLeaguePickerState();
+  const fixtureSchedule = useFixtureScheduleState();
+  const fixtureSelection = useFixtureSelectionState();
+  const pageOverlay = usePageOverlayControl();
+  const overlaySettings = useOverlaySettingsState();
 
   useEffect(() => {
-    void loadState();
+    lifecycle.loadState();
 
     const listener = (message: RuntimeMessage) => {
-      handleRuntimeMessage(message);
+      lifecycle.handleRuntimeMessage(message);
     };
 
     chrome.runtime.onMessage.addListener(listener);
     return () => chrome.runtime.onMessage.removeListener(listener);
-  }, [handleRuntimeMessage, loadState]);
+  }, [lifecycle]);
 
   return (
     <PopupView
-      activeTab={activeTab}
-      error={error}
-      fixtureQueryLoading={fixtureQueryLoading}
-      fixtures={fixtures}
-      leagues={leagues}
-      loadingText={loadingText}
-      pageOverlayState={pageOverlayState}
-      pageOverlayStateLoading={pageOverlayStateLoading}
-      settings={settings}
-      onChangeTab={setActiveTab}
-      onHideOverlayOnCurrentPage={() => void hideOverlayOnCurrentPage()}
-      onNavigateFixtureDate={(direction) => void navigateFixtureDate(direction)}
-      onReturnToSelectedFixtureDate={() => void returnToSelectedFixtureDate()}
-      onSelectFixture={(fixtureUid) => void selectFixture(fixtureUid)}
-      onSelectFixtureDate={(fixtureDate) =>
-        void updateFixtureQuery({
-          fixtureDate,
-          fixtureLookupMode: "exact"
-        })
-      }
-      onSelectLeague={(leagueUid) => void selectLeague(leagueUid)}
-      onShowOverlayOnCurrentPage={() => void showOverlayOnCurrentPage()}
-      onUpdateSettings={(patch) => void updateSettings(patch)}
+      fixtureSchedule={fixtureSchedule}
+      fixtureSelection={fixtureSelection}
+      leaguePicker={leaguePicker}
+      overlaySettings={overlaySettings}
+      pageOverlay={pageOverlay}
+      shell={shell}
     />
   );
 }

@@ -1,100 +1,114 @@
 import type { AvailableLeague, FixtureSummary } from "@/domain/live-match/types";
-import type { PageOverlayState, RuntimeSettingsPatch } from "@/shared/messages";
 import type { ExtensionSettings } from "@/shared/overlay/types";
 import { FixtureDateNavigator } from "./components/FixtureDateNavigator";
 import { FixtureList } from "./components/FixtureList";
 import { LeaguePicker } from "./components/LeaguePicker";
 import { OverlaySettingsSection } from "./components/OverlaySettingsSection";
 import { PopupTabBar } from "./components/PopupTabBar";
-import type { PopupTab } from "./store";
+import type { FixtureDateDirection, PopupTab } from "./store";
 
-type PopupViewProps = {
+export type PopupShellViewModel = {
   activeTab: PopupTab;
   error: string | null;
-  fixtureQueryLoading: boolean;
-  fixtures: FixtureSummary[];
-  leagues: AvailableLeague[];
-  loadingText: string | null;
-  pageOverlayState: PageOverlayState | null;
-  pageOverlayStateLoading: boolean;
-  settings: ExtensionSettings;
   onChangeTab: (activeTab: PopupTab) => void;
-  onHideOverlayOnCurrentPage: () => void;
-  onNavigateFixtureDate: (direction: "previous" | "next") => void;
-  onReturnToSelectedFixtureDate: () => void;
-  onSelectFixture: (fixtureUid: string) => void;
-  onSelectFixtureDate: (fixtureDate?: string) => void;
+};
+
+export type LeaguePickerViewModel = {
+  leagues: AvailableLeague[];
+  selectedLeagueUid?: string;
   onSelectLeague: (leagueUid: string) => void;
-  onShowOverlayOnCurrentPage: () => void;
-  onUpdateSettings: (patch: RuntimeSettingsPatch) => void;
+};
+
+export type FixtureScheduleViewModel = {
+  disabled: boolean;
+  fixtureDate?: string;
+  selectedFixtureDate?: string;
+  onNavigate: (direction: FixtureDateDirection) => void;
+  onReturnToSelectedFixtureDate: () => void;
+  onSelectDate: (fixtureDate?: string) => void;
+};
+
+export type FixtureSelectionViewModel = {
+  fixtures: FixtureSummary[];
+  loadingText: string | null;
+  selectedFixtureUid?: string;
+  selectedLeagueUid?: string;
+  onSelectFixture: (fixtureUid: string) => void;
+};
+
+export type PageOverlayViewModel = {
+  canControl: boolean;
+  pending: boolean;
+  visible: boolean;
+  onToggle: (visible: boolean) => void;
+};
+
+export type OverlaySettingsViewModel = {
+  overlayPosition: ExtensionSettings["overlayPosition"];
+  onChangeSettings: (patch: Partial<ExtensionSettings>) => void;
+};
+
+type PopupViewProps = {
+  fixtureSchedule: FixtureScheduleViewModel;
+  fixtureSelection: FixtureSelectionViewModel;
+  leaguePicker: LeaguePickerViewModel;
+  overlaySettings: OverlaySettingsViewModel;
+  pageOverlay: PageOverlayViewModel;
+  shell: PopupShellViewModel;
 };
 
 export function PopupView({
-  activeTab,
-  error,
-  fixtureQueryLoading,
-  fixtures,
-  leagues,
-  loadingText,
-  pageOverlayState,
-  pageOverlayStateLoading,
-  settings,
-  onChangeTab,
-  onHideOverlayOnCurrentPage,
-  onNavigateFixtureDate,
-  onReturnToSelectedFixtureDate,
-  onSelectFixture,
-  onSelectFixtureDate,
-  onSelectLeague,
-  onShowOverlayOnCurrentPage,
-  onUpdateSettings
+  fixtureSchedule,
+  fixtureSelection,
+  leaguePicker,
+  overlaySettings,
+  pageOverlay,
+  shell
 }: PopupViewProps) {
   return (
     <main className="footballay-popup">
       <PopupTabBar
-        activeTab={activeTab}
-        canControlPageOverlay={pageOverlayState?.url.startsWith("http") ?? false}
-        pageOverlayPending={pageOverlayStateLoading}
-        pageOverlayVisible={pageOverlayState?.visible ?? false}
-        onChangeTab={onChangeTab}
-        onTogglePageOverlay={(visible) =>
-          visible ? onShowOverlayOnCurrentPage() : onHideOverlayOnCurrentPage()
-        }
+        activeTab={shell.activeTab}
+        canControlPageOverlay={pageOverlay.canControl}
+        pageOverlayPending={pageOverlay.pending}
+        pageOverlayVisible={pageOverlay.visible}
+        onChangeTab={shell.onChangeTab}
+        onTogglePageOverlay={pageOverlay.onToggle}
       />
 
-      {activeTab === "fixtures" ? (
+      {shell.activeTab === "fixtures" ? (
         <section className="footballay-picker">
           <LeaguePicker
-            leagues={leagues}
-            selectedLeagueUid={settings.selectedLeagueUid}
-            onSelectLeague={onSelectLeague}
+            leagues={leaguePicker.leagues}
+            selectedLeagueUid={leaguePicker.selectedLeagueUid}
+            onSelectLeague={leaguePicker.onSelectLeague}
           />
 
           <FixtureDateNavigator
-            disabled={fixtureQueryLoading}
-            fixtureDate={settings.fixtureDate}
-            selectedFixtureDate={settings.selectedFixtureDate}
-            onNavigate={onNavigateFixtureDate}
-            onReturnToSelectedFixtureDate={onReturnToSelectedFixtureDate}
-            onSelectDate={onSelectFixtureDate}
+            disabled={fixtureSchedule.disabled}
+            fixtureDate={fixtureSchedule.fixtureDate}
+            selectedFixtureDate={fixtureSchedule.selectedFixtureDate}
+            onNavigate={fixtureSchedule.onNavigate}
+            onReturnToSelectedFixtureDate={fixtureSchedule.onReturnToSelectedFixtureDate}
+            onSelectDate={fixtureSchedule.onSelectDate}
           />
 
           <FixtureList
-            fixtures={fixtures}
-            loadingText={loadingText}
-            selectedFixtureUid={settings.selectedFixtureUid}
-            selectedLeagueUid={settings.selectedLeagueUid}
-            onSelectFixture={onSelectFixture}
+            fixtures={fixtureSelection.fixtures}
+            loadingText={fixtureSelection.loadingText}
+            selectedFixtureUid={fixtureSelection.selectedFixtureUid}
+            selectedLeagueUid={fixtureSelection.selectedLeagueUid}
+            onSelectFixture={fixtureSelection.onSelectFixture}
           />
         </section>
       ) : (
         <OverlaySettingsSection
-          overlayPosition={settings.overlayPosition}
-          onChangeSettings={onUpdateSettings}
+          overlayPosition={overlaySettings.overlayPosition}
+          onChangeSettings={overlaySettings.onChangeSettings}
         />
       )}
 
-      {error ? <p className="footballay-popup-error">{error}</p> : null}
+      {shell.error ? <p className="footballay-popup-error">{shell.error}</p> : null}
     </main>
   );
 }

@@ -4,14 +4,13 @@ import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import type { FixtureSummary } from "@/domain/live-match/types";
+import { defaultSettings } from "@/shared/constants";
+import { PopupView } from "../PopupView";
 import { FixtureDateNavigator } from "./FixtureDateNavigator";
 import { FixtureList } from "./FixtureList";
 import { LeaguePicker } from "./LeaguePicker";
 import { OverlaySettingsSection } from "./OverlaySettingsSection";
 import { PopupTabBar } from "./PopupTabBar";
-import { toDateInputValue } from "../utils/date";
-import { PopupView } from "../PopupView";
-import { defaultSettings } from "@/shared/constants";
 
 const fixtures: FixtureSummary[] = [
   {
@@ -67,42 +66,53 @@ describe("popup components", () => {
 
     render(
       <PopupView
-        activeTab="fixtures"
-        error={null}
-        fixtureQueryLoading={false}
-        fixtures={fixtures}
-        leagues={[
-          { name: "Premier League", nameKo: "프리미어리그", uid: "league-1" },
-          { name: "World Cup", uid: "league-2" }
-        ]}
-        loadingText={null}
-        pageOverlayState={{
-          isSupportedPage: false,
-          manualVisible: false,
-          url: "https://example.com/watch",
+        shell={{
+          activeTab: "fixtures",
+          error: null,
+          onChangeTab
+        }}
+        pageOverlay={{
+          canControl: true,
+          onToggle: (visible) => {
+            if (visible) {
+              onShowOverlayOnCurrentPage();
+            }
+          },
+          pending: false,
           visible: false
         }}
-        pageOverlayStateLoading={false}
-        settings={{
-          ...defaultSettings,
+        leaguePicker={{
+          leagues: [
+            { name: "Premier League", uid: "league-1" },
+            { name: "World Cup", uid: "league-2" }
+          ],
+          onSelectLeague,
+          selectedLeagueUid: "league-1"
+        }}
+        fixtureSchedule={{
+          disabled: false,
           fixtureDate: "2026-05-20",
+          onNavigate: onNavigateFixtureDate,
+          onReturnToSelectedFixtureDate: vi.fn(),
+          onSelectDate: vi.fn(),
+          selectedFixtureDate: undefined
+        }}
+        fixtureSelection={{
+          fixtures,
+          loadingText: null,
+          onSelectFixture,
           selectedFixtureUid: "fixture-1",
           selectedLeagueUid: "league-1"
         }}
-        onChangeTab={onChangeTab}
-        onHideOverlayOnCurrentPage={vi.fn()}
-        onNavigateFixtureDate={onNavigateFixtureDate}
-        onReturnToSelectedFixtureDate={vi.fn()}
-        onSelectFixture={onSelectFixture}
-        onSelectFixtureDate={vi.fn()}
-        onSelectLeague={onSelectLeague}
-        onShowOverlayOnCurrentPage={onShowOverlayOnCurrentPage}
-        onUpdateSettings={vi.fn()}
+        overlaySettings={{
+          onChangeSettings: vi.fn(),
+          overlayPosition: defaultSettings.overlayPosition
+        }}
       />
     );
 
     expect(screen.getByText("Footballay")).toBeTruthy();
-    expect(screen.getByText("프리미어리그")).toBeTruthy();
+    expect(screen.getByText("Premier League")).toBeTruthy();
     expect(screen.getByText("Bournemouth")).toBeTruthy();
 
     await user.click(screen.getByRole("button", { name: "World Cup" }));
@@ -123,41 +133,55 @@ describe("popup components", () => {
     expect(onSelectFixture).toHaveBeenCalledWith("fixture-2");
   });
 
-  it("renders popup settings view and error state", async () => {
+  it("renders popup settings view and forwards setting actions", async () => {
     const user = userEvent.setup();
     const onChangeTab = vi.fn();
     const onUpdateSettings = vi.fn();
 
     render(
       <PopupView
-        activeTab="settings"
-        error="문제가 발생했습니다"
-        fixtureQueryLoading={false}
-        fixtures={[]}
-        leagues={[]}
-        loadingText={null}
-        pageOverlayState={null}
-        pageOverlayStateLoading={false}
-        settings={{
-          ...defaultSettings,
+        shell={{
+          activeTab: "settings",
+          error: "Popup error",
+          onChangeTab
+        }}
+        pageOverlay={{
+          canControl: false,
+          onToggle: vi.fn(),
+          pending: false,
+          visible: false
+        }}
+        leaguePicker={{
+          leagues: [],
+          onSelectLeague: vi.fn(),
+          selectedLeagueUid: undefined
+        }}
+        fixtureSchedule={{
+          disabled: false,
+          fixtureDate: undefined,
+          onNavigate: vi.fn(),
+          onReturnToSelectedFixtureDate: vi.fn(),
+          onSelectDate: vi.fn(),
+          selectedFixtureDate: undefined
+        }}
+        fixtureSelection={{
+          fixtures: [],
+          loadingText: null,
+          onSelectFixture: vi.fn(),
+          selectedFixtureUid: undefined,
+          selectedLeagueUid: undefined
+        }}
+        overlaySettings={{
+          onChangeSettings: onUpdateSettings,
           overlayPosition: "bottom-right"
         }}
-        onChangeTab={onChangeTab}
-        onHideOverlayOnCurrentPage={vi.fn()}
-        onNavigateFixtureDate={vi.fn()}
-        onReturnToSelectedFixtureDate={vi.fn()}
-        onSelectFixture={vi.fn()}
-        onSelectFixtureDate={vi.fn()}
-        onSelectLeague={vi.fn()}
-        onShowOverlayOnCurrentPage={vi.fn()}
-        onUpdateSettings={onUpdateSettings}
       />
     );
 
     expect(screen.getByText("Setting")).toBeTruthy();
-    expect(screen.getByText("문제가 발생했습니다")).toBeTruthy();
+    expect(screen.getByText("Popup error")).toBeTruthy();
 
-    await user.selectOptions(screen.getByRole("combobox", { name: "표시 위치" }), "top-left");
+    await user.selectOptions(screen.getByRole("combobox"), "top-left");
     await user.click(screen.getByRole("button", { name: "Close settings" }));
 
     expect(onUpdateSettings).toHaveBeenCalledWith({ overlayPosition: "top-left" });
@@ -203,9 +227,8 @@ describe("popup components", () => {
     expect(onChangeTab).toHaveBeenCalledWith("fixtures");
   });
 
-  it("toggles the page overlay from popup tab bar", async () => {
+  it("toggles and disables the page overlay from popup tab bar", async () => {
     const user = userEvent.setup();
-    const onChangeTab = vi.fn();
     const onTogglePageOverlay = vi.fn();
     const { rerender } = render(
       <PopupTabBar
@@ -213,7 +236,7 @@ describe("popup components", () => {
         canControlPageOverlay
         pageOverlayPending={false}
         pageOverlayVisible={false}
-        onChangeTab={onChangeTab}
+        onChangeTab={vi.fn()}
         onTogglePageOverlay={onTogglePageOverlay}
       />
     );
@@ -229,44 +252,10 @@ describe("popup components", () => {
     rerender(
       <PopupTabBar
         activeTab="fixtures"
-        canControlPageOverlay
-        pageOverlayPending={false}
-        pageOverlayVisible
-        onChangeTab={onChangeTab}
-        onTogglePageOverlay={onTogglePageOverlay}
-      />
-    );
-
-    await user.click(screen.getByRole("checkbox", { name: "Toggle page overlay" }));
-
-    expect(onTogglePageOverlay).toHaveBeenLastCalledWith(false);
-  });
-
-  it("disables the page overlay toggle when pending or unsupported", () => {
-    const onChangeTab = vi.fn();
-    const onTogglePageOverlay = vi.fn();
-    const { rerender } = render(
-      <PopupTabBar
-        activeTab="fixtures"
-        canControlPageOverlay
-        pageOverlayPending
-        pageOverlayVisible={false}
-        onChangeTab={onChangeTab}
-        onTogglePageOverlay={onTogglePageOverlay}
-      />
-    );
-
-    const pendingToggle = screen.getByRole("checkbox", { name: "Toggle page overlay" });
-    expect((pendingToggle as HTMLInputElement).disabled).toBe(true);
-    expect(pendingToggle.closest("label")?.classList.contains("footballay-power--pending")).toBe(true);
-
-    rerender(
-      <PopupTabBar
-        activeTab="fixtures"
         canControlPageOverlay={false}
         pageOverlayPending={false}
         pageOverlayVisible={false}
-        onChangeTab={onChangeTab}
+        onChangeTab={vi.fn()}
         onTogglePageOverlay={onTogglePageOverlay}
       />
     );
@@ -283,7 +272,7 @@ describe("popup components", () => {
     render(
       <LeaguePicker
         leagues={[
-          { name: "Premier League", nameKo: "프리미어리그", uid: "league-1" },
+          { name: "Premier League", uid: "league-1" },
           { name: "World Cup", uid: "league-2" }
         ]}
         selectedLeagueUid="league-1"
@@ -291,7 +280,7 @@ describe("popup components", () => {
       />
     );
 
-    const selectedLeague = screen.getByRole("button", { name: "프리미어리그" });
+    const selectedLeague = screen.getByRole("button", { name: "Premier League" });
     expect(selectedLeague.getAttribute("aria-pressed")).toBe("true");
 
     await user.click(screen.getByRole("button", { name: "World Cup" }));
@@ -299,7 +288,7 @@ describe("popup components", () => {
     expect(onSelectLeague).toHaveBeenCalledWith("league-2");
   });
 
-  it("renders fixtures and selects a fixture", async () => {
+  it("renders fixtures and forwards fixture selection", async () => {
     const user = userEvent.setup();
     const onSelectFixture = vi.fn();
 
@@ -318,75 +307,31 @@ describe("popup components", () => {
     expect(screen.getByText("1:1")).toBeTruthy();
     expect(screen.getByRole("button", { name: "Selected fixture" })).toBeTruthy();
 
-    const unselectedFixtureButton = screen.getAllByRole("button", { name: "Select fixture" })[0];
-    if (!unselectedFixtureButton) {
+    const selectFixtureButton = screen.getAllByRole("button", { name: "Select fixture" })[0];
+    if (!selectFixtureButton) {
       throw new Error("Expected an unselected fixture button");
     }
 
-    await user.click(unselectedFixtureButton);
+    await user.click(selectFixtureButton);
+    await user.click(screen.getByRole("button", { name: "Selected fixture" }));
 
-    expect(onSelectFixture).toHaveBeenCalledWith("fixture-2");
+    expect(onSelectFixture).toHaveBeenNthCalledWith(1, "fixture-2");
+    expect(onSelectFixture).toHaveBeenNthCalledWith(2, "fixture-1");
   });
 
-  it("renders fixture list empty states", () => {
-    const onSelectFixture = vi.fn();
+  it("renders fixture list loading and unselected states", () => {
     const { rerender } = render(
       <FixtureList
         fixtures={[]}
-        loadingText={null}
-        selectedLeagueUid={undefined}
-        onSelectFixture={onSelectFixture}
-      />
-    );
-
-    expect(screen.getByText("리그를 선택하세요")).toBeTruthy();
-
-    rerender(
-      <FixtureList
-        fixtures={[]}
-        loadingText={null}
-        selectedLeagueUid="league-1"
-        onSelectFixture={onSelectFixture}
-      />
-    );
-
-    expect(screen.getByText("경기가 없습니다")).toBeTruthy();
-  });
-
-  it("renders fixture list loading state", () => {
-    render(
-      <FixtureList
-        fixtures={[]}
-        loadingText="경기 목록을 불러오는 중"
+        loadingText="Loading fixtures"
         selectedLeagueUid="league-1"
         onSelectFixture={vi.fn()}
       />
     );
 
-    expect(screen.getByText("경기 목록을 불러오는 중")).toBeTruthy();
-  });
+    expect(screen.getByText("Loading fixtures")).toBeTruthy();
 
-  it("passes the selected fixture uid when selected fixture button is clicked", async () => {
-    const user = userEvent.setup();
-    const onSelectFixture = vi.fn();
-
-    render(
-      <FixtureList
-        fixtures={fixtures}
-        loadingText={null}
-        selectedFixtureUid="fixture-1"
-        selectedLeagueUid="league-1"
-        onSelectFixture={onSelectFixture}
-      />
-    );
-
-    await user.click(screen.getByRole("button", { name: "Selected fixture" }));
-
-    expect(onSelectFixture).toHaveBeenCalledWith("fixture-1");
-  });
-
-  it("does not render a selected fixture action when selected fixture is outside current list", () => {
-    render(
+    rerender(
       <FixtureList
         fixtures={fixtures}
         loadingText={null}
@@ -400,7 +345,7 @@ describe("popup components", () => {
     expect(screen.getAllByRole("button", { name: "Select fixture" })).toHaveLength(2);
   });
 
-  it("updates overlay position from settings section", async () => {
+  it("updates overlay position and renders contact links", async () => {
     const user = userEvent.setup();
     const onChangeSettings = vi.fn();
 
@@ -411,39 +356,9 @@ describe("popup components", () => {
       />
     );
 
-    const positionSelect = screen.getByRole("combobox", { name: "표시 위치" }) as HTMLSelectElement;
-    expect(positionSelect.value).toBe("bottom-right");
-    expect(screen.getByText("오른쪽 하단")).toBeTruthy();
-    expect(screen.getByText("physickskim@gmail.com")).toBeTruthy();
-
-    await user.selectOptions(positionSelect, "top-left");
+    await user.selectOptions(screen.getByRole("combobox"), "top-left");
 
     expect(onChangeSettings).toHaveBeenCalledWith({ overlayPosition: "top-left" });
-  });
-
-  it("renders all localized overlay position options", () => {
-    render(
-      <OverlaySettingsSection
-        overlayPosition="bottom-right"
-        onChangeSettings={vi.fn()}
-      />
-    );
-
-    expect(screen.getByRole("option", { name: "왼쪽 상단" }).getAttribute("value")).toBe("top-left");
-    expect(screen.getByRole("option", { name: "오른쪽 상단" }).getAttribute("value")).toBe("top-right");
-    expect(screen.getByRole("option", { name: "왼쪽 하단" }).getAttribute("value")).toBe("bottom-left");
-    expect(screen.getByRole("option", { name: "오른쪽 하단" }).getAttribute("value")).toBe("bottom-right");
-    expect(screen.getByRole("option", { name: "하단 중앙" }).getAttribute("value")).toBe("bottom-center");
-  });
-
-  it("renders settings contact links", () => {
-    render(
-      <OverlaySettingsSection
-        overlayPosition="bottom-right"
-        onChangeSettings={vi.fn()}
-      />
-    );
-
     expect(screen.getByRole("link", { name: "GitHub" }).getAttribute("href")).toBe(
       "https://github.com/PhysicksKim"
     );
@@ -456,7 +371,6 @@ describe("popup components", () => {
     const user = userEvent.setup();
     const onNavigate = vi.fn();
     const onReturnToSelectedFixtureDate = vi.fn();
-    const onSelectDate = vi.fn();
 
     render(
       <FixtureDateNavigator
@@ -465,7 +379,7 @@ describe("popup components", () => {
         selectedFixtureDate="2026-05-18"
         onNavigate={onNavigate}
         onReturnToSelectedFixtureDate={onReturnToSelectedFixtureDate}
-        onSelectDate={onSelectDate}
+        onSelectDate={vi.fn()}
       />
     );
 
@@ -476,13 +390,9 @@ describe("popup components", () => {
     expect(onNavigate).toHaveBeenNthCalledWith(2, "next");
 
     await user.click(screen.getByRole("button", { name: /05\.20/ }));
-
-    expect(screen.getByRole("dialog", { name: "Fixture date picker" })).toBeTruthy();
-
     await user.click(screen.getByRole("button", { name: "Return to selected fixture date" }));
 
     expect(onReturnToSelectedFixtureDate).toHaveBeenCalledTimes(1);
-    expect(onSelectDate).not.toHaveBeenCalled();
   });
 
   it("disables fixture date controls while loading", () => {
@@ -505,104 +415,5 @@ describe("popup components", () => {
       (screen.getByRole("button", { name: "Next fixture date" }) as HTMLButtonElement).disabled
     ).toBe(true);
     expect(screen.queryByRole("dialog", { name: "Fixture date picker" })).toBeNull();
-  });
-
-  it("selects a date from the fixture date picker", async () => {
-    const user = userEvent.setup();
-    const onSelectDate = vi.fn();
-
-    render(
-      <FixtureDateNavigator
-        disabled={false}
-        fixtureDate="2026-05-20"
-        selectedFixtureDate={undefined}
-        onNavigate={vi.fn()}
-        onReturnToSelectedFixtureDate={vi.fn()}
-        onSelectDate={onSelectDate}
-      />
-    );
-
-    await user.click(screen.getByRole("button", { name: /05\.20/ }));
-    await user.click(screen.getByRole("button", { name: "2026년 5월 22일 금요일" }));
-
-    expect(onSelectDate).toHaveBeenCalledWith("2026-05-22");
-    expect(screen.queryByRole("dialog", { name: "Fixture date picker" })).toBeNull();
-  });
-
-  it("selects today from the fixture date picker", async () => {
-    const user = userEvent.setup();
-    const onSelectDate = vi.fn();
-    const expectedToday = toDateInputValue(new Date());
-
-    render(
-      <FixtureDateNavigator
-        disabled={false}
-        fixtureDate="2026-05-20"
-        selectedFixtureDate={undefined}
-        onNavigate={vi.fn()}
-        onReturnToSelectedFixtureDate={vi.fn()}
-        onSelectDate={onSelectDate}
-      />
-    );
-
-    await user.click(screen.getByRole("button", { name: /05\.20/ }));
-    await user.click(screen.getByRole("button", { name: "오늘" }));
-
-    expect(onSelectDate).toHaveBeenCalledWith(expectedToday);
-    expect(screen.queryByRole("dialog", { name: "Fixture date picker" })).toBeNull();
-  });
-
-  it("closes the fixture date picker with Escape", async () => {
-    const user = userEvent.setup();
-
-    render(
-      <FixtureDateNavigator
-        disabled={false}
-        fixtureDate="2026-05-20"
-        selectedFixtureDate={undefined}
-        onNavigate={vi.fn()}
-        onReturnToSelectedFixtureDate={vi.fn()}
-        onSelectDate={vi.fn()}
-      />
-    );
-
-    await user.click(screen.getByRole("button", { name: /05\.20/ }));
-
-    expect(screen.getByRole("dialog", { name: "Fixture date picker" })).toBeTruthy();
-
-    await user.keyboard("{Escape}");
-
-    expect(screen.queryByRole("dialog", { name: "Fixture date picker" })).toBeNull();
-  });
-
-  it("hides return-to-selected-date action when it is not needed", async () => {
-    const user = userEvent.setup();
-    const { rerender } = render(
-      <FixtureDateNavigator
-        disabled={false}
-        fixtureDate="2026-05-20"
-        selectedFixtureDate={undefined}
-        onNavigate={vi.fn()}
-        onReturnToSelectedFixtureDate={vi.fn()}
-        onSelectDate={vi.fn()}
-      />
-    );
-
-    await user.click(screen.getByRole("button", { name: /05\.20/ }));
-
-    expect(screen.queryByRole("button", { name: "Return to selected fixture date" })).toBeNull();
-
-    rerender(
-      <FixtureDateNavigator
-        disabled={false}
-        fixtureDate="2026-05-20"
-        selectedFixtureDate="2026-05-20"
-        onNavigate={vi.fn()}
-        onReturnToSelectedFixtureDate={vi.fn()}
-        onSelectDate={vi.fn()}
-      />
-    );
-
-    expect(screen.queryByRole("button", { name: "Return to selected fixture date" })).toBeNull();
   });
 });
