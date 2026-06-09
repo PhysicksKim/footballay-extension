@@ -1,0 +1,65 @@
+{
+  "content.overlay.aria.hide": {
+    "message": "Footballay 오버레이 숨기기"
+  },
+  "content.overlay.aria.open": {
+    "message": "Footballay 오버레이 열기"
+  },
+  "content.overlay.aria.ticker": {
+    "message": "Footballay 실시간 통계 티커"
+  },
+  "content.overlay.title.liveStats": {
+    "message": "Footballay 실시간 통계"
+  },
+  "content.overlay.waiting.liveData": {
+    "message": "실시간 데이터를 기다리는 중"
+  },
+  "content.overlay.waiting.matchStats": {
+    "message": "경기 통계를 기다리는 중"
+  },
+  "extension.description": {
+    "message": "스트리밍 페이지에 표시되는 컴팩트한 실시간 축구 통계 오버레이입니다."
+  },
+  "extension.name": {
+    "message": "Footballay"
+  },
+  "overlay.stat.cards": {
+    "message": "카드"
+  },
+  "overlay.stat.possession": {
+    "message": "점유율"
+  },
+  "overlay.stat.shots": {
+    "message": "슈팅"
+  },
+  "overlay.stat.shotsOnGoal": {
+    "message": "유효슛"
+  },
+  "popup.error.pageOverlayUnavailable": {
+    "message": "이 페이지에서는 오버레이를 실행할 수 없습니다"
+  },
+  "popup.fixture.empty.noFixtures": {
+    "message": "경기가 없습니다"
+  },
+  "popup.fixture.empty.noLeague": {
+    "message": "리그를 선택하세요"
+  },
+  "popup.fixture.loading": {
+    "message": "경기 목록을 불러오는 중"
+  },
+  "popup.settings.close": {
+    "message": "설정 닫기"
+  },
+  "popup.settings.open": {
+    "message": "설정 열기"
+  },
+  "popup.settings.overlayPosition": {
+    "message": "표시 위치"
+  },
+  "popup.settings.title": {
+    "message": "설정"
+  },
+  "popup.title": {
+    "message": "Footballay"
+  }
+}

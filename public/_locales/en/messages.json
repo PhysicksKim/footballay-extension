@@ -1,0 +1,65 @@
+{
+  "content.overlay.aria.hide": {
+    "message": "Hide Footballay overlay"
+  },
+  "content.overlay.aria.open": {
+    "message": "Open Footballay overlay"
+  },
+  "content.overlay.aria.ticker": {
+    "message": "Footballay live stat ticker"
+  },
+  "content.overlay.title.liveStats": {
+    "message": "Footballay live stats"
+  },
+  "content.overlay.waiting.liveData": {
+    "message": "Waiting for live data"
+  },
+  "content.overlay.waiting.matchStats": {
+    "message": "Waiting for match stats"
+  },
+  "extension.description": {
+    "message": "Compact live football stats overlay for streaming pages."
+  },
+  "extension.name": {
+    "message": "Footballay"
+  },
+  "overlay.stat.cards": {
+    "message": "Cards"
+  },
+  "overlay.stat.possession": {
+    "message": "Possession"
+  },
+  "overlay.stat.shots": {
+    "message": "Shots"
+  },
+  "overlay.stat.shotsOnGoal": {
+    "message": "SOT"
+  },
+  "popup.error.pageOverlayUnavailable": {
+    "message": "This page cannot run the overlay"
+  },
+  "popup.fixture.empty.noFixtures": {
+    "message": "No fixtures"
+  },
+  "popup.fixture.empty.noLeague": {
+    "message": "Select a league"
+  },
+  "popup.fixture.loading": {
+    "message": "Loading fixtures"
+  },
+  "popup.settings.close": {
+    "message": "Close settings"
+  },
+  "popup.settings.open": {
+    "message": "Open settings"
+  },
+  "popup.settings.overlayPosition": {
+    "message": "Display position"
+  },
+  "popup.settings.title": {
+    "message": "Setting"
+  },
+  "popup.title": {
+    "message": "Footballay"
+  }
+}

@@ -4,6 +4,7 @@ export default defineConfig({
     srcDir: 'src',
     manifestVersion: 3,
     manifest: {
+        default_locale: 'en',
         name: 'Footballay',
         description: 'Compact live football stats overlay for streaming pages.',
         icons: {
