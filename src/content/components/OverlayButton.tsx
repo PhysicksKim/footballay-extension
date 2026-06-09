@@ -1,18 +1,20 @@
+import { PanelLeftOpen } from "lucide-react";
+
 type OverlayButtonProps = {
   label?: string;
   muted?: boolean;
   onClick: () => void;
 };
 
-export function OverlayButton({ label = "Footballay", muted = false, onClick }: OverlayButtonProps) {
+export function OverlayButton({ label, muted = false, onClick }: OverlayButtonProps) {
   return (
     <button
-      aria-label="Toggle Footballay overlay"
+      aria-label={label ?? "Open Footballay overlay"}
       className={`footballay-overlay-button${muted ? " footballay-overlay-button--muted" : ""}`}
       type="button"
       onClick={onClick}
     >
-      {label}
+      {label ?? <PanelLeftOpen aria-hidden size={15} strokeWidth={2.2} />}
     </button>
   );
 }
