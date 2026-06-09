@@ -1,18 +1,15 @@
 import { useShallow } from "zustand/react/shallow";
-import { usePopupStore } from "../store";
+import {
+  hideOverlayOnCurrentPage,
+  showOverlayOnCurrentPage
+} from "../actions/popupPageOverlayActions";
+import { usePopupPageOverlayStore } from "../stores/popupPageOverlayStore";
 
 export function usePageOverlayControl() {
-  const {
-    hideOverlayOnCurrentPage,
-    pageOverlayState,
-    pageOverlayStateLoading,
-    showOverlayOnCurrentPage
-  } = usePopupStore(
+  const { pageOverlayState, pageOverlayStateLoading } = usePopupPageOverlayStore(
     useShallow((state) => ({
-      hideOverlayOnCurrentPage: state.hideOverlayOnCurrentPage,
       pageOverlayState: state.pageOverlayState,
-      pageOverlayStateLoading: state.pageOverlayStateLoading,
-      showOverlayOnCurrentPage: state.showOverlayOnCurrentPage
+      pageOverlayStateLoading: state.pageOverlayStateLoading
     }))
   );
 

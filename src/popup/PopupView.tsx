@@ -5,7 +5,7 @@ import { FixtureList } from "./components/FixtureList";
 import { LeaguePicker } from "./components/LeaguePicker";
 import { OverlaySettingsSection } from "./components/OverlaySettingsSection";
 import { PopupTabBar } from "./components/PopupTabBar";
-import type { FixtureDateDirection, PopupTab } from "./store";
+import type { FixtureDateDirection, PopupTab } from "./types";
 
 export type PopupShellViewModel = {
   activeTab: PopupTab;

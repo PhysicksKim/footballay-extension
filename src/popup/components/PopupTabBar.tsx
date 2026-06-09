@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Settings, X } from 'lucide-react';
-import type { PopupTab } from '../store';
+import type { PopupTab } from '../types';
 import footballayIconUrl from '../../../assets/footballay_icon.png';
 
 type PopupTabBarProps = {

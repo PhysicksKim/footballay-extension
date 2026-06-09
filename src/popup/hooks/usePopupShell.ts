@@ -1,8 +1,8 @@
 import { useShallow } from "zustand/react/shallow";
-import { usePopupStore } from "../store";
+import { usePopupUiStore } from "../stores/popupUiStore";
 
 export function usePopupShell() {
-  return usePopupStore(
+  return usePopupUiStore(
     useShallow((state) => ({
       activeTab: state.activeTab,
       error: state.error,

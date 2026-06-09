@@ -1,12 +1,13 @@
 import { useShallow } from "zustand/react/shallow";
-import { usePopupStore } from "../store";
+import { selectLeague } from "../actions/popupFixtureActions";
+import { usePopupFixtureStore } from "../stores/popupFixtureStore";
+import { usePopupSettingsStore } from "../stores/popupSettingsStore";
 
 export function useLeaguePickerState() {
-  const { leagues, selectedLeagueUid, selectLeague } = usePopupStore(
+  const leagues = usePopupFixtureStore((state) => state.leagues);
+  const { selectedLeagueUid } = usePopupSettingsStore(
     useShallow((state) => ({
-      leagues: state.leagues,
-      selectedLeagueUid: state.settings.selectedLeagueUid,
-      selectLeague: state.selectLeague
+      selectedLeagueUid: state.settings.selectedLeagueUid
     }))
   );
 

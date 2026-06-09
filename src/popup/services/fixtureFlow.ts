@@ -2,13 +2,16 @@ import type { FixtureLookupMode, FixtureSummary } from "@/domain/live-match/type
 import type { RuntimeSettingsPatch } from "@/shared/messages";
 import { sendRuntimeMessage } from "@/shared/messages";
 import type { ExtensionSettings } from "@/shared/overlay/types";
-import type { PopupStoreSet } from "../store";
 import {
   addDaysToDateInputValue,
   getFixtureDateFromFixtures,
   getTodayDateInputValue
 } from "../utils/date";
 import { getBrowserTimezone } from "./runtimeClient";
+
+export type FixtureLoadResult =
+  | { ok: true; fixtures: FixtureSummary[] }
+  | { ok: false; error: string };
 
 // The fixture list always needs a query date; default to today's local date for first load.
 export function getQueryDate(settings: ExtensionSettings): string {
@@ -29,15 +32,9 @@ export function getFixtureNavigationPatch(
   };
 }
 
-// Loads fixtures for the selected league and writes the result into popup state.
-// This stays as a flow helper because it combines runtime messaging with store updates.
-export async function loadFixtures(
-  nextSettings: ExtensionSettings,
-  set: PopupStoreSet
-): Promise<FixtureSummary[] | null> {
+export async function loadFixtures(nextSettings: ExtensionSettings): Promise<FixtureLoadResult> {
   if (!nextSettings.selectedLeagueUid) {
-    set({ fixtures: [] });
-    return [];
+    return { fixtures: [], ok: true };
   }
 
   const response = await sendRuntimeMessage({
@@ -51,41 +48,30 @@ export async function loadFixtures(
   });
 
   if (response.ok && "fixtures" in response) {
-    set({ fixtures: response.fixtures });
-    return response.fixtures;
+    return { fixtures: response.fixtures, ok: true };
   }
 
   if (!response.ok) {
-    set({ error: response.error });
+    return { error: response.error, ok: false };
   }
 
-  return null;
+  return { error: "Unable to load fixtures", ok: false };
 }
 
-// Nearest/previous requests can resolve to a different actual fixture date.
-// Persist that resolved date so the popup date label matches the returned fixture list.
-export async function syncResolvedFixtureDate(
+export function getResolvedFixtureDatePatch(
   nextSettings: ExtensionSettings,
-  nextFixtures: FixtureSummary[] | null,
-  set: PopupStoreSet
-): Promise<void> {
+  nextFixtures: FixtureSummary[] | null
+): Pick<ExtensionSettings, "fixtureDate"> | null {
   if (nextSettings.fixtureLookupMode === "exact" || !nextFixtures) {
-    return;
+    return null;
   }
 
   const resolvedDate = getFixtureDateFromFixtures(nextFixtures);
   if (!resolvedDate || resolvedDate === nextSettings.fixtureDate) {
-    return;
+    return null;
   }
 
-  const response = await sendRuntimeMessage({
-    type: "UPDATE_SETTINGS",
-    payload: { fixtureDate: resolvedDate }
-  });
-
-  if (response.ok && "settings" in response) {
-    set({ settings: response.settings });
-  }
+  return { fixtureDate: resolvedDate };
 }
 
 // Exact date queries keep the requested date. Nearest/previous queries follow the date

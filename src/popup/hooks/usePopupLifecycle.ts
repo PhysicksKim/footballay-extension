@@ -1,14 +1,13 @@
 import { useCallback, useMemo } from "react";
 import type { RuntimeMessage } from "@/shared/messages";
-import { usePopupStore } from "../store";
+import { loadPopupState } from "../actions/popupLifecycleActions";
+import { handlePopupRuntimeMessage } from "../actions/popupRuntimeActions";
 
 export function usePopupLifecycle() {
-  const loadState = usePopupStore((state) => state.loadState);
-  const handleRuntimeMessage = usePopupStore((state) => state.handleRuntimeMessage);
-  const load = useCallback(() => void loadState(), [loadState]);
+  const load = useCallback(() => void loadPopupState(), []);
   const handleMessage = useCallback(
-    (message: RuntimeMessage) => handleRuntimeMessage(message),
-    [handleRuntimeMessage]
+    (message: RuntimeMessage) => handlePopupRuntimeMessage(message),
+    []
   );
 
   return useMemo(

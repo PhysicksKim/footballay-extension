@@ -1,23 +1,19 @@
 import { useShallow } from "zustand/react/shallow";
-import type { FixtureDateDirection } from "../store";
-import { usePopupStore } from "../store";
+import {
+  navigateFixtureDate,
+  returnToSelectedFixtureDate,
+  updateFixtureQuery
+} from "../actions/popupFixtureActions";
+import { usePopupFixtureStore } from "../stores/popupFixtureStore";
+import { usePopupSettingsStore } from "../stores/popupSettingsStore";
+import type { FixtureDateDirection } from "../types";
 
 export function useFixtureScheduleState() {
-  const {
-    fixtureDate,
-    fixtureQueryLoading,
-    navigateFixtureDate,
-    returnToSelectedFixtureDate,
-    selectedFixtureDate,
-    updateFixtureQuery
-  } = usePopupStore(
+  const fixtureQueryLoading = usePopupFixtureStore((state) => state.fixtureQueryLoading);
+  const { fixtureDate, selectedFixtureDate } = usePopupSettingsStore(
     useShallow((state) => ({
       fixtureDate: state.settings.fixtureDate,
-      fixtureQueryLoading: state.fixtureQueryLoading,
-      navigateFixtureDate: state.navigateFixtureDate,
-      returnToSelectedFixtureDate: state.returnToSelectedFixtureDate,
-      selectedFixtureDate: state.settings.selectedFixtureDate,
-      updateFixtureQuery: state.updateFixtureQuery
+      selectedFixtureDate: state.settings.selectedFixtureDate
     }))
   );
 
