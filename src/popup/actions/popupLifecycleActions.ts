@@ -1,4 +1,5 @@
 import { sendRuntimeMessage } from "@/shared/messages";
+import { t } from "@/shared/i18n/locale";
 import { loadFixtures } from "../services/fixtureFlow";
 import { usePopupFixtureStore } from "../stores/popupFixtureStore";
 import { usePopupLiveDataStore } from "../stores/popupLiveDataStore";
@@ -7,7 +8,7 @@ import { usePopupUiStore } from "../stores/popupUiStore";
 import { refreshPageOverlayState } from "./popupPageOverlayActions";
 
 export async function loadPopupState(): Promise<void> {
-  usePopupFixtureStore.getState().setLoadingText("Loading");
+  usePopupFixtureStore.getState().setLoadingText(t("popup.fixture.loading"));
   usePopupUiStore.getState().clearError();
 
   try {

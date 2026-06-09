@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Check, Plus } from "lucide-react";
 import type { FixtureSummary } from "@/domain/live-match/types";
+import { t } from "@/shared/i18n/locale";
 import { formatFixtureScore, formatFixtureStatus, formatKickoffTime } from "../utils/format";
 
 type FixtureListProps = {
@@ -97,11 +98,11 @@ export function FixtureList({
 
   return (
     <div className="footballay-fixture-list-shell">
-      <div ref={listRef} className="footballay-fixture-list" aria-label="Fixtures" onScroll={updateScrollbar}>
+      <div ref={listRef} className="footballay-fixture-list" aria-label={t("popup.fixtures.aria.list")} onScroll={updateScrollbar}>
         {loadingText && !fixtures.length ? (
           <p className="footballay-empty-state">{loadingText}</p>
         ) : !selectedLeagueUid ? (
-          <p className="footballay-empty-state">리그를 선택하세요</p>
+          <p className="footballay-empty-state">{t("popup.fixture.empty.noLeague")}</p>
         ) : fixtures.length ? (
           fixtures.map((fixture) => {
             const selected = fixture.uid === selectedFixtureUid;
@@ -128,18 +129,18 @@ export function FixtureList({
                   <button
                     className="footballay-fixture-action"
                     type="button"
-                    aria-label={selected ? "Selected fixture" : "Select fixture"}
+                    aria-label={selected ? t("popup.fixture.action.selected") : t("popup.fixture.action.select")}
                     onClick={() => onSelectFixture(fixture.uid)}
                   >
                     {selected ? <Check aria-hidden size={18} strokeWidth={3} /> : <Plus aria-hidden size={18} strokeWidth={3} />}
-                    <span>{selected ? "선택됨" : "선택"}</span>
+                    <span>{selected ? t("popup.fixture.actionLabel.selected") : t("popup.fixture.actionLabel.select")}</span>
                   </button>
                 </div>
               </article>
             );
           })
         ) : (
-          <p className="footballay-empty-state">경기가 없습니다</p>
+          <p className="footballay-empty-state">{t("popup.fixture.empty.noFixtures")}</p>
         )}
       </div>
 

@@ -1,4 +1,5 @@
 import { GitBranch, Mail } from "lucide-react";
+import { t } from "@/shared/i18n/locale";
 import type { ExtensionSettings, OverlayPosition } from "@/shared/overlay/types";
 import { overlayPositions } from "@/shared/overlay/position";
 
@@ -8,11 +9,11 @@ type OverlaySettingsSectionProps = {
 };
 
 const overlayPositionLabels: Record<OverlayPosition, string> = {
-  "bottom-center": "하단 중앙",
-  "bottom-left": "왼쪽 하단",
-  "bottom-right": "오른쪽 하단",
-  "top-left": "왼쪽 상단",
-  "top-right": "오른쪽 상단"
+  "bottom-center": t("overlayPosition.bottomCenter"),
+  "bottom-left": t("overlayPosition.bottomLeft"),
+  "bottom-right": t("overlayPosition.bottomRight"),
+  "top-left": t("overlayPosition.topLeft"),
+  "top-right": t("overlayPosition.topRight")
 };
 
 const contactLinks = {
@@ -27,7 +28,7 @@ export function OverlaySettingsSection({
   return (
     <section className="footballay-settings">
       <label className="footballay-settings-row footballay-settings-row--select">
-        <span>표시 위치</span>
+        <span>{t("popup.settings.overlayPosition")}</span>
         <select
           value={overlayPosition}
           onChange={(event) =>

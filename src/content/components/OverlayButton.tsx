@@ -1,4 +1,5 @@
 import { PanelLeftOpen } from "lucide-react";
+import { t } from "@/shared/i18n/locale";
 
 type OverlayButtonProps = {
   label?: string;
@@ -9,7 +10,7 @@ type OverlayButtonProps = {
 export function OverlayButton({ label, muted = false, onClick }: OverlayButtonProps) {
   return (
     <button
-      aria-label={label ?? "Open Footballay overlay"}
+      aria-label={label ?? t("content.overlay.aria.open")}
       className={`footballay-overlay-button${muted ? " footballay-overlay-button--muted" : ""}`}
       type="button"
       onClick={onClick}

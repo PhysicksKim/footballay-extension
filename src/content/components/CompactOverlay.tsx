@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import type { LiveMatchOverlayData } from "@/domain/live-match/types";
+import { t } from "@/shared/i18n/locale";
+import type { MessageKey } from "@/shared/i18n/messages";
 import footballayIconSmallUrl from "../../../assets/footballay_icon_small.png";
 
 type CompactOverlayProps = {
@@ -11,7 +13,7 @@ type CompactOverlayProps = {
 type AmbientStat = {
   away?: string | number;
   home?: string | number;
-  label: string;
+  labelKey: MessageKey;
 };
 
 const ROTATION_INTERVAL_MS = 7000;
@@ -38,12 +40,17 @@ export function CompactOverlay({ data, onCollapse }: CompactOverlayProps) {
   }, [stats.length]);
 
   return (
-    <section className="footballay-ambient" aria-label="Footballay live stat ticker">
+    <section className="footballay-ambient" aria-label={t("content.overlay.aria.ticker")}>
       <p className="footballay-ambient__line" title={getAmbientTitle(data, activeStat)}>
         <img className="footballay-ambient__icon" src={footballayIconSmallUrl} alt="" />
         <span className="footballay-ambient__stat">{formatAmbientStat(activeStat)}</span>
       </p>
-      <button className="footballay-ambient__close" type="button" onClick={onCollapse} aria-label="Hide Footballay overlay">
+      <button
+        className="footballay-ambient__close"
+        type="button"
+        onClick={onCollapse}
+        aria-label={t("content.overlay.aria.hide")}
+      >
         <X aria-hidden size={12} strokeWidth={2.4} />
       </button>
     </section>
@@ -52,33 +59,34 @@ export function CompactOverlay({ data, onCollapse }: CompactOverlayProps) {
 
 function getAmbientStats(data: LiveMatchOverlayData | null): AmbientStat[] {
   if (!data) {
-    return [{ label: "Waiting for live data" }];
+    return [{ labelKey: "content.overlay.waiting.liveData" }];
   }
 
-  const stats = [
-    { away: data.awayStats?.possession, home: data.homeStats?.possession, label: "Possession" },
-    { away: data.awayStats?.shotsOnGoal, home: data.homeStats?.shotsOnGoal, label: "SOT" },
-    { away: data.awayStats?.shotsTotal, home: data.homeStats?.shotsTotal, label: "Shots" },
+  const stats: AmbientStat[] = [
+    { away: data.awayStats?.possession, home: data.homeStats?.possession, labelKey: "overlay.stat.possession" },
+    { away: data.awayStats?.shotsOnGoal, home: data.homeStats?.shotsOnGoal, labelKey: "overlay.stat.shotsOnGoal" },
+    { away: data.awayStats?.shotsTotal, home: data.homeStats?.shotsTotal, labelKey: "overlay.stat.shots" },
     {
       away: formatCards(data.awayStats?.yellowCards, data.awayStats?.redCards),
       home: formatCards(data.homeStats?.yellowCards, data.homeStats?.redCards),
-      label: "Cards"
+      labelKey: "overlay.stat.cards"
     }
-  ].filter((stat) => stat.home !== undefined || stat.away !== undefined);
+  ];
+  const availableStats = stats.filter((stat) => stat.home !== undefined || stat.away !== undefined);
 
-  return stats.length ? stats : [{ label: "Waiting for match stats" }];
+  return availableStats.length ? availableStats : [{ labelKey: "content.overlay.waiting.matchStats" }];
 }
 
 function formatAmbientStat(stat?: AmbientStat): string {
   if (!stat) {
-    return "Waiting for live data";
+    return t("content.overlay.waiting.liveData");
   }
 
   if (stat.home === undefined && stat.away === undefined) {
-    return stat.label;
+    return t(stat.labelKey);
   }
 
-  return `${stat.label} ${stat.home ?? "-"} - ${stat.away ?? "-"}`;
+  return `${t(stat.labelKey)} ${stat.home ?? "-"} - ${stat.away ?? "-"}`;
 }
 
 function formatCards(yellowCards?: number, redCards?: number): string | undefined {
@@ -91,7 +99,7 @@ function formatCards(yellowCards?: number, redCards?: number): string | undefine
 
 function getAmbientTitle(data: LiveMatchOverlayData | null, stat?: AmbientStat): string {
   if (!data || !stat) {
-    return "Footballay live stats";
+    return t("content.overlay.title.liveStats");
   }
 
   return `${data.homeTeamName} vs ${data.awayTeamName}: ${formatAmbientStat(stat)}`;

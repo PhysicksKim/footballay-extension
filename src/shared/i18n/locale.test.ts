@@ -26,14 +26,16 @@ describe("i18n locale helpers", () => {
   });
 
   it("returns Chrome i18n messages when available", () => {
+    const getMessage = vi.fn().mockReturnValue("Chrome message");
     vi.stubGlobal("chrome", {
       i18n: {
-        getMessage: vi.fn().mockReturnValue("Chrome message"),
+        getMessage,
         getUILanguage: vi.fn().mockReturnValue("en-US")
       }
     });
 
     expect(t("popup.title")).toBe("Chrome message");
+    expect(getMessage).toHaveBeenCalledWith("popup_title", undefined);
   });
 
   it("falls back to local dictionaries", () => {

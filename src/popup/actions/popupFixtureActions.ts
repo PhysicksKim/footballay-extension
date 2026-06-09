@@ -1,4 +1,5 @@
 import type { FixtureLookupMode } from "@/domain/live-match/types";
+import { t } from "@/shared/i18n/locale";
 import { sendRuntimeMessage } from "@/shared/messages";
 import type { RuntimeSettingsPatch } from "@/shared/messages";
 import {
@@ -30,7 +31,7 @@ const clearLeagueSelectionPatch: RuntimeSettingsPatch = {
 
 export async function selectLeague(leagueUid: string): Promise<void> {
   const fixtureStore = usePopupFixtureStore.getState();
-  fixtureStore.setLoadingText("Loading fixtures");
+  fixtureStore.setLoadingText(t("popup.fixture.loading"));
   usePopupUiStore.getState().clearError();
 
   if (!leagueUid) {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Settings, X } from 'lucide-react';
+import { t } from '@/shared/i18n/locale';
 import type { PopupTab } from '../types';
 import footballayIconUrl from '../../../assets/footballay_icon.png';
 
@@ -27,7 +28,7 @@ export function PopupTabBar({
         <header className="footballay-popup-header">
             <div className="footballay-brand">
                 <img src={footballayIconUrl} alt="" />
-                <strong>{settingsActive ? 'Setting' : 'Footballay'}</strong>
+                <strong>{settingsActive ? t('popup.settings.title') : t('popup.title')}</strong>
             </div>
 
             <label
@@ -38,7 +39,7 @@ export function PopupTabBar({
                 ]
                     .filter(Boolean)
                     .join(' ')}
-                aria-label="Toggle page overlay"
+                aria-label={t('popup.pageOverlay.toggle')}
             >
                 <input
                     checked={pageOverlayVisible}
@@ -55,7 +56,7 @@ export function PopupTabBar({
             <button
                 className={`footballay-settings-toggle${settingsActive ? ' footballay-settings-toggle--active' : ''}`}
                 type="button"
-                aria-label={settingsActive ? 'Close settings' : 'Open settings'}
+                aria-label={settingsActive ? t('popup.settings.close') : t('popup.settings.open')}
                 aria-pressed={settingsActive}
                 onClick={() => onChangeTab(settingsActive ? 'fixtures' : 'settings')}
             >

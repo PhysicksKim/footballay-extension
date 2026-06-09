@@ -1,65 +1,119 @@
 {
-  "content.overlay.aria.hide": {
+  "content_overlay_aria_hide": {
     "message": "Footballay 오버레이 숨기기"
   },
-  "content.overlay.aria.open": {
+  "content_overlay_aria_open": {
     "message": "Footballay 오버레이 열기"
   },
-  "content.overlay.aria.ticker": {
+  "content_overlay_aria_ticker": {
     "message": "Footballay 실시간 통계 티커"
   },
-  "content.overlay.title.liveStats": {
+  "content_overlay_title_liveStats": {
     "message": "Footballay 실시간 통계"
   },
-  "content.overlay.waiting.liveData": {
+  "content_overlay_waiting_liveData": {
     "message": "실시간 데이터를 기다리는 중"
   },
-  "content.overlay.waiting.matchStats": {
+  "content_overlay_waiting_matchStats": {
     "message": "경기 통계를 기다리는 중"
   },
-  "extension.description": {
+  "extension_description": {
     "message": "스트리밍 페이지에 표시되는 컴팩트한 실시간 축구 통계 오버레이입니다."
   },
-  "extension.name": {
+  "extension_name": {
     "message": "Footballay"
   },
-  "overlay.stat.cards": {
+  "overlay_stat_cards": {
     "message": "카드"
   },
-  "overlay.stat.possession": {
+  "overlay_stat_possession": {
     "message": "점유율"
   },
-  "overlay.stat.shots": {
+  "overlay_stat_shots": {
     "message": "슈팅"
   },
-  "overlay.stat.shotsOnGoal": {
+  "overlay_stat_shotsOnGoal": {
     "message": "유효슛"
   },
-  "popup.error.pageOverlayUnavailable": {
+  "overlayPosition_bottomCenter": {
+    "message": "하단 중앙"
+  },
+  "overlayPosition_bottomLeft": {
+    "message": "왼쪽 하단"
+  },
+  "overlayPosition_bottomRight": {
+    "message": "오른쪽 하단"
+  },
+  "overlayPosition_topLeft": {
+    "message": "왼쪽 상단"
+  },
+  "overlayPosition_topRight": {
+    "message": "오른쪽 상단"
+  },
+  "popup_error_pageOverlayUnavailable": {
     "message": "이 페이지에서는 오버레이를 실행할 수 없습니다"
   },
-  "popup.fixture.empty.noFixtures": {
+  "popup_fixture_action_select": {
+    "message": "경기 선택"
+  },
+  "popup_fixture_action_selected": {
+    "message": "선택된 경기"
+  },
+  "popup_fixture_actionLabel_select": {
+    "message": "선택"
+  },
+  "popup_fixture_actionLabel_selected": {
+    "message": "선택됨"
+  },
+  "popup_fixture_datePicker_nextMonth": {
+    "message": "다음 달"
+  },
+  "popup_fixture_datePicker_previousMonth": {
+    "message": "이전 달"
+  },
+  "popup_fixture_datePicker_returnToSelected": {
+    "message": "선택한 경기 날짜로 돌아가기"
+  },
+  "popup_fixture_datePicker_title": {
+    "message": "경기 날짜 선택"
+  },
+  "popup_fixture_datePicker_today": {
+    "message": "오늘"
+  },
+  "popup_fixture_empty_noFixtures": {
     "message": "경기가 없습니다"
   },
-  "popup.fixture.empty.noLeague": {
+  "popup_fixture_empty_noLeague": {
     "message": "리그를 선택하세요"
   },
-  "popup.fixture.loading": {
+  "popup_fixture_loading": {
     "message": "경기 목록을 불러오는 중"
   },
-  "popup.settings.close": {
+  "popup_fixture_nav_nextDate": {
+    "message": "다음 경기 날짜"
+  },
+  "popup_fixture_nav_previousDate": {
+    "message": "이전 경기 날짜"
+  },
+  "popup_fixtures_aria_list": {
+    "message": "경기 목록"
+  },
+  "popup_pageOverlay_toggle": {
+    "message": "페이지 오버레이 전환"
+  },
+  "popup_settings_close": {
     "message": "설정 닫기"
   },
-  "popup.settings.open": {
+  "popup_settings_open": {
     "message": "설정 열기"
   },
-  "popup.settings.overlayPosition": {
+  "popup_settings_overlayPosition": {
     "message": "표시 위치"
   },
-  "popup.settings.title": {
+  "popup_settings_title": {
     "message": "설정"
   },
-  "popup.title": {
+  "popup_title": {
     "message": "Footballay"
   }
 }

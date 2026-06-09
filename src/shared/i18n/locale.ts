@@ -44,7 +44,11 @@ function getChromeMessage(key: MessageKey, substitutions?: I18nSubstitutions): s
     return "";
   }
 
-  return chrome.i18n.getMessage(key, substitutions);
+  return chrome.i18n.getMessage(getChromeMessageKey(key), substitutions);
+}
+
+function getChromeMessageKey(key: MessageKey): string {
+  return key.replaceAll(".", "_");
 }
 
 function interpolateMessage(message: string, substitutions?: I18nSubstitutions): string {

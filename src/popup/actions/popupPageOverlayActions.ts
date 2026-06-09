@@ -1,4 +1,5 @@
 import { sendActiveTabMessage } from "../services/runtimeClient";
+import { t } from "@/shared/i18n/locale";
 import {
   resolveCurrentPageOverlayState,
   shouldDisableGlobalOverlayForSupportedPage
@@ -33,7 +34,7 @@ export async function showOverlayOnCurrentPage(): Promise<void> {
   }
 
   await refreshPageOverlayState();
-  usePopupUiStore.getState().setError("This page cannot run the overlay");
+  usePopupUiStore.getState().setError(t("popup.error.pageOverlayUnavailable"));
 }
 
 export async function hideOverlayOnCurrentPage(): Promise<void> {

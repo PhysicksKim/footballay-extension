@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { FixtureSummary } from "@/domain/live-match/types";
 import { defaultSettings } from "@/shared/constants";
+import { t } from "@/shared/i18n/locale";
 import { sendRuntimeMessage } from "@/shared/messages";
 import type { RuntimeMessage, RuntimeResponse } from "@/shared/messages";
 import type { ExtensionSettings } from "@/shared/overlay/types";
@@ -612,7 +613,7 @@ describe("popup split store actions", () => {
       },
       pageOverlayStateLoading: false
     });
-    expect(usePopupUiStore.getState().error).toBe("This page cannot run the overlay");
+    expect(usePopupUiStore.getState().error).toBe(t("popup.error.pageOverlayUnavailable"));
   });
 
   it("hides supported page overlays by disabling the global overlay setting", async () => {

@@ -1,65 +1,119 @@
 {
-  "content.overlay.aria.hide": {
+  "content_overlay_aria_hide": {
     "message": "Hide Footballay overlay"
   },
-  "content.overlay.aria.open": {
+  "content_overlay_aria_open": {
     "message": "Open Footballay overlay"
   },
-  "content.overlay.aria.ticker": {
+  "content_overlay_aria_ticker": {
     "message": "Footballay live stat ticker"
   },
-  "content.overlay.title.liveStats": {
+  "content_overlay_title_liveStats": {
     "message": "Footballay live stats"
   },
-  "content.overlay.waiting.liveData": {
+  "content_overlay_waiting_liveData": {
     "message": "Waiting for live data"
   },
-  "content.overlay.waiting.matchStats": {
+  "content_overlay_waiting_matchStats": {
     "message": "Waiting for match stats"
   },
-  "extension.description": {
+  "extension_description": {
     "message": "Compact live football stats overlay for streaming pages."
   },
-  "extension.name": {
+  "extension_name": {
     "message": "Footballay"
   },
-  "overlay.stat.cards": {
+  "overlay_stat_cards": {
     "message": "Cards"
   },
-  "overlay.stat.possession": {
+  "overlay_stat_possession": {
     "message": "Possession"
   },
-  "overlay.stat.shots": {
+  "overlay_stat_shots": {
     "message": "Shots"
   },
-  "overlay.stat.shotsOnGoal": {
+  "overlay_stat_shotsOnGoal": {
     "message": "SOT"
   },
-  "popup.error.pageOverlayUnavailable": {
+  "overlayPosition_bottomCenter": {
+    "message": "Bottom center"
+  },
+  "overlayPosition_bottomLeft": {
+    "message": "Bottom left"
+  },
+  "overlayPosition_bottomRight": {
+    "message": "Bottom right"
+  },
+  "overlayPosition_topLeft": {
+    "message": "Top left"
+  },
+  "overlayPosition_topRight": {
+    "message": "Top right"
+  },
+  "popup_error_pageOverlayUnavailable": {
     "message": "This page cannot run the overlay"
   },
-  "popup.fixture.empty.noFixtures": {
+  "popup_fixture_action_select": {
+    "message": "Select fixture"
+  },
+  "popup_fixture_action_selected": {
+    "message": "Selected fixture"
+  },
+  "popup_fixture_actionLabel_select": {
+    "message": "Select"
+  },
+  "popup_fixture_actionLabel_selected": {
+    "message": "Selected"
+  },
+  "popup_fixture_datePicker_nextMonth": {
+    "message": "Next month"
+  },
+  "popup_fixture_datePicker_previousMonth": {
+    "message": "Previous month"
+  },
+  "popup_fixture_datePicker_returnToSelected": {
+    "message": "Return to selected fixture date"
+  },
+  "popup_fixture_datePicker_title": {
+    "message": "Fixture date picker"
+  },
+  "popup_fixture_datePicker_today": {
+    "message": "Today"
+  },
+  "popup_fixture_empty_noFixtures": {
     "message": "No fixtures"
   },
-  "popup.fixture.empty.noLeague": {
+  "popup_fixture_empty_noLeague": {
     "message": "Select a league"
   },
-  "popup.fixture.loading": {
+  "popup_fixture_loading": {
     "message": "Loading fixtures"
   },
-  "popup.settings.close": {
+  "popup_fixture_nav_nextDate": {
+    "message": "Next fixture date"
+  },
+  "popup_fixture_nav_previousDate": {
+    "message": "Previous fixture date"
+  },
+  "popup_fixtures_aria_list": {
+    "message": "Fixtures"
+  },
+  "popup_pageOverlay_toggle": {
+    "message": "Toggle page overlay"
+  },
+  "popup_settings_close": {
     "message": "Close settings"
   },
-  "popup.settings.open": {
+  "popup_settings_open": {
     "message": "Open settings"
   },
-  "popup.settings.overlayPosition": {
+  "popup_settings_overlayPosition": {
     "message": "Display position"
   },
-  "popup.settings.title": {
+  "popup_settings_title": {
     "message": "Setting"
   },
-  "popup.title": {
+  "popup_title": {
     "message": "Footballay"
   }
 }

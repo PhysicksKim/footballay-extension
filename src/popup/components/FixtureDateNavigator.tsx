@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { DayPicker } from "@daypicker/react";
 import { ko } from "@daypicker/react/locale/ko";
 import { CalendarDays, CalendarSync, ChevronLeft, ChevronRight } from "lucide-react";
+import { t } from "@/shared/i18n/locale";
 import { getTodayDateInputValue, toDateInputValue } from "../utils/date";
 import { formatSelectedDate } from "../utils/format";
 
@@ -89,7 +90,7 @@ export function FixtureDateNavigator({
       <button
         className="footballay-date-nav-button footballay-date-nav-button--previous"
         type="button"
-        aria-label="Previous fixture date"
+        aria-label={t("popup.fixture.nav.previousDate")}
         disabled={disabled}
         onClick={() => onNavigate("previous")}
       >
@@ -112,23 +113,23 @@ export function FixtureDateNavigator({
           <CalendarDays aria-hidden size={22} strokeWidth={2.4} />
         </button>
         {calendarOpen ? (
-          <div className="footballay-calendar-popover" role="dialog" aria-label="Fixture date picker">
+          <div className="footballay-calendar-popover" role="dialog" aria-label={t("popup.fixture.datePicker.title")}>
             <div className="footballay-calendar-header">
-              <button type="button" aria-label="Previous month" onClick={goToPreviousMonth}>
+              <button type="button" aria-label={t("popup.fixture.datePicker.previousMonth")} onClick={goToPreviousMonth}>
                 <ChevronLeft aria-hidden size={18} strokeWidth={2.6} />
               </button>
               <strong>{formatCalendarMonth(displayMonth)}</strong>
-              <button type="button" aria-label="Next month" onClick={goToNextMonth}>
+              <button type="button" aria-label={t("popup.fixture.datePicker.nextMonth")} onClick={goToNextMonth}>
                 <ChevronRight aria-hidden size={18} strokeWidth={2.6} />
               </button>
               <button className="footballay-calendar-action" type="button" onClick={selectToday}>
-                오늘
+                {t("popup.fixture.datePicker.today")}
               </button>
               {canReturnToSelectedFixtureDate ? (
                 <button
                   className="footballay-calendar-action footballay-calendar-action--icon"
                   type="button"
-                  aria-label="Return to selected fixture date"
+                  aria-label={t("popup.fixture.datePicker.returnToSelected")}
                   onClick={returnToSelectedFixtureDate}
                 >
                   <CalendarSync aria-hidden size={15} strokeWidth={2.4} />
@@ -154,7 +155,7 @@ export function FixtureDateNavigator({
       <button
         className="footballay-date-nav-button footballay-date-nav-button--next"
         type="button"
-        aria-label="Next fixture date"
+        aria-label={t("popup.fixture.nav.nextDate")}
         disabled={disabled}
         onClick={() => onNavigate("next")}
       >
