@@ -5,7 +5,9 @@ export const supportedLocales = ["en", "ko"] as const;
 export const fallbackMessages = {
   en: {
     "content.overlay.aria.hide": "Hide Footballay overlay",
+    "content.overlay.aria.nextStat": "Show next stat",
     "content.overlay.aria.open": "Open Footballay overlay",
+    "content.overlay.aria.previousStat": "Show previous stat",
     "content.overlay.aria.ticker": "Footballay live stat ticker",
     "content.overlay.title.liveStats": "Footballay live stats",
     "content.overlay.waiting.liveData": "Waiting for live data",
@@ -44,7 +46,9 @@ export const fallbackMessages = {
   },
   ko: {
     "content.overlay.aria.hide": "Footballay 오버레이 숨기기",
+    "content.overlay.aria.nextStat": "다음 통계 보기",
     "content.overlay.aria.open": "Footballay 오버레이 열기",
+    "content.overlay.aria.previousStat": "이전 통계 보기",
     "content.overlay.aria.ticker": "Footballay 실시간 통계 티커",
     "content.overlay.title.liveStats": "Footballay 실시간 통계",
     "content.overlay.waiting.liveData": "실시간 데이터를 기다리는 중",

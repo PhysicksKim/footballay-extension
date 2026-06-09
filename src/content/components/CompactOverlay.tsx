@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { LiveMatchOverlayData } from "@/domain/live-match/types";
 import { t } from "@/shared/i18n/locale";
 import type { MessageKey } from "@/shared/i18n/messages";
@@ -39,10 +39,38 @@ export function CompactOverlay({ data, onCollapse }: CompactOverlayProps) {
     return () => window.clearInterval(timer);
   }, [stats.length]);
 
+  function showPreviousStat(): void {
+    setActiveIndex((currentIndex) => (currentIndex - 1 + stats.length) % stats.length);
+  }
+
+  function showNextStat(): void {
+    setActiveIndex((currentIndex) => (currentIndex + 1) % stats.length);
+  }
+
   return (
     <section className="footballay-ambient" aria-label={t("content.overlay.aria.ticker")}>
-      <p className="footballay-ambient__line" title={getAmbientTitle(data, activeStat)}>
+      <div className="footballay-ambient__controls">
+        <button
+          className="footballay-ambient__step"
+          type="button"
+          onClick={showPreviousStat}
+          aria-label={t("content.overlay.aria.previousStat")}
+          disabled={stats.length <= 1}
+        >
+          <ChevronLeft aria-hidden size={12} strokeWidth={2.4} />
+        </button>
         <img className="footballay-ambient__icon" src={footballayIconSmallUrl} alt="" />
+        <button
+          className="footballay-ambient__step"
+          type="button"
+          onClick={showNextStat}
+          aria-label={t("content.overlay.aria.nextStat")}
+          disabled={stats.length <= 1}
+        >
+          <ChevronRight aria-hidden size={12} strokeWidth={2.4} />
+        </button>
+      </div>
+      <p className="footballay-ambient__line" title={getAmbientTitle(data, activeStat)}>
         <span className="footballay-ambient__stat">{formatAmbientStat(activeStat)}</span>
       </p>
       <button

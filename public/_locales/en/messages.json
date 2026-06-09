@@ -2,8 +2,14 @@
   "content_overlay_aria_hide": {
     "message": "Hide Footballay overlay"
   },
+  "content_overlay_aria_nextStat": {
+    "message": "Show next stat"
+  },
   "content_overlay_aria_open": {
     "message": "Open Footballay overlay"
+  },
+  "content_overlay_aria_previousStat": {
+    "message": "Show previous stat"
   },
   "content_overlay_aria_ticker": {
     "message": "Footballay live stat ticker"

@@ -53,10 +53,23 @@ describe("CompactOverlay", () => {
     expect(screen.getByText("SOT 5 - 2")).toBeTruthy();
   });
 
+  it("moves between ambient stats with manual controls", async () => {
+    const user = userEvent.setup();
+    render(<CompactOverlay data={matchData} onCollapse={vi.fn()} />);
+
+    await user.click(screen.getByRole("button", { name: "Show next stat" }));
+    expect(screen.getByText("SOT 5 - 2")).toBeTruthy();
+
+    await user.click(screen.getByRole("button", { name: "Show previous stat" }));
+    expect(screen.getByText("Possession 58% - 42%")).toBeTruthy();
+  });
+
   it("shows a fallback line without live data", () => {
     render(<CompactOverlay data={null} onCollapse={vi.fn()} />);
 
     expect(screen.getByText("Waiting for live data")).toBeTruthy();
+    expect((screen.getByRole("button", { name: "Show previous stat" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "Show next stat" }) as HTMLButtonElement).disabled).toBe(true);
   });
 
   it("forwards the hide action", async () => {

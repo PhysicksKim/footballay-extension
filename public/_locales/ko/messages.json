@@ -2,8 +2,14 @@
   "content_overlay_aria_hide": {
     "message": "Footballay 오버레이 숨기기"
   },
+  "content_overlay_aria_nextStat": {
+    "message": "다음 통계 보기"
+  },
   "content_overlay_aria_open": {
     "message": "Footballay 오버레이 열기"
+  },
+  "content_overlay_aria_previousStat": {
+    "message": "이전 통계 보기"
   },
   "content_overlay_aria_ticker": {
     "message": "Footballay 실시간 통계 티커"
