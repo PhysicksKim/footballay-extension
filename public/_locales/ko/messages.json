@@ -23,6 +23,12 @@
   "content_overlay_waiting_matchStats": {
     "message": "경기 통계를 기다리는 중"
   },
+  "content_drawer_left_open": {
+    "message": "경기 이벤트와 팀 통계 열기"
+  },
+  "content_drawer_right_open": {
+    "message": "라인업과 선수 통계 열기"
+  },
   "extension_description": {
     "message": "스트리밍 페이지에 표시되는 컴팩트한 실시간 축구 통계 오버레이입니다."
   },

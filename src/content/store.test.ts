@@ -21,7 +21,11 @@ describe("content overlay stores", () => {
       manualVisible: false,
       pageUrl: "https://example.com/watch"
     });
-    useContentOverlayViewStore.setState({ viewMode: "compact" });
+    useContentOverlayViewStore.setState({
+      drawerSide: undefined,
+      selectedPlayerUid: undefined,
+      viewMode: "compact"
+    });
   });
 
   it("updates settings and live data from runtime messages", () => {
@@ -132,5 +136,40 @@ describe("content overlay stores", () => {
     useContentOverlayViewStore.getState().setViewMode("drawer");
 
     expect(useContentOverlayViewStore.getState().viewMode).toBe("drawer");
+  });
+
+  it("opens and closes drawer view state", () => {
+    useContentOverlayViewStore.getState().openLeftDrawer();
+
+    expect(useContentOverlayViewStore.getState()).toMatchObject({
+      drawerSide: "left",
+      selectedPlayerUid: undefined,
+      viewMode: "drawer"
+    });
+
+    useContentOverlayViewStore.getState().openRightDrawer();
+
+    expect(useContentOverlayViewStore.getState()).toMatchObject({
+      drawerSide: "right",
+      viewMode: "drawer"
+    });
+
+    useContentOverlayViewStore.getState().closeDrawer();
+
+    expect(useContentOverlayViewStore.getState()).toMatchObject({
+      drawerSide: undefined,
+      selectedPlayerUid: undefined,
+      viewMode: "compact"
+    });
+  });
+
+  it("selects players in the right drawer", () => {
+    useContentOverlayViewStore.getState().selectPlayer("player-1");
+
+    expect(useContentOverlayViewStore.getState()).toMatchObject({
+      drawerSide: "right",
+      selectedPlayerUid: "player-1",
+      viewMode: "drawer"
+    });
   });
 });

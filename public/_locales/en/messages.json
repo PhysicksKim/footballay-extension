@@ -23,6 +23,12 @@
   "content_overlay_waiting_matchStats": {
     "message": "Waiting for match stats"
   },
+  "content_drawer_left_open": {
+    "message": "Open match events and team stats"
+  },
+  "content_drawer_right_open": {
+    "message": "Open lineup and player stats"
+  },
   "extension_description": {
     "message": "Compact live football stats overlay for streaming pages."
   },
