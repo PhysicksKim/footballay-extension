@@ -5,6 +5,10 @@ export type OverlayPosition =
   | "bottom-right"
   | "bottom-center";
 
+export type OverlayLanguage = "auto" | "ko" | "en";
+
+export type OverlayTickerStatKey = "possession" | "shotsOnGoal" | "shotsTotal" | "cards";
+
 export type ExtensionSettings = {
   selectedLeagueUid?: string;
   selectedFixtureUid?: string;
@@ -13,6 +17,10 @@ export type ExtensionSettings = {
   fixtureLookupMode: "previous" | "exact" | "nearest";
   overlayEnabled: boolean;
   overlayCollapsed: boolean;
+  overlayLanguage: OverlayLanguage;
   overlayPosition: OverlayPosition;
+  overlayTickerIntervalMs: number;
+  overlayTickerScale: number;
+  overlayTickerStatKeys: OverlayTickerStatKey[];
   pollingIntervalMs: number;
 };

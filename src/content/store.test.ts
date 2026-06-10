@@ -1,17 +1,27 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { defaultSettings } from "@/shared/constants";
-import { selectShouldRegisterContentOverlay, selectShouldRenderOverlayControl, useContentOverlayStore } from "./store";
+import {
+  handleContentRuntimeMessage
+} from "@/content/actions/contentOverlayActions";
+import {
+  selectShouldRegisterContentOverlay,
+  selectShouldRenderOverlayControl
+} from "@/content/selectors/contentOverlaySelectors";
+import { useContentLiveDataStore } from "@/content/stores/contentLiveDataStore";
+import { useContentOverlayViewStore } from "@/content/stores/contentOverlayViewStore";
+import { useContentPageOverlayStore } from "@/content/stores/contentPageOverlayStore";
+import { useContentSettingsStore } from "@/content/stores/contentSettingsStore";
 
-describe("content overlay store", () => {
+describe("content overlay stores", () => {
   beforeEach(() => {
-    useContentOverlayStore.setState({
-      data: null,
+    useContentLiveDataStore.setState({ data: null });
+    useContentSettingsStore.setState({ settings: defaultSettings });
+    useContentPageOverlayStore.setState({
       isSupportedPage: false,
       manualVisible: false,
-      pageUrl: "https://example.com/watch",
-      settings: defaultSettings,
-      viewMode: "compact"
+      pageUrl: "https://example.com/watch"
     });
+    useContentOverlayViewStore.setState({ viewMode: "compact" });
   });
 
   it("updates settings and live data from runtime messages", () => {
@@ -24,29 +34,29 @@ describe("content overlay store", () => {
       updatedAt: "2026-06-05T00:00:00.000Z"
     };
 
-    useContentOverlayStore.getState().handleRuntimeMessage({
+    handleContentRuntimeMessage({
       type: "SETTINGS_UPDATED",
       payload: {
         ...defaultSettings,
         overlayCollapsed: false
       }
     });
-    useContentOverlayStore.getState().handleRuntimeMessage({
+    handleContentRuntimeMessage({
       type: "LIVE_MATCH_DATA_UPDATED",
       payload: data
     });
 
-    expect(useContentOverlayStore.getState().settings.overlayCollapsed).toBe(false);
-    expect(useContentOverlayStore.getState().data).toBe(data);
+    expect(useContentSettingsStore.getState().settings.overlayCollapsed).toBe(false);
+    expect(useContentLiveDataStore.getState().data).toBe(data);
   });
 
   it("returns page overlay state responses for popup messages", () => {
-    useContentOverlayStore.setState({
+    useContentPageOverlayStore.setState({
       isSupportedPage: false,
       manualVisible: false
     });
 
-    const showResponse = useContentOverlayStore.getState().handleRuntimeMessage({
+    const showResponse = handleContentRuntimeMessage({
       type: "SHOW_PAGE_OVERLAY"
     });
 
@@ -60,7 +70,7 @@ describe("content overlay store", () => {
       }
     });
 
-    const hideResponse = useContentOverlayStore.getState().handleRuntimeMessage({
+    const hideResponse = handleContentRuntimeMessage({
       type: "HIDE_PAGE_OVERLAY"
     });
 
@@ -76,37 +86,51 @@ describe("content overlay store", () => {
   });
 
   it("selects render and registry states", () => {
-    useContentOverlayStore.setState({
+    useContentPageOverlayStore.setState({
       isSupportedPage: false,
-      manualVisible: false,
+      manualVisible: false
+    });
+    useContentSettingsStore.setState({
       settings: {
         ...defaultSettings,
         overlayEnabled: true
       }
     });
 
-    expect(selectShouldRenderOverlayControl(useContentOverlayStore.getState())).toBe(false);
-    expect(selectShouldRegisterContentOverlay(useContentOverlayStore.getState())).toBe(false);
+    expect(
+      selectShouldRenderOverlayControl(useContentPageOverlayStore.getState())
+    ).toBe(false);
+    expect(
+      selectShouldRegisterContentOverlay(useContentSettingsStore.getState().settings, useContentPageOverlayStore.getState())
+    ).toBe(false);
 
-    useContentOverlayStore.setState({ manualVisible: true });
+    useContentPageOverlayStore.setState({ manualVisible: true });
 
-    expect(selectShouldRenderOverlayControl(useContentOverlayStore.getState())).toBe(true);
-    expect(selectShouldRegisterContentOverlay(useContentOverlayStore.getState())).toBe(true);
+    expect(
+      selectShouldRenderOverlayControl(useContentPageOverlayStore.getState())
+    ).toBe(true);
+    expect(
+      selectShouldRegisterContentOverlay(useContentSettingsStore.getState().settings, useContentPageOverlayStore.getState())
+    ).toBe(true);
 
-    useContentOverlayStore.setState({
+    useContentSettingsStore.setState({
       settings: {
         ...defaultSettings,
         overlayEnabled: false
       }
     });
 
-    expect(selectShouldRenderOverlayControl(useContentOverlayStore.getState())).toBe(true);
-    expect(selectShouldRegisterContentOverlay(useContentOverlayStore.getState())).toBe(false);
+    expect(
+      selectShouldRenderOverlayControl(useContentPageOverlayStore.getState())
+    ).toBe(true);
+    expect(
+      selectShouldRegisterContentOverlay(useContentSettingsStore.getState().settings, useContentPageOverlayStore.getState())
+    ).toBe(false);
   });
 
   it("updates overlay view mode", () => {
-    useContentOverlayStore.getState().setViewMode("expanded");
+    useContentOverlayViewStore.getState().setViewMode("drawer");
 
-    expect(useContentOverlayStore.getState().viewMode).toBe("expanded");
+    expect(useContentOverlayViewStore.getState().viewMode).toBe("drawer");
   });
 });

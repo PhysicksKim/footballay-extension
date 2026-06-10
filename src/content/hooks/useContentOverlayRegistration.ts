@@ -1,10 +1,20 @@
 import { useEffect } from "react";
 import { sendRuntimeMessage } from "@/shared/messages";
-import { selectShouldRegisterContentOverlay, useContentOverlayStore } from "../store";
+import { refreshLatestMatchData } from "@/content/actions/contentOverlayActions";
+import { selectShouldRegisterContentOverlay } from "@/content/selectors/contentOverlaySelectors";
+import { useContentPageOverlayStore } from "@/content/stores/contentPageOverlayStore";
+import { useContentSettingsStore } from "@/content/stores/contentSettingsStore";
 
 export function useContentOverlayRegistration(): void {
-  const shouldRegisterOverlay = useContentOverlayStore(selectShouldRegisterContentOverlay);
-  const refreshLatestMatchData = useContentOverlayStore((state) => state.refreshLatestMatchData);
+  const settings = useContentSettingsStore((state) => state.settings);
+  const isSupportedPage = useContentPageOverlayStore((state) => state.isSupportedPage);
+  const manualVisible = useContentPageOverlayStore((state) => state.manualVisible);
+  const pageUrl = useContentPageOverlayStore((state) => state.pageUrl);
+  const shouldRegisterOverlay = selectShouldRegisterContentOverlay(settings, {
+    isSupportedPage,
+    manualVisible,
+    pageUrl
+  });
 
   useEffect(() => {
     if (!shouldRegisterOverlay) {
@@ -18,5 +28,5 @@ export function useContentOverlayRegistration(): void {
     return () => {
       void sendRuntimeMessage({ type: "UNREGISTER_CONTENT_OVERLAY" });
     };
-  }, [refreshLatestMatchData, shouldRegisterOverlay]);
+  }, [shouldRegisterOverlay]);
 }

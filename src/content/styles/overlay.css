@@ -87,16 +87,19 @@
   --footballay-ambient-glyph-size: 16px;
   --footballay-ambient-font-size: 16px;
   --footballay-ambient-gap: 8px;
+  --footballay-ambient-min-height: 30px;
+  --footballay-ambient-padding-block: 3px;
+  --footballay-ambient-padding-inline: 6px;
 
   display: flex;
   align-items: center;
   gap: var(--footballay-ambient-gap);
   width: max-content;
   max-width: min(680px, calc(100vw - 16px));
-  min-height: 30px;
+  min-height: var(--footballay-ambient-min-height);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 4px;
-  padding: 3px 6px;
+  padding: var(--footballay-ambient-padding-block) var(--footballay-ambient-padding-inline);
   color: #f7fafc;
   background: rgba(8, 10, 14, 0.78);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
@@ -110,7 +113,9 @@
     var(--footballay-ambient-control-size);
   align-items: center;
   gap: 2px;
-  flex: 0 0 70px;
+  flex: 0 0 calc(
+    (var(--footballay-ambient-control-size) * 2) + var(--footballay-ambient-icon-size) + 4px
+  );
 }
 
 .footballay-ambient__step,

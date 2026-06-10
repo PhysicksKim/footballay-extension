@@ -3,6 +3,7 @@ import type { AvailableLeague, FixtureSummary } from '@/domain/live-match/types'
 import type { ExtensionSettings } from '@/shared/overlay/types';
 import type { RuntimeMessage, RuntimeResponse, RuntimeSettingsPatch } from '@/shared/messages';
 import { readSettings, writeSettings } from '@/shared/storage';
+import { normalizeSettingsPatch } from '@/shared/overlay/settings';
 import { createLiveMatchPollingService } from './liveMatchPolling';
 
 export type LiveMatchBackgroundController = {
@@ -132,12 +133,6 @@ export function createLiveMatchBackgroundController(): LiveMatchBackgroundContro
         await startMatchPollingIfNeed(settings);
 
         return settings;
-    }
-
-    function normalizeSettingsPatch(patch: RuntimeSettingsPatch | Partial<ExtensionSettings>): Partial<ExtensionSettings> {
-        return Object.fromEntries(
-            Object.entries(patch).map(([key, value]) => [key, value === null ? undefined : value]),
-        ) as Partial<ExtensionSettings>;
     }
 
     async function initialize(): Promise<void> {

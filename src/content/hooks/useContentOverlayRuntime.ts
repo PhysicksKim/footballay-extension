@@ -1,14 +1,14 @@
 import { useEffect } from "react";
-import { useContentOverlayStore } from "../store";
 import type { RuntimeMessage, RuntimeResponse } from "@/shared/messages";
+import {
+  handleContentRuntimeMessage,
+  loadInitialContentOverlayState
+} from "@/content/actions/contentOverlayActions";
 
 export function useContentOverlayRuntime(): void {
-  const handleRuntimeMessage = useContentOverlayStore((state) => state.handleRuntimeMessage);
-  const loadInitialState = useContentOverlayStore((state) => state.loadInitialState);
-
   useEffect(() => {
-    void loadInitialState();
-  }, [loadInitialState]);
+    void loadInitialContentOverlayState();
+  }, []);
 
   useEffect(() => {
     const listener = (
@@ -16,7 +16,7 @@ export function useContentOverlayRuntime(): void {
       _sender: chrome.runtime.MessageSender,
       sendResponse: (response?: RuntimeResponse) => void
     ) => {
-      const response = handleRuntimeMessage(message);
+      const response = handleContentRuntimeMessage(message);
       if (response) {
         sendResponse(response);
         return true;
@@ -27,5 +27,5 @@ export function useContentOverlayRuntime(): void {
 
     chrome.runtime.onMessage.addListener(listener);
     return () => chrome.runtime.onMessage.removeListener(listener);
-  }, [handleRuntimeMessage]);
+  }, []);
 }

@@ -1,13 +1,17 @@
+import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { LiveMatchOverlayData } from "@/domain/live-match/types";
+import { defaultSettings } from "@/shared/constants";
 import { t } from "@/shared/i18n/locale";
 import type { MessageKey } from "@/shared/i18n/messages";
+import type { ExtensionSettings, OverlayTickerStatKey } from "@/shared/overlay/types";
 import footballayIconSmallUrl from "../../../assets/footballay_icon_small.png";
 
 type CompactOverlayProps = {
   data: LiveMatchOverlayData | null;
   onCollapse: () => void;
+  settings?: ExtensionSettings;
 };
 
 type AmbientStat = {
@@ -16,12 +20,28 @@ type AmbientStat = {
   labelKey: MessageKey;
 };
 
-const ROTATION_INTERVAL_MS = 7000;
+const tickerSizeBase = {
+  controlSize: 22,
+  fontSize: 16,
+  gap: 8,
+  glyphSize: 16,
+  iconSize: 22,
+  minHeight: 30,
+  paddingBlock: 3,
+  paddingInline: 6
+};
 
-export function CompactOverlay({ data, onCollapse }: CompactOverlayProps) {
-  const stats = useMemo(() => getAmbientStats(data), [data]);
+export function CompactOverlay({ data, onCollapse, settings = defaultSettings }: CompactOverlayProps) {
+  const stats = useMemo(
+    () => getAmbientStats(data, settings.overlayTickerStatKeys),
+    [data, settings.overlayTickerStatKeys]
+  );
   const [activeIndex, setActiveIndex] = useState(0);
   const activeStat = stats[activeIndex % stats.length];
+  const tickerStyle = useMemo(
+    () => getTickerScaleStyle(settings.overlayTickerScale),
+    [settings.overlayTickerScale]
+  );
 
   useEffect(() => {
     setActiveIndex(0);
@@ -34,10 +54,10 @@ export function CompactOverlay({ data, onCollapse }: CompactOverlayProps) {
 
     const timer = window.setInterval(() => {
       setActiveIndex((currentIndex) => (currentIndex + 1) % stats.length);
-    }, ROTATION_INTERVAL_MS);
+    }, settings.overlayTickerIntervalMs);
 
     return () => window.clearInterval(timer);
-  }, [stats.length]);
+  }, [settings.overlayTickerIntervalMs, stats.length]);
 
   function showPreviousStat(): void {
     setActiveIndex((currentIndex) => (currentIndex - 1 + stats.length) % stats.length);
@@ -48,7 +68,11 @@ export function CompactOverlay({ data, onCollapse }: CompactOverlayProps) {
   }
 
   return (
-    <section className="footballay-ambient" aria-label={t("content.overlay.aria.ticker")}>
+    <section
+      className="footballay-ambient"
+      style={tickerStyle}
+      aria-label={t("content.overlay.aria.ticker")}
+    >
       <div className="footballay-ambient__controls">
         <button
           className="footballay-ambient__step"
@@ -85,24 +109,47 @@ export function CompactOverlay({ data, onCollapse }: CompactOverlayProps) {
   );
 }
 
-function getAmbientStats(data: LiveMatchOverlayData | null): AmbientStat[] {
+function getAmbientStats(data: LiveMatchOverlayData | null, statKeys: OverlayTickerStatKey[]): AmbientStat[] {
   if (!data) {
     return [{ labelKey: "content.overlay.waiting.liveData" }];
   }
 
-  const stats: AmbientStat[] = [
-    { away: data.awayStats?.possession, home: data.homeStats?.possession, labelKey: "overlay.stat.possession" },
-    { away: data.awayStats?.shotsOnGoal, home: data.homeStats?.shotsOnGoal, labelKey: "overlay.stat.shotsOnGoal" },
-    { away: data.awayStats?.shotsTotal, home: data.homeStats?.shotsTotal, labelKey: "overlay.stat.shots" },
-    {
-      away: formatCards(data.awayStats?.yellowCards, data.awayStats?.redCards),
-      home: formatCards(data.homeStats?.yellowCards, data.homeStats?.redCards),
-      labelKey: "overlay.stat.cards"
-    }
-  ];
+  const stats = statKeys.map((statKey) => getAmbientStat(data, statKey));
   const availableStats = stats.filter((stat) => stat.home !== undefined || stat.away !== undefined);
 
   return availableStats.length ? availableStats : [{ labelKey: "content.overlay.waiting.matchStats" }];
+}
+
+function getAmbientStat(data: LiveMatchOverlayData, statKey: OverlayTickerStatKey): AmbientStat {
+  if (statKey === "possession") {
+    return {
+      away: data.awayStats?.possession,
+      home: data.homeStats?.possession,
+      labelKey: "overlay.stat.possession"
+    };
+  }
+
+  if (statKey === "shotsOnGoal") {
+    return {
+      away: data.awayStats?.shotsOnGoal,
+      home: data.homeStats?.shotsOnGoal,
+      labelKey: "overlay.stat.shotsOnGoal"
+    };
+  }
+
+  if (statKey === "shotsTotal") {
+    return {
+      away: data.awayStats?.shotsTotal,
+      home: data.homeStats?.shotsTotal,
+      labelKey: "overlay.stat.shots"
+    };
+  }
+
+  return {
+    away: formatCards(data.awayStats?.yellowCards, data.awayStats?.redCards),
+    home: formatCards(data.homeStats?.yellowCards, data.homeStats?.redCards),
+    labelKey: "overlay.stat.cards"
+  };
 }
 
 function formatAmbientStat(stat?: AmbientStat): string {
@@ -131,4 +178,17 @@ function getAmbientTitle(data: LiveMatchOverlayData | null, stat?: AmbientStat):
   }
 
   return `${data.homeTeamName} vs ${data.awayTeamName}: ${formatAmbientStat(stat)}`;
+}
+
+function getTickerScaleStyle(scale: number): CSSProperties {
+  return {
+    "--footballay-ambient-control-size": `${tickerSizeBase.controlSize * scale}px`,
+    "--footballay-ambient-font-size": `${tickerSizeBase.fontSize * scale}px`,
+    "--footballay-ambient-gap": `${tickerSizeBase.gap * scale}px`,
+    "--footballay-ambient-glyph-size": `${tickerSizeBase.glyphSize * scale}px`,
+    "--footballay-ambient-icon-size": `${tickerSizeBase.iconSize * scale}px`,
+    "--footballay-ambient-min-height": `${tickerSizeBase.minHeight * scale}px`,
+    "--footballay-ambient-padding-block": `${tickerSizeBase.paddingBlock * scale}px`,
+    "--footballay-ambient-padding-inline": `${tickerSizeBase.paddingInline * scale}px`
+  } as CSSProperties;
 }

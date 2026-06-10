@@ -15,6 +15,7 @@ import type {
 } from "@/domain/live-match/backendTypes";
 import { mapFixtureLiveData } from "@/domain/live-match/mapper";
 import type { LiveMatchOverlayData } from "@/domain/live-match/types";
+import { defaultSettings } from "@/shared/constants";
 import type { ExtensionSettings } from "@/shared/overlay/types";
 import { createLiveMatchPollingService } from "./liveMatchPolling";
 
@@ -35,10 +36,8 @@ vi.mock("@/shared/storage", () => ({
 }));
 
 const baseSettings: ExtensionSettings = {
-  fixtureLookupMode: "nearest",
+  ...defaultSettings,
   overlayCollapsed: false,
-  overlayEnabled: true,
-  overlayPosition: "bottom-right",
   pollingIntervalMs: 1000,
   selectedFixtureUid: "fixture-1"
 };

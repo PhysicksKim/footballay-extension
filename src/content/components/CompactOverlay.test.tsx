@@ -4,6 +4,7 @@ import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { LiveMatchOverlayData } from "@/domain/live-match/types";
+import { defaultSettings } from "@/shared/constants";
 import { CompactOverlay } from "./CompactOverlay";
 
 const matchData: LiveMatchOverlayData = {
@@ -51,6 +52,44 @@ describe("CompactOverlay", () => {
     });
 
     expect(screen.getByText("SOT 5 - 2")).toBeTruthy();
+  });
+
+  it("uses configured ticker stat order and interval", () => {
+    vi.useFakeTimers();
+    render(
+      <CompactOverlay
+        data={matchData}
+        settings={{
+          ...defaultSettings,
+          overlayTickerIntervalMs: 1200,
+          overlayTickerStatKeys: ["shotsTotal", "possession"]
+        }}
+        onCollapse={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText("Shots 11 - 7")).toBeTruthy();
+
+    act(() => {
+      vi.advanceTimersByTime(1200);
+    });
+
+    expect(screen.getByText("Possession 58% - 42%")).toBeTruthy();
+  });
+
+  it("applies configured ticker scale", () => {
+    render(
+      <CompactOverlay
+        data={matchData}
+        settings={{
+          ...defaultSettings,
+          overlayTickerScale: 1.5
+        }}
+        onCollapse={vi.fn()}
+      />
+    );
+
+    expect(screen.getByLabelText("Footballay live stat ticker").style.getPropertyValue("--footballay-ambient-font-size")).toBe("24px");
   });
 
   it("moves between ambient stats with manual controls", async () => {

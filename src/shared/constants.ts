@@ -1,10 +1,21 @@
-import type { ExtensionSettings } from "@/shared/overlay/types";
+import type { ExtensionSettings, OverlayTickerStatKey } from "@/shared/overlay/types";
+
+export const defaultOverlayTickerStatKeys: OverlayTickerStatKey[] = [
+  "possession",
+  "shotsOnGoal",
+  "shotsTotal",
+  "cards"
+];
 
 export const defaultSettings: ExtensionSettings = {
   fixtureLookupMode: "nearest",
   overlayEnabled: true,
   overlayCollapsed: true,
+  overlayLanguage: "auto",
   overlayPosition: "bottom-right",
+  overlayTickerIntervalMs: 7000,
+  overlayTickerScale: 1,
+  overlayTickerStatKeys: defaultOverlayTickerStatKeys,
   pollingIntervalMs: 30000
 };
 
