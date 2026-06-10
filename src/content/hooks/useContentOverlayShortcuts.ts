@@ -25,7 +25,13 @@ export function useContentOverlayShortcuts(enabled: boolean): void {
       }
 
       if (event.key === "Escape") {
-        useContentOverlayViewStore.getState().closeDrawer();
+        const viewStore = useContentOverlayViewStore.getState();
+        if (viewStore.selectedPlayerUid) {
+          viewStore.clearSelectedPlayer();
+          return;
+        }
+
+        viewStore.closeDrawer();
       }
     };
 

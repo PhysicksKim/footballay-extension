@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { CompactOverlay } from "./components/CompactOverlay";
 import { OverlayEdgeHandle } from "./components/OverlayEdgeHandle";
 import { OverlayButton } from "./components/OverlayButton";
+import { RightLineupDrawer } from "./components/RightLineupDrawer";
 import { useContentOverlayRegistration } from "./hooks/useContentOverlayRegistration";
 import { useContentOverlayRuntime } from "./hooks/useContentOverlayRuntime";
 import { useContentOverlayShortcuts } from "./hooks/useContentOverlayShortcuts";
@@ -20,9 +21,12 @@ export function ContentOverlayApp() {
   const manualVisible = useContentPageOverlayStore((state) => state.manualVisible);
   const pageUrl = useContentPageOverlayStore((state) => state.pageUrl);
   const drawerSide = useContentOverlayViewStore((state) => state.drawerSide);
+  const selectedPlayerUid = useContentOverlayViewStore((state) => state.selectedPlayerUid);
+  const clearSelectedPlayer = useContentOverlayViewStore((state) => state.clearSelectedPlayer);
   const closeDrawer = useContentOverlayViewStore((state) => state.closeDrawer);
   const openLeftDrawer = useContentOverlayViewStore((state) => state.openLeftDrawer);
   const openRightDrawer = useContentOverlayViewStore((state) => state.openRightDrawer);
+  const selectPlayer = useContentOverlayViewStore((state) => state.selectPlayer);
   const shouldRenderControl = selectShouldRenderOverlayControl({
     isSupportedPage,
     manualVisible,
@@ -72,6 +76,14 @@ export function ContentOverlayApp() {
             onClick={drawerSide === "right" ? closeDrawer : openRightDrawer}
           />
         </>
+      ) : null}
+      {drawerSide === "right" && shouldRenderDrawerHandles ? (
+        <RightLineupDrawer
+          data={data}
+          selectedPlayerUid={selectedPlayerUid}
+          onClearSelectedPlayer={clearSelectedPlayer}
+          onSelectPlayer={selectPlayer}
+        />
       ) : null}
     </>
   );

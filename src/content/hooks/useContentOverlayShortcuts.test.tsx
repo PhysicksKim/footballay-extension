@@ -59,4 +59,28 @@ describe("useContentOverlayShortcuts", () => {
 
     expect(useContentOverlayViewStore.getState().drawerSide).toBeUndefined();
   });
+
+  it("clears selected player before closing the drawer with Escape", () => {
+    render(<ShortcutHost enabled />);
+    useContentOverlayViewStore.setState({
+      drawerSide: "right",
+      selectedPlayerUid: "player-1",
+      viewMode: "drawer"
+    });
+
+    fireEvent.keyDown(window, { key: "Escape" });
+
+    expect(useContentOverlayViewStore.getState()).toMatchObject({
+      drawerSide: "right",
+      selectedPlayerUid: undefined,
+      viewMode: "drawer"
+    });
+
+    fireEvent.keyDown(window, { key: "Escape" });
+
+    expect(useContentOverlayViewStore.getState()).toMatchObject({
+      drawerSide: undefined,
+      viewMode: "compact"
+    });
+  });
 });

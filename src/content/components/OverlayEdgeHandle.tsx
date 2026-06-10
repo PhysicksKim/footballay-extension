@@ -1,4 +1,4 @@
-import { ChartNoAxesColumn, UserRound } from "lucide-react";
+import { ChartNoAxesColumn, UserRound, X } from "lucide-react";
 import { t } from "@/shared/i18n/locale";
 
 type OverlayEdgeHandleProps = {
@@ -13,7 +13,7 @@ const labels = {
 } as const;
 
 export function OverlayEdgeHandle({ active = false, onClick, side }: OverlayEdgeHandleProps) {
-  const Icon = side === "left" ? ChartNoAxesColumn : UserRound;
+  const Icon = active ? X : side === "left" ? ChartNoAxesColumn : UserRound;
 
   return (
     <button

@@ -65,7 +65,7 @@ export function mapFixtureLiveData(
     awayStats: statistics.away ? mapTeamStats(statistics.away) : undefined,
     topPlayers: getTopPlayers(statistics),
     events: events ? mapMatchEvents(events) : undefined,
-    lineup: lineup ? mapMatchLineup(lineup) : undefined,
+    lineup: lineup ? mapMatchLineup(lineup, statistics) : undefined,
     updatedAt: new Date().toISOString()
   };
 }
@@ -76,7 +76,9 @@ function mapMatchEvents(response: FixtureEventsResponse): MatchEvent[] {
     elapsed: event.elapsed,
     extraTime: event.extraTime,
     teamName: getDisplayName(event.team),
+    playerMatchPlayerUid: event.player?.matchPlayerUid,
     playerName: event.player ? getDisplayName(event.player) : undefined,
+    assistMatchPlayerUid: event.assist?.matchPlayerUid,
     assistName: event.assist ? getDisplayName(event.assist) : undefined,
     type: event.type,
     detail: event.detail,
@@ -84,30 +86,55 @@ function mapMatchEvents(response: FixtureEventsResponse): MatchEvent[] {
   }));
 }
 
-function mapMatchLineup(response: FixtureLineupResponse): MatchLineup {
+function mapMatchLineup(response: FixtureLineupResponse, statistics: FixtureStatisticsResponse): MatchLineup {
   return {
-    home: response.lineup.home ? mapTeamLineup(response.lineup.home) : undefined,
-    away: response.lineup.away ? mapTeamLineup(response.lineup.away) : undefined
+    home: response.lineup.home ? mapTeamLineup(response.lineup.home, statistics.home?.playerStatistics ?? []) : undefined,
+    away: response.lineup.away ? mapTeamLineup(response.lineup.away, statistics.away?.playerStatistics ?? []) : undefined
   };
 }
 
-function mapTeamLineup(lineup: FixtureStartLineupResponse): TeamLineup {
+function mapTeamLineup(lineup: FixtureStartLineupResponse, playerStatistics: PlayerWithStatistics[]): TeamLineup {
+  const statisticsByPlayerUid = new Map(
+    playerStatistics.map((player) => [player.player.matchPlayerUid, player])
+  );
+
   return {
     teamName: lineup.teamKoreanName ?? lineup.teamName,
     formation: lineup.formation,
-    players: lineup.players.map(mapLineupPlayer),
-    substitutes: lineup.substitutes.map(mapLineupPlayer)
+    players: lineup.players.map((player) => mapLineupPlayer(player, statisticsByPlayerUid)),
+    substitutes: lineup.substitutes.map((player) => mapLineupPlayer(player, statisticsByPlayerUid))
   };
 }
 
-function mapLineupPlayer(player: FixtureLineupPlayerResponse): LineupPlayer {
+function mapLineupPlayer(
+  player: FixtureLineupPlayerResponse,
+  statisticsByPlayerUid: Map<string, PlayerWithStatistics>
+): LineupPlayer {
+  const playerStatistics = statisticsByPlayerUid.get(player.matchPlayerUid);
+
   return {
     matchPlayerUid: player.matchPlayerUid,
     name: player.koreanName ?? player.name,
     number: player.number,
     position: player.position,
     grid: player.grid,
-    substitute: player.substitute
+    substitute: player.substitute,
+    ...(playerStatistics ? mapLineupPlayerStatistics(playerStatistics) : {})
+  };
+}
+
+function mapLineupPlayerStatistics(player: PlayerWithStatistics): Partial<LineupPlayer> {
+  const rating = parseRating(player.statistics.rating);
+
+  return {
+    assists: player.statistics.assists || undefined,
+    goals: player.statistics.goals || undefined,
+    passes:
+      player.statistics.passesTotal > 0
+        ? `${player.statistics.passesAccuracy}%`
+        : undefined,
+    rating,
+    shots: player.statistics.shotsTotal || undefined
   };
 }
 

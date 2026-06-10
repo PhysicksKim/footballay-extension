@@ -26,8 +26,56 @@
   "content_drawer_left_open": {
     "message": "Open match events and team stats"
   },
+  "content_drawer_close": {
+    "message": "Close drawer"
+  },
+  "content_drawer_empty_lineup": {
+    "message": "No lineup"
+  },
+  "content_drawer_player_assists": {
+    "message": "Assists"
+  },
+  "content_drawer_player_closeDetail": {
+    "message": "Close player details"
+  },
+  "content_drawer_player_dismissDetail": {
+    "message": "Dismiss player details"
+  },
+  "content_drawer_player_empty": {
+    "message": "Select a player"
+  },
+  "content_drawer_player_goal": {
+    "message": "Goal"
+  },
+  "content_drawer_player_goals": {
+    "message": "Goals"
+  },
+  "content_drawer_player_ownGoal": {
+    "message": "Own goal"
+  },
+  "content_drawer_player_passes": {
+    "message": "Passes"
+  },
+  "content_drawer_player_rating": {
+    "message": "Rating"
+  },
+  "content_drawer_player_redCard": {
+    "message": "Red card"
+  },
+  "content_drawer_player_shots": {
+    "message": "Shots"
+  },
+  "content_drawer_player_substitutedIn": {
+    "message": "Substituted in"
+  },
+  "content_drawer_player_yellowCard": {
+    "message": "Yellow card"
+  },
   "content_drawer_right_open": {
     "message": "Open lineup and player stats"
+  },
+  "content_drawer_right_title": {
+    "message": "Lineup"
   },
   "extension_description": {
     "message": "Compact live football stats overlay for streaming pages."

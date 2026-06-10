@@ -21,7 +21,9 @@ export type MatchEvent = {
   elapsed: number;
   extraTime?: number | null;
   teamName: string;
+  playerMatchPlayerUid?: string;
   playerName?: string;
+  assistMatchPlayerUid?: string;
   assistName?: string;
   type: string;
   detail: string;
@@ -47,6 +49,11 @@ export type LineupPlayer = {
   position?: string | null;
   grid?: string | null;
   substitute: boolean;
+  rating?: number;
+  goals?: number;
+  assists?: number;
+  shots?: number;
+  passes?: string;
 };
 
 export type LiveMatchOverlayData = {
