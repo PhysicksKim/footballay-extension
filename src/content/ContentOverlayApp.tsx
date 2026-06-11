@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import "./styles/base.css";
 import { CompactOverlay } from "./components/CompactOverlay";
 import { OverlayEdgeHandle } from "./components/OverlayEdgeHandle";
 import { OverlayButton } from "./components/OverlayButton";

@@ -1,0 +1,44 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap");
+
+#footballay-overlay-root {
+  all: initial;
+}
+
+#footballay-overlay-root *,
+#footballay-overlay-root *::before,
+#footballay-overlay-root *::after {
+  box-sizing: border-box;
+  font-family: "Noto Sans KR", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.footballay-overlay-shell {
+  position: fixed;
+  z-index: 2147483647;
+  color: #f7fafc;
+}
+
+.footballay-overlay-shell--top-left {
+  top: 8px;
+  left: 8px;
+}
+
+.footballay-overlay-shell--top-right {
+  top: 8px;
+  right: 8px;
+}
+
+.footballay-overlay-shell--bottom-left {
+  bottom: 8px;
+  left: 8px;
+}
+
+.footballay-overlay-shell--bottom-right {
+  right: 8px;
+  bottom: 8px;
+}
+
+.footballay-overlay-shell--bottom-center {
+  right: 50%;
+  bottom: 8px;
+  transform: translateX(50%);
+}

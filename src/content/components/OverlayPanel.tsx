@@ -1,4 +1,5 @@
 import type { LiveMatchOverlayData } from "@/domain/live-match/types";
+import "@/content/styles/expanded-panel.css";
 import { StatLine } from "./StatLine";
 
 type OverlayPanelProps = {

@@ -1,4 +1,5 @@
 import { PanelLeftOpen } from "lucide-react";
+import "@/content/styles/overlay-button.css";
 import { t } from "@/shared/i18n/locale";
 
 type OverlayButtonProps = {

@@ -1,4 +1,6 @@
 import { ArrowUp, X } from "lucide-react";
+import "@/content/styles/side-drawer.css";
+import "@/content/styles/right-lineup-drawer.css";
 import type { LiveMatchOverlayData } from "@/domain/live-match/types";
 import { t } from "@/shared/i18n/locale";
 import {

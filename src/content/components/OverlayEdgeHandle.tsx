@@ -1,4 +1,5 @@
 import { ChartNoAxesColumn, UserRound, X } from "lucide-react";
+import "@/content/styles/edge-handle.css";
 import { t } from "@/shared/i18n/locale";
 
 type OverlayEdgeHandleProps = {

@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import "@/content/styles/compact-overlay.css";
 import type { LiveMatchOverlayData } from "@/domain/live-match/types";
 import { defaultSettings } from "@/shared/constants";
 import { t } from "@/shared/i18n/locale";

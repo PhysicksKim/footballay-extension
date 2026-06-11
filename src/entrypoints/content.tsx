@@ -1,7 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { ContentOverlayApp } from "@/content/ContentOverlayApp";
-import "@/content/styles/overlay.css";
 
 export default defineContentScript({
   matches: ["http://*/*", "https://*/*"],
