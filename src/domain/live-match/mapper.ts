@@ -128,47 +128,104 @@ function mapLineupPlayerStatistics(player: PlayerWithStatistics): Partial<Lineup
 
   return {
     assists: player.statistics.assists || undefined,
+    captain: player.statistics.captain,
+    dribblesAttempts: player.statistics.dribblesAttempts || undefined,
+    dribblesSuccess: player.statistics.dribblesSuccess || undefined,
+    duelsTotal: player.statistics.duelsTotal || undefined,
+    duelsWon: player.statistics.duelsWon || undefined,
+    foulsCommitted: player.statistics.foulsCommitted || undefined,
+    foulsDrawn: player.statistics.foulsDrawn || undefined,
     goals: player.statistics.goals || undefined,
+    goalsConceded: player.statistics.goalsConceded || undefined,
+    interceptions: player.statistics.interceptions || undefined,
+    minutesPlayed: player.statistics.minutesPlayed || undefined,
     passes:
       player.statistics.passesTotal > 0
-        ? `${player.statistics.passesAccuracy}%`
+        ? `${player.statistics.passesAccuracy}/${player.statistics.passesTotal}`
         : undefined,
+    passesAccuracy: player.statistics.passesAccuracy || undefined,
+    passesKey: player.statistics.passesKey || undefined,
+    passesTotal: player.statistics.passesTotal || undefined,
+    penaltiesMissed: player.statistics.penaltiesMissed || undefined,
+    penaltiesSaved: player.statistics.penaltiesSaved || undefined,
+    penaltiesScored: player.statistics.penaltiesScored || undefined,
     rating,
-    shots: player.statistics.shotsTotal || undefined
+    redCards: player.statistics.redCards || undefined,
+    saves: player.statistics.saves || undefined,
+    shots: player.statistics.shotsTotal || undefined,
+    shotsOn: player.statistics.shotsOn || undefined,
+    tacklesTotal: player.statistics.tacklesTotal || undefined,
+    yellowCards: player.statistics.yellowCards || undefined
   };
 }
 
 function mapTeamStats(team: TeamWithStatistics) {
+  const xg = team.teamStatistics.xg.map((point) => ({
+    elapsed: point.elapsed,
+    xg: point.xg
+  }));
+
   return {
+    blockedShots: team.teamStatistics.blockedShots,
+    cornerKicks: team.teamStatistics.cornerKicks,
+    expectedGoals: xg.at(-1)?.xg,
+    fouls: team.teamStatistics.fouls,
+    goalkeeperSaves: team.teamStatistics.goalkeeperSaves,
+    goalsPrevented: team.teamStatistics.goalsPrevented,
+    offsides: team.teamStatistics.offsides,
+    passesAccurate: team.teamStatistics.passesAccurate,
+    passesAccuracyPercentage: team.teamStatistics.passesAccuracyPercentage,
     shotsOnGoal: team.teamStatistics.shotsOnGoal,
+    shotsOffGoal: team.teamStatistics.shotsOffGoal,
+    shotsInsideBox: team.teamStatistics.shotsInsideBox,
+    shotsOutsideBox: team.teamStatistics.shotsOutsideBox,
     shotsTotal: team.teamStatistics.totalShots,
+    totalPasses: team.teamStatistics.totalPasses,
     possession: `${team.teamStatistics.ballPossession}%`,
     yellowCards: team.teamStatistics.yellowCards,
-    redCards: team.teamStatistics.redCards
+    redCards: team.teamStatistics.redCards,
+    xg
   };
 }
 
 function getTopPlayers(statistics: FixtureStatisticsResponse): TopPlayer[] {
-  return [...(statistics.home?.playerStatistics ?? []), ...(statistics.away?.playerStatistics ?? [])]
-    .map(mapTopPlayer)
+  return [
+    ...(statistics.home?.playerStatistics ?? []).map((player) => mapTopPlayer(player, getDisplayName(statistics.home?.team))),
+    ...(statistics.away?.playerStatistics ?? []).map((player) => mapTopPlayer(player, getDisplayName(statistics.away?.team)))
+  ]
     .filter((player): player is TopPlayer & { rating: number } => player.rating !== undefined)
     .sort((left, right) => right.rating - left.rating)
     .slice(0, 3);
 }
 
-function mapTopPlayer(player: PlayerWithStatistics): TopPlayer {
+function mapTopPlayer(player: PlayerWithStatistics, teamName: string): TopPlayer {
   const rating = parseRating(player.statistics.rating);
 
   return {
     name: player.player.koreanName ?? player.player.name,
-    teamName: "",
+    teamName,
     rating,
     goals: player.statistics.goals || undefined,
     assists: player.statistics.assists || undefined,
+    captain: player.statistics.captain,
+    duelsTotal: player.statistics.duelsTotal || undefined,
+    duelsWon: player.statistics.duelsWon || undefined,
+    foulsCommitted: player.statistics.foulsCommitted || undefined,
+    foulsDrawn: player.statistics.foulsDrawn || undefined,
+    interceptions: player.statistics.interceptions || undefined,
+    minutesPlayed: player.statistics.minutesPlayed || undefined,
+    passesAccuracy: player.statistics.passesAccuracy || undefined,
+    passesKey: player.statistics.passesKey || undefined,
+    passesTotal: player.statistics.passesTotal || undefined,
+    redCards: player.statistics.redCards || undefined,
+    saves: player.statistics.saves || undefined,
+    shotsOn: player.statistics.shotsOn || undefined,
     shots: player.statistics.shotsTotal || undefined,
+    tacklesTotal: player.statistics.tacklesTotal || undefined,
+    yellowCards: player.statistics.yellowCards || undefined,
     passes:
       player.statistics.passesTotal > 0
-        ? `${player.statistics.passesAccuracy}%`
+        ? `${player.statistics.passesAccuracy}/${player.statistics.passesTotal}`
         : undefined
   };
 }

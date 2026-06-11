@@ -35,20 +35,38 @@
   "content_drawer_player_assists": {
     "message": "Assists"
   },
+  "content_drawer_player_captain": {
+    "message": "Captain"
+  },
   "content_drawer_player_closeDetail": {
     "message": "Close player details"
   },
   "content_drawer_player_dismissDetail": {
     "message": "Dismiss player details"
   },
+  "content_drawer_player_duels": {
+    "message": "Duels"
+  },
   "content_drawer_player_empty": {
     "message": "Select a player"
+  },
+  "content_drawer_player_fouls": {
+    "message": "Fouls"
   },
   "content_drawer_player_goal": {
     "message": "Goal"
   },
   "content_drawer_player_goals": {
     "message": "Goals"
+  },
+  "content_drawer_player_interceptions": {
+    "message": "Interceptions"
+  },
+  "content_drawer_player_keyPasses": {
+    "message": "Key passes"
+  },
+  "content_drawer_player_minutes": {
+    "message": "Minutes"
   },
   "content_drawer_player_ownGoal": {
     "message": "Own goal"
@@ -67,6 +85,9 @@
   },
   "content_drawer_player_substitutedIn": {
     "message": "Substituted in"
+  },
+  "content_drawer_player_tackles": {
+    "message": "Tackles"
   },
   "content_drawer_player_yellowCard": {
     "message": "Yellow card"

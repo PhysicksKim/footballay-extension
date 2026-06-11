@@ -88,7 +88,7 @@ describe("live match mapper", () => {
         status: "2H",
         uid: "fixture-1"
       },
-      home: createTeamStatistics("home-player", "Home Star", "8.4", 2)
+      home: createTeamStatistics("lineup-1", "Home Star", "8.4", 2)
     };
     const events: FixtureEventsResponse = {
       fixtureUid: "fixture-1",
@@ -142,17 +142,22 @@ describe("live match mapper", () => {
       statusShort: "2H",
       updatedAt: "2026-06-05T00:00:00.000Z"
     });
-    expect(mapped.homeStats).toEqual({
+    expect(mapped.homeStats).toMatchObject({
+      cornerKicks: 4,
+      expectedGoals: "1.4",
+      passesAccuracyPercentage: 84,
       possession: "55%",
       redCards: 0,
       shotsOnGoal: 6,
+      shotsOffGoal: 4,
       shotsTotal: 12,
       yellowCards: 1
     });
     expect(mapped.topPlayers?.[0]).toMatchObject({
       goals: 2,
       name: "Home Star",
-      rating: 8.4
+      rating: 8.4,
+      teamName: "Team"
     });
     expect(mapped.events?.[0]).toMatchObject({
       assistName: "도움",
@@ -170,6 +175,7 @@ describe("live match mapper", () => {
           name: "골키퍼",
           number: 1,
           position: "G",
+          shotsOn: 2,
           substitute: false
         }
       ],
@@ -193,11 +199,31 @@ function createTeamStatistics(
         },
         statistics: {
           assists: 0,
+          captain: false,
+          dribblesAttempts: 0,
+          dribblesSuccess: 0,
+          duelsTotal: 4,
+          duelsWon: 2,
+          foulsCommitted: 1,
+          foulsDrawn: 1,
           goals,
+          goalsConceded: 0,
+          interceptions: 1,
+          minutesPlayed: 90,
           passesAccuracy: 84,
+          passesKey: 2,
           passesTotal: 20,
+          penaltiesMissed: 0,
+          penaltiesSaved: 0,
+          penaltiesScored: 0,
           rating,
-          shotsTotal: 3
+          redCards: 0,
+          saves: 0,
+          shotsOn: 2,
+          shotsTotal: 3,
+          substitute: false,
+          tacklesTotal: 2,
+          yellowCards: 1
         }
       }
     ],
@@ -207,10 +233,23 @@ function createTeamStatistics(
     },
     teamStatistics: {
       ballPossession: 55,
+      blockedShots: 2,
+      cornerKicks: 4,
+      fouls: 8,
+      goalkeeperSaves: 3,
+      goalsPrevented: 0,
+      offsides: 1,
+      passesAccurate: 320,
+      passesAccuracyPercentage: 84,
       redCards: 0,
       shotsOnGoal: 6,
+      shotsOffGoal: 4,
+      shotsInsideBox: 8,
+      shotsOutsideBox: 4,
+      totalPasses: 380,
       totalShots: 12,
-      yellowCards: 1
+      yellowCards: 1,
+      xg: [{ elapsed: 90, xg: "1.4" }]
     }
   };
 }

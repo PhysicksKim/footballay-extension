@@ -1,9 +1,28 @@
 export type TeamStats = {
+  blockedShots?: number;
+  cornerKicks?: number;
+  expectedGoals?: string;
+  fouls?: number;
+  goalkeeperSaves?: number;
+  goalsPrevented?: number;
+  offsides?: number;
+  passesAccurate?: number;
+  passesAccuracyPercentage?: number;
   shotsOnGoal?: number;
+  shotsOffGoal?: number;
+  shotsInsideBox?: number;
+  shotsOutsideBox?: number;
   shotsTotal?: number;
+  totalPasses?: number;
   possession?: string;
   yellowCards?: number;
   redCards?: number;
+  xg?: TeamExpectedGoal[];
+};
+
+export type TeamExpectedGoal = {
+  elapsed: number;
+  xg: string;
 };
 
 export type TopPlayer = {
@@ -12,7 +31,28 @@ export type TopPlayer = {
   rating?: number;
   goals?: number;
   assists?: number;
+  captain?: boolean;
+  duelsTotal?: number;
+  duelsWon?: number;
+  dribblesAttempts?: number;
+  dribblesSuccess?: number;
+  foulsCommitted?: number;
+  foulsDrawn?: number;
+  goalsConceded?: number;
+  interceptions?: number;
+  minutesPlayed?: number;
+  passesKey?: number;
+  passesTotal?: number;
+  passesAccuracy?: number;
+  penaltiesMissed?: number;
+  penaltiesSaved?: number;
+  penaltiesScored?: number;
+  redCards?: number;
+  saves?: number;
+  shotsOn?: number;
   shots?: number;
+  tacklesTotal?: number;
+  yellowCards?: number;
   passes?: string;
 };
 
@@ -49,11 +89,32 @@ export type LineupPlayer = {
   position?: string | null;
   grid?: string | null;
   substitute: boolean;
+  minutesPlayed?: number;
   rating?: number;
+  captain?: boolean;
   goals?: number;
+  goalsConceded?: number;
   assists?: number;
   shots?: number;
+  shotsOn?: number;
+  saves?: number;
+  passesTotal?: number;
+  passesKey?: number;
+  passesAccuracy?: number;
   passes?: string;
+  tacklesTotal?: number;
+  interceptions?: number;
+  duelsTotal?: number;
+  duelsWon?: number;
+  dribblesAttempts?: number;
+  dribblesSuccess?: number;
+  foulsCommitted?: number;
+  foulsDrawn?: number;
+  yellowCards?: number;
+  redCards?: number;
+  penaltiesScored?: number;
+  penaltiesMissed?: number;
+  penaltiesSaved?: number;
 };
 
 export type LiveMatchOverlayData = {

@@ -145,10 +145,28 @@ export type TeamWithStatistics = {
 
 export type TeamStatistics = {
   shotsOnGoal: number;
+  shotsOffGoal: number;
   totalShots: number;
+  blockedShots: number;
+  shotsInsideBox: number;
+  shotsOutsideBox: number;
+  fouls: number;
+  cornerKicks: number;
+  offsides: number;
   ballPossession: number;
   yellowCards: number;
   redCards: number;
+  goalkeeperSaves: number;
+  totalPasses: number;
+  passesAccurate: number;
+  passesAccuracyPercentage: number;
+  goalsPrevented: number;
+  xg: TeamExpectedGoalResponse[];
+};
+
+export type TeamExpectedGoalResponse = {
+  elapsed: number;
+  xg: string;
 };
 
 export type PlayerWithStatistics = {
@@ -162,12 +180,33 @@ export type PlayerWithStatistics = {
     number?: number | null;
   };
   statistics: {
+    minutesPlayed: number;
+    position?: string | null;
     rating?: string | null;
+    captain: boolean;
+    substitute: boolean;
     goals: number;
+    goalsConceded: number;
     assists: number;
     shotsTotal: number;
+    shotsOn: number;
+    saves: number;
     passesTotal: number;
+    passesKey: number;
     passesAccuracy: number;
+    tacklesTotal: number;
+    interceptions: number;
+    duelsTotal: number;
+    duelsWon: number;
+    dribblesAttempts: number;
+    dribblesSuccess: number;
+    foulsCommitted: number;
+    foulsDrawn: number;
+    yellowCards: number;
+    redCards: number;
+    penaltiesScored: number;
+    penaltiesMissed: number;
+    penaltiesSaved: number;
   };
 };
 

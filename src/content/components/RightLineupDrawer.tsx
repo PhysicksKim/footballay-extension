@@ -118,7 +118,10 @@ function LineupPlayerButton({
             <PlayerGoals player={activePlayer} />
             <span className="footballay-lineup-player__number">{activePlayer.number ?? "-"}</span>
           </span>
-          <span className="footballay-lineup-player__name">{activePlayer.name}</span>
+          <span className="footballay-lineup-player__name">
+            {activePlayer.captain ? <span className="footballay-lineup-player__captain" aria-label={t("content.drawer.player.captain")}>C</span> : null}
+            {activePlayer.name}
+          </span>
         </span>
       </button>
     </span>
@@ -178,30 +181,48 @@ function PlayerDetailOverlay({ onClose, player }: { onClose: () => void; player:
           <span>{player.number ? `#${player.number}` : player.position ?? ""}</span>
         </div>
         <dl>
-          <div>
-            <dt>{t("content.drawer.player.rating")}</dt>
-            <dd>{player.rating?.toFixed(1) ?? "-"}</dd>
-          </div>
-          <div>
-            <dt>{t("content.drawer.player.goals")}</dt>
-            <dd>{player.goals || "-"}</dd>
-          </div>
-          <div>
-            <dt>{t("content.drawer.player.assists")}</dt>
-            <dd>{player.assists || "-"}</dd>
-          </div>
-          <div>
-            <dt>{t("content.drawer.player.shots")}</dt>
-            <dd>{player.shots || "-"}</dd>
-          </div>
-          <div>
-            <dt>{t("content.drawer.player.passes")}</dt>
-            <dd>{player.passes ?? "-"}</dd>
-          </div>
+          {getPlayerDetailStats(player).map((stat) => (
+            <div key={stat.label}>
+              <dt>{stat.label}</dt>
+              <dd>{stat.value}</dd>
+            </div>
+          ))}
         </dl>
       </section>
     </div>
   );
+}
+
+function getPlayerDetailStats(player: LineupViewPlayer): Array<{ label: string; value: string | number }> {
+  return [
+    { label: t("content.drawer.player.rating"), value: player.rating?.toFixed(1) ?? "-" },
+    { label: t("content.drawer.player.minutes"), value: player.minutesPlayed ?? "-" },
+    { label: t("content.drawer.player.goals"), value: player.goals || "-" },
+    { label: t("content.drawer.player.assists"), value: player.assists || "-" },
+    { label: t("content.drawer.player.shots"), value: formatPair(player.shotsOn, player.shots) },
+    { label: t("content.drawer.player.passes"), value: formatPasses(player) },
+    { label: t("content.drawer.player.keyPasses"), value: player.passesKey ?? "-" },
+    { label: t("content.drawer.player.tackles"), value: player.tacklesTotal ?? "-" },
+    { label: t("content.drawer.player.interceptions"), value: player.interceptions ?? "-" },
+    { label: t("content.drawer.player.duels"), value: formatPair(player.duelsWon, player.duelsTotal) },
+    { label: t("content.drawer.player.fouls"), value: formatPair(player.foulsCommitted, player.foulsDrawn) }
+  ];
+}
+
+function formatPair(left?: number, right?: number): string {
+  if (left === undefined && right === undefined) {
+    return "-";
+  }
+
+  return `${left ?? 0}/${right ?? 0}`;
+}
+
+function formatPasses(player: LineupViewPlayer): string {
+  if (player.passesTotal === undefined && player.passesAccuracy === undefined) {
+    return player.passes ?? "-";
+  }
+
+  return `${player.passesAccuracy ?? 0}/${player.passesTotal ?? 0}`;
 }
 
 function getVisiblePlayer(player: LineupViewPlayer): LineupViewPlayer {

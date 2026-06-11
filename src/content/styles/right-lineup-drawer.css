@@ -176,6 +176,10 @@
 }
 
 .footballay-lineup-player__name {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
   overflow: visible;
   width: fit-content;
   max-width: 100%;
@@ -191,6 +195,21 @@
   white-space: normal;
   word-break: normal;
   overflow-wrap: anywhere;
+}
+
+.footballay-lineup-player__captain {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 11px;
+  height: 11px;
+  flex: 0 0 11px;
+  border-radius: 999px;
+  color: #111827;
+  background: #facc15;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .footballay-lineup-player__rating {

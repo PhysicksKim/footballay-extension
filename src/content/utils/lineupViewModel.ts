@@ -4,20 +4,40 @@ export type LineupSide = "home" | "away";
 
 export type LineupViewPlayer = {
   assists?: number;
+  captain?: boolean;
+  dribblesAttempts?: number;
+  dribblesSuccess?: number;
+  duelsTotal?: number;
+  duelsWon?: number;
+  foulsCommitted?: number;
+  foulsDrawn?: number;
   goals: number;
+  goalsConceded?: number;
   grid?: string | null;
+  interceptions?: number;
   matchPlayerUid: string;
+  minutesPlayed?: number;
   name: string;
   number?: number | null;
   ownGoals: number;
   passes?: string;
+  passesAccuracy?: number;
+  passesKey?: number;
+  passesTotal?: number;
+  penaltiesMissed?: number;
+  penaltiesSaved?: number;
+  penaltiesScored?: number;
   playerSubstitute?: LineupViewPlayer;
   position?: string | null;
   rating?: number;
   redCards: number;
+  saves?: number;
+  shotsOn?: number;
   shots?: number;
   substitutedIn: boolean;
   substitute: boolean;
+  tacklesTotal?: number;
+  usesStatisticCards: boolean;
   usesStatisticGoals: boolean;
   yellowCards: number;
 };
@@ -94,21 +114,41 @@ export function flattenLineupPlayers(players: LineupViewPlayer[]): LineupViewPla
 function createLineupViewPlayer(player: LineupPlayer): LineupViewPlayer {
   return {
     assists: player.assists,
+    captain: player.captain,
+    dribblesAttempts: player.dribblesAttempts,
+    dribblesSuccess: player.dribblesSuccess,
+    duelsTotal: player.duelsTotal,
+    duelsWon: player.duelsWon,
+    foulsCommitted: player.foulsCommitted,
+    foulsDrawn: player.foulsDrawn,
     goals: player.goals ?? 0,
+    goalsConceded: player.goalsConceded,
     grid: player.grid,
+    interceptions: player.interceptions,
     matchPlayerUid: player.matchPlayerUid,
+    minutesPlayed: player.minutesPlayed,
     name: player.name,
     number: player.number,
     ownGoals: 0,
     passes: player.passes,
+    passesAccuracy: player.passesAccuracy,
+    passesKey: player.passesKey,
+    passesTotal: player.passesTotal,
+    penaltiesMissed: player.penaltiesMissed,
+    penaltiesSaved: player.penaltiesSaved,
+    penaltiesScored: player.penaltiesScored,
     position: player.position,
     rating: player.rating,
-    redCards: 0,
+    redCards: player.redCards ?? 0,
+    saves: player.saves,
+    shotsOn: player.shotsOn,
     shots: player.shots,
     substitutedIn: player.substitute,
     substitute: player.substitute,
+    tacklesTotal: player.tacklesTotal,
+    usesStatisticCards: player.yellowCards !== undefined || player.redCards !== undefined,
     usesStatisticGoals: player.goals !== undefined,
-    yellowCards: 0
+    yellowCards: player.yellowCards ?? 0
   };
 }
 
@@ -141,11 +181,11 @@ function applyEvent(
     }
   }
 
-  if (isYellowCardEvent(event)) {
+  if (isYellowCardEvent(event) && !player.usesStatisticCards) {
     player.yellowCards += 1;
   }
 
-  if (isRedCardEvent(event)) {
+  if (isRedCardEvent(event) && !player.usesStatisticCards) {
     player.redCards += 1;
   }
 }

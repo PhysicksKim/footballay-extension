@@ -35,20 +35,38 @@
   "content_drawer_player_assists": {
     "message": "도움"
   },
+  "content_drawer_player_captain": {
+    "message": "주장"
+  },
   "content_drawer_player_closeDetail": {
     "message": "선수 상세 닫기"
   },
   "content_drawer_player_dismissDetail": {
     "message": "선수 상세 배경 닫기"
   },
+  "content_drawer_player_duels": {
+    "message": "경합"
+  },
   "content_drawer_player_empty": {
     "message": "선수를 선택하세요"
+  },
+  "content_drawer_player_fouls": {
+    "message": "파울"
   },
   "content_drawer_player_goal": {
     "message": "득점"
   },
   "content_drawer_player_goals": {
     "message": "득점"
+  },
+  "content_drawer_player_interceptions": {
+    "message": "인터셉트"
+  },
+  "content_drawer_player_keyPasses": {
+    "message": "키패스"
+  },
+  "content_drawer_player_minutes": {
+    "message": "출전시간"
   },
   "content_drawer_player_ownGoal": {
     "message": "자책골"
@@ -67,6 +85,9 @@
   },
   "content_drawer_player_substitutedIn": {
     "message": "교체 투입"
+  },
+  "content_drawer_player_tackles": {
+    "message": "태클"
   },
   "content_drawer_player_yellowCard": {
     "message": "옐로카드"
