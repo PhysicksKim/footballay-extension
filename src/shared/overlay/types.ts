@@ -7,7 +7,18 @@ export type OverlayPosition =
 
 export type OverlayLanguage = "auto" | "ko" | "en";
 
-export type OverlayTickerStatKey = "possession" | "shotsOnGoal" | "shotsTotal" | "cards";
+export type OverlayTickerStatKey =
+  | "expectedGoals"
+  | "possession"
+  | "shotsOnGoal"
+  | "shotsTotal"
+  | "shotsInsideBox"
+  | "cornerKicks"
+  | "passesAccuracy"
+  | "fouls"
+  | "offsides"
+  | "goalkeeperSaves"
+  | "cards";
 
 export type ExtensionSettings = {
   extensionEnabled: boolean;

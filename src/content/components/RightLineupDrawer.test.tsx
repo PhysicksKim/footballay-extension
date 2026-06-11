@@ -29,10 +29,22 @@ const data: LiveMatchOverlayData = {
       ],
       substitutes: [
         {
+          assists: 1,
+          duelsTotal: 7,
+          duelsWon: 4,
+          foulsCommitted: 2,
+          foulsDrawn: 3,
+          interceptions: 1,
+          minutesPlayed: 30,
           matchPlayerUid: "sub-1",
           name: "Sub",
           number: 19,
+          passesAccuracy: 12,
+          passesKey: 2,
+          passesTotal: 16,
           position: "F",
+          shots: 3,
+          shotsOn: 2,
           substitute: true
         }
       ],
@@ -136,6 +148,12 @@ describe("RightLineupDrawer", () => {
 
     expect(screen.getByRole("dialog", { name: "Sub" })).toBeTruthy();
     expect(screen.getByText("#19")).toBeTruthy();
+    expect(screen.getByText("Minutes")).toBeTruthy();
+    expect(screen.getByText("30")).toBeTruthy();
+    expect(screen.getByText("Key passes")).toBeTruthy();
+    expect(screen.getByText("2")).toBeTruthy();
+    expect(screen.getByText("Duels")).toBeTruthy();
+    expect(screen.getByText("4/7")).toBeTruthy();
 
     await user.click(screen.getByRole("button", { name: "Close player details" }));
 

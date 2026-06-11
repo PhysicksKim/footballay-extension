@@ -107,11 +107,32 @@
   "overlay_stat_cards": {
     "message": "카드"
   },
+  "overlay_stat_cornerKicks": {
+    "message": "코너킥"
+  },
+  "overlay_stat_expectedGoals": {
+    "message": "xG"
+  },
+  "overlay_stat_fouls": {
+    "message": "파울"
+  },
+  "overlay_stat_goalkeeperSaves": {
+    "message": "선방"
+  },
+  "overlay_stat_offsides": {
+    "message": "오프사이드"
+  },
+  "overlay_stat_passesAccuracy": {
+    "message": "패스성공률"
+  },
   "overlay_stat_possession": {
     "message": "점유율"
   },
   "overlay_stat_shots": {
     "message": "슈팅"
+  },
+  "overlay_stat_shotsInsideBox": {
+    "message": "박스 안 슈팅"
   },
   "overlay_stat_shotsOnGoal": {
     "message": "유효슛"

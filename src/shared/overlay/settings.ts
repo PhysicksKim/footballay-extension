@@ -9,6 +9,19 @@ import type {
 const fixtureLookupModes: ExtensionSettings["fixtureLookupMode"][] = ["previous", "exact", "nearest"];
 const overlayLanguages: OverlayLanguage[] = ["auto", "ko", "en"];
 const overlayTickerStatKeys: OverlayTickerStatKey[] = [
+  "expectedGoals",
+  "possession",
+  "shotsOnGoal",
+  "shotsTotal",
+  "shotsInsideBox",
+  "cornerKicks",
+  "passesAccuracy",
+  "fouls",
+  "offsides",
+  "goalkeeperSaves",
+  "cards"
+];
+const previousDefaultOverlayTickerStatKeys: OverlayTickerStatKey[] = [
   "possession",
   "shotsOnGoal",
   "shotsTotal",
@@ -96,5 +109,13 @@ function normalizeOverlayTickerStatKeys(value: unknown): OverlayTickerStatKey[] 
   );
   const uniqueKeys = [...new Set(validKeys)];
 
+  if (matchesTickerStatKeys(uniqueKeys, previousDefaultOverlayTickerStatKeys)) {
+    return [...defaultOverlayTickerStatKeys];
+  }
+
   return uniqueKeys.length ? uniqueKeys : [...defaultOverlayTickerStatKeys];
+}
+
+function matchesTickerStatKeys(left: OverlayTickerStatKey[], right: OverlayTickerStatKey[]): boolean {
+  return left.length === right.length && left.every((key, index) => key === right[index]);
 }

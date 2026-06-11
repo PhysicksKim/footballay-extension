@@ -107,11 +107,32 @@
   "overlay_stat_cards": {
     "message": "Cards"
   },
+  "overlay_stat_cornerKicks": {
+    "message": "Corners"
+  },
+  "overlay_stat_expectedGoals": {
+    "message": "xG"
+  },
+  "overlay_stat_fouls": {
+    "message": "Fouls"
+  },
+  "overlay_stat_goalkeeperSaves": {
+    "message": "Saves"
+  },
+  "overlay_stat_offsides": {
+    "message": "Offsides"
+  },
+  "overlay_stat_passesAccuracy": {
+    "message": "Pass %"
+  },
   "overlay_stat_possession": {
     "message": "Possession"
   },
   "overlay_stat_shots": {
     "message": "Shots"
+  },
+  "overlay_stat_shotsInsideBox": {
+    "message": "Box shots"
   },
   "overlay_stat_shotsOnGoal": {
     "message": "SOT"

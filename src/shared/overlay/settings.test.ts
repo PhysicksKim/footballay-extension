@@ -40,6 +40,14 @@ describe("overlay settings normalization", () => {
     ).toEqual(defaultOverlayTickerStatKeys);
   });
 
+  it("upgrades the previous default ticker stat keys to the current defaults", () => {
+    expect(
+      normalizeExtensionSettings({
+        overlayTickerStatKeys: ["possession", "shotsOnGoal", "shotsTotal", "cards"]
+      }).overlayTickerStatKeys
+    ).toEqual(defaultOverlayTickerStatKeys);
+  });
+
   it("converts nullable patch values to undefined", () => {
     expect(
       normalizeSettingsPatch({

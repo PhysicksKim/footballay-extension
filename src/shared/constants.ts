@@ -1,9 +1,11 @@
 import type { ExtensionSettings, OverlayTickerStatKey } from "@/shared/overlay/types";
 
 export const defaultOverlayTickerStatKeys: OverlayTickerStatKey[] = [
-  "possession",
+  "expectedGoals",
   "shotsOnGoal",
-  "shotsTotal",
+  "possession",
+  "cornerKicks",
+  "passesAccuracy",
   "cards"
 ];
 

@@ -10,6 +10,9 @@ import { CompactOverlay } from "./CompactOverlay";
 const matchData: LiveMatchOverlayData = {
   awayScore: 1,
   awayStats: {
+    cornerKicks: 3,
+    expectedGoals: "0.8",
+    passesAccuracyPercentage: 81,
     possession: "42%",
     shotsOnGoal: 2,
     shotsTotal: 7,
@@ -19,6 +22,9 @@ const matchData: LiveMatchOverlayData = {
   fixtureUid: "fixture-1",
   homeScore: 2,
   homeStats: {
+    cornerKicks: 6,
+    expectedGoals: "1.6",
+    passesAccuracyPercentage: 88,
     possession: "58%",
     shotsOnGoal: 5,
     shotsTotal: 11,
@@ -39,7 +45,7 @@ describe("CompactOverlay", () => {
 
     expect(screen.getByLabelText("Footballay live stat ticker")).toBeTruthy();
     expect(container.querySelector(".footballay-ambient__icon")).toBeTruthy();
-    expect(screen.getByText("Possession 58% - 42%")).toBeTruthy();
+    expect(screen.getByText("xG 1.6 - 0.8")).toBeTruthy();
     expect(screen.queryByText("Expand")).toBeNull();
   });
 
@@ -100,7 +106,7 @@ describe("CompactOverlay", () => {
     expect(screen.getByText("SOT 5 - 2")).toBeTruthy();
 
     await user.click(screen.getByRole("button", { name: "Show previous stat" }));
-    expect(screen.getByText("Possession 58% - 42%")).toBeTruthy();
+    expect(screen.getByText("xG 1.6 - 0.8")).toBeTruthy();
   });
 
   it("shows a fallback line without live data", () => {
