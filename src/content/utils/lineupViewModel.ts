@@ -156,10 +156,12 @@ function applySubstitutionEvent(
   substitutePool: Map<string, LineupViewPlayer>,
   playerIndex: Map<string, LineupViewPlayer>
 ): void {
-  const outgoingPlayer = findEventPlayer(event, players);
-  const incomingPlayer =
+  const outgoingPlayer =
     getPlayerByEventUid(event.assistMatchPlayerUid, substitutePool, playerIndex) ??
-    getPlayerByName(event.assistName, substitutePool);
+    findLineupPlayerByName(players, event.assistName);
+  const incomingPlayer =
+    getPlayerByEventUid(event.playerMatchPlayerUid, substitutePool, playerIndex) ??
+    getPlayerByName(event.playerName, substitutePool);
 
   if (!outgoingPlayer || !incomingPlayer) {
     return;

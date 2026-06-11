@@ -10,6 +10,7 @@ import {
   type LineupViewPlayer,
   type TeamLineupViewModel
 } from "@/content/utils/lineupViewModel";
+import goalMarkerUrl from "../../../assets/goal_marker.png";
 
 type RightLineupDrawerProps = {
   data: LiveMatchOverlayData | null;
@@ -95,28 +96,32 @@ function LineupPlayerButton({
   const activePlayer = getVisiblePlayer(player);
 
   return (
-    <button
-      className={`footballay-lineup-player${
-        selectedPlayerUid === activePlayer.matchPlayerUid ? " footballay-lineup-player--selected" : ""
-      }`}
-      type="button"
-      onClick={() => onSelectPlayer(activePlayer.matchPlayerUid)}
-    >
-      <span className="footballay-lineup-player__marker">
-        {activePlayer.substitutedIn ? (
-          <span className="footballay-lineup-player__sub-in" aria-label={t("content.drawer.player.substitutedIn")}>
-            <ArrowUp aria-hidden size={10} strokeWidth={2.6} />
+    <span className="footballay-lineup-player-slot">
+      <button
+        className={`footballay-lineup-player${
+          selectedPlayerUid === activePlayer.matchPlayerUid ? " footballay-lineup-player--selected" : ""
+        }`}
+        type="button"
+        onClick={() => onSelectPlayer(activePlayer.matchPlayerUid)}
+      >
+        <span className="footballay-lineup-player__content">
+          <span className="footballay-lineup-player__marker">
+            {activePlayer.substitutedIn ? (
+              <span className="footballay-lineup-player__sub-in" aria-label={t("content.drawer.player.substitutedIn")}>
+                <ArrowUp aria-hidden size={10} strokeWidth={2.6} />
+              </span>
+            ) : null}
+            <PlayerCards player={activePlayer} />
+            {activePlayer.rating !== undefined ? (
+              <span className="footballay-lineup-player__rating">{activePlayer.rating.toFixed(1)}</span>
+            ) : null}
+            <PlayerGoals player={activePlayer} />
+            <span className="footballay-lineup-player__number">{activePlayer.number ?? "-"}</span>
           </span>
-        ) : null}
-        <PlayerCards player={activePlayer} />
-        {activePlayer.rating !== undefined ? (
-          <span className="footballay-lineup-player__rating">{activePlayer.rating.toFixed(1)}</span>
-        ) : null}
-        <PlayerGoals player={activePlayer} />
-        <span className="footballay-lineup-player__number">{activePlayer.number ?? "-"}</span>
-      </span>
-      <span className="footballay-lineup-player__name">{activePlayer.name}</span>
-    </button>
+          <span className="footballay-lineup-player__name">{activePlayer.name}</span>
+        </span>
+      </button>
+    </span>
   );
 }
 
@@ -125,14 +130,16 @@ function PlayerCards({ player }: { player: LineupViewPlayer }) {
     return null;
   }
 
+  const cardClassName = player.redCards
+    ? "footballay-lineup-player__card footballay-lineup-player__card--red"
+    : "footballay-lineup-player__card";
+  const cardLabel = player.redCards
+    ? t("content.drawer.player.redCard")
+    : t("content.drawer.player.yellowCard");
+
   return (
     <span className="footballay-lineup-player__cards">
-      {Array.from({ length: player.yellowCards }).map((_, index) => (
-        <span key={`yellow-${index}`} className="footballay-lineup-player__card" aria-label={t("content.drawer.player.yellowCard")} />
-      ))}
-      {Array.from({ length: player.redCards }).map((_, index) => (
-        <span key={`red-${index}`} className="footballay-lineup-player__card footballay-lineup-player__card--red" aria-label={t("content.drawer.player.redCard")} />
-      ))}
+      <span className={cardClassName} aria-label={cardLabel} />
     </span>
   );
 }
@@ -146,12 +153,12 @@ function PlayerGoals({ player }: { player: LineupViewPlayer }) {
     <span className="footballay-lineup-player__goals">
       {Array.from({ length: player.goals }).map((_, index) => (
         <span key={`goal-${index}`} className="footballay-lineup-player__goal" aria-label={t("content.drawer.player.goal")}>
-          ⚽
+          <img src={goalMarkerUrl} alt="" />
         </span>
       ))}
       {Array.from({ length: player.ownGoals }).map((_, index) => (
         <span key={`own-goal-${index}`} className="footballay-lineup-player__goal footballay-lineup-player__goal--own" aria-label={t("content.drawer.player.ownGoal")}>
-          ⚽
+          <img src={goalMarkerUrl} alt="" />
         </span>
       ))}
     </span>

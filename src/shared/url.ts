@@ -1,10 +1,14 @@
 import { supportedStreamingHosts } from "./constants";
 
-export function isSupportedStreamingUrl(url: string): boolean {
+export function getHostname(url: string): string | null {
   try {
-    const parsedUrl = new URL(url);
-    return supportedStreamingHosts.includes(parsedUrl.hostname);
+    return new URL(url).hostname;
   } catch {
-    return false;
+    return null;
   }
+}
+
+export function isSupportedStreamingUrl(url: string): boolean {
+  const hostname = getHostname(url);
+  return hostname ? supportedStreamingHosts.includes(hostname) : false;
 }

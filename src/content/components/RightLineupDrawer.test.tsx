@@ -41,12 +41,12 @@ const data: LiveMatchOverlayData = {
   },
   events: [
     {
-      assistMatchPlayerUid: "sub-1",
-      assistName: "Sub",
+      assistMatchPlayerUid: "starter-1",
+      assistName: "Starter",
       detail: "Substitution 1",
       elapsed: 60,
-      playerMatchPlayerUid: "starter-1",
-      playerName: "Starter",
+      playerMatchPlayerUid: "sub-1",
+      playerName: "Sub",
       sequence: 1,
       teamName: "Home",
       type: "subst"
@@ -59,6 +59,24 @@ const data: LiveMatchOverlayData = {
       sequence: 2,
       teamName: "Home",
       type: "Goal"
+    },
+    {
+      detail: "Yellow Card",
+      elapsed: 75,
+      playerMatchPlayerUid: "sub-1",
+      playerName: "Sub",
+      sequence: 3,
+      teamName: "Home",
+      type: "Card"
+    },
+    {
+      detail: "Red Card",
+      elapsed: 80,
+      playerMatchPlayerUid: "sub-1",
+      playerName: "Sub",
+      sequence: 4,
+      teamName: "Home",
+      type: "Card"
     }
   ],
   updatedAt: "2026-06-05T00:00:00.000Z"
@@ -89,6 +107,8 @@ describe("RightLineupDrawer", () => {
     expect(screen.getByText("Sub")).toBeTruthy();
     expect(screen.getByLabelText("Substituted in")).toBeTruthy();
     expect(screen.getByLabelText("Own goal")).toBeTruthy();
+    expect(screen.getByLabelText("Red card")).toBeTruthy();
+    expect(screen.queryByLabelText("Yellow card")).toBeNull();
 
     await user.click(screen.getByRole("button", { name: /Sub/ }));
 

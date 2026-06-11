@@ -17,6 +17,8 @@ export type PageOverlayState = {
   url: string;
 };
 
+export type RuntimeOverlayDrawerSide = "left" | "right";
+
 export type RuntimeMessage =
   | { type: "GET_SETTINGS" }
   | { type: "UPDATE_SETTINGS"; payload: RuntimeSettingsPatch }
@@ -43,7 +45,11 @@ export type RuntimeMessage =
   | { type: "START_POLLING" }
   | { type: "STOP_POLLING" }
   | { type: "GET_LATEST_MATCH_DATA" }
+  | { type: "GET_SITE_OVERLAY_DRAWER"; payload: { url: string } }
+  | { type: "GET_SITE_OVERLAY_VISIBILITY"; payload: { url: string } }
   | { type: "REGISTER_CONTENT_OVERLAY" }
+  | { type: "SET_SITE_OVERLAY_DRAWER"; payload: { drawerSide?: RuntimeOverlayDrawerSide; url: string } }
+  | { type: "SET_SITE_OVERLAY_VISIBILITY"; payload: { url: string; visible: boolean } }
   | { type: "UNREGISTER_CONTENT_OVERLAY" }
   | { type: "GET_PAGE_OVERLAY_STATE" }
   | { type: "SHOW_PAGE_OVERLAY" }
@@ -57,7 +63,9 @@ export type RuntimeResponse =
   | { ok: true; leagues: AvailableLeague[] }
   | { ok: true; fixtures: FixtureSummary[] }
   | { ok: true; settings: ExtensionSettings; fixtures: FixtureSummary[] }
+  | { ok: true; drawerSide?: RuntimeOverlayDrawerSide }
   | { ok: true; pageOverlayState: PageOverlayState }
+  | { ok: true; visible: boolean }
   | { ok: true }
   | { ok: false; error: string };
 

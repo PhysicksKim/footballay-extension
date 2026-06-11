@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { defaultSettings } from "@/shared/constants";
+import { sendRuntimeMessage } from "@/shared/messages";
 import {
   handleContentRuntimeMessage
 } from "@/content/actions/contentOverlayActions";
@@ -12,8 +13,19 @@ import { useContentOverlayViewStore } from "@/content/stores/contentOverlayViewS
 import { useContentPageOverlayStore } from "@/content/stores/contentPageOverlayStore";
 import { useContentSettingsStore } from "@/content/stores/contentSettingsStore";
 
+vi.mock("@/shared/messages", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/shared/messages")>();
+  return {
+    ...actual,
+    sendRuntimeMessage: vi.fn()
+  };
+});
+
+const sendRuntimeMessageMock = vi.mocked(sendRuntimeMessage);
+
 describe("content overlay stores", () => {
   beforeEach(() => {
+    sendRuntimeMessageMock.mockResolvedValue({ ok: true });
     useContentLiveDataStore.setState({ data: null });
     useContentSettingsStore.setState({ settings: defaultSettings });
     useContentPageOverlayStore.setState({
@@ -73,6 +85,13 @@ describe("content overlay stores", () => {
         visible: true
       }
     });
+    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({
+      type: "SET_SITE_OVERLAY_VISIBILITY",
+      payload: {
+        url: "https://example.com/watch",
+        visible: true
+      }
+    });
 
     const hideResponse = handleContentRuntimeMessage({
       type: "HIDE_PAGE_OVERLAY"
@@ -85,6 +104,20 @@ describe("content overlay stores", () => {
         manualVisible: false,
         url: "https://example.com/watch",
         visible: false
+      }
+    });
+    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({
+      type: "SET_SITE_OVERLAY_VISIBILITY",
+      payload: {
+        url: "https://example.com/watch",
+        visible: false
+      }
+    });
+    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({
+      type: "SET_SITE_OVERLAY_DRAWER",
+      payload: {
+        drawerSide: undefined,
+        url: "https://example.com/watch"
       }
     });
   });
@@ -129,7 +162,7 @@ describe("content overlay stores", () => {
     ).toBe(true);
     expect(
       selectShouldRegisterContentOverlay(useContentSettingsStore.getState().settings, useContentPageOverlayStore.getState())
-    ).toBe(false);
+    ).toBe(true);
   });
 
   it("updates overlay view mode", () => {

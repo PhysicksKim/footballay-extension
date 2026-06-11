@@ -15,6 +15,7 @@ type ContentOverlayViewActions = {
   closeDrawer: () => void;
   openLeftDrawer: () => void;
   openRightDrawer: () => void;
+  restoreDrawerSide: (drawerSide?: OverlayDrawerSide) => void;
   selectPlayer: (matchPlayerUid: string) => void;
   setViewMode: (viewMode: OverlayViewMode) => void;
 };
@@ -40,6 +41,14 @@ export const useContentOverlayViewStore = create<ContentOverlayViewStore>((set) 
 
   openRightDrawer() {
     set({ drawerSide: "right", viewMode: "drawer" });
+  },
+
+  restoreDrawerSide(drawerSide) {
+    set({
+      drawerSide,
+      selectedPlayerUid: undefined,
+      viewMode: drawerSide ? "drawer" : "compact"
+    });
   },
 
   selectPlayer(matchPlayerUid) {

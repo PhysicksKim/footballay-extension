@@ -2,7 +2,14 @@ import { fetchAvailableLeagues, fetchFixturesByLeague } from '@/domain/live-matc
 import type { AvailableLeague, FixtureSummary } from '@/domain/live-match/types';
 import type { ExtensionSettings } from '@/shared/overlay/types';
 import type { RuntimeMessage, RuntimeResponse, RuntimeSettingsPatch } from '@/shared/messages';
-import { readSettings, writeSettings } from '@/shared/storage';
+import {
+    readSettings,
+    readSiteOverlayDrawerSide,
+    readSiteOverlayVisible,
+    writeSettings,
+    writeSiteOverlayDrawerSide,
+    writeSiteOverlayVisible
+} from '@/shared/storage';
 import { normalizeSettingsPatch } from '@/shared/overlay/settings';
 import { createLiveMatchPollingService } from './liveMatchPolling';
 
@@ -78,6 +85,24 @@ export function createLiveMatchBackgroundController(): LiveMatchBackgroundContro
                 }
                 case 'GET_LATEST_MATCH_DATA': {
                     return { ok: true, data: await pollingService.getLatestMatchData() };
+                }
+                case 'GET_SITE_OVERLAY_DRAWER': {
+                    return { ok: true, drawerSide: await readSiteOverlayDrawerSide(message.payload.url) };
+                }
+                case 'GET_SITE_OVERLAY_VISIBILITY': {
+                    return { ok: true, visible: await readSiteOverlayVisible(message.payload.url) };
+                }
+                case 'SET_SITE_OVERLAY_DRAWER': {
+                    return {
+                        ok: true,
+                        drawerSide: await writeSiteOverlayDrawerSide(message.payload.url, message.payload.drawerSide),
+                    };
+                }
+                case 'SET_SITE_OVERLAY_VISIBILITY': {
+                    return {
+                        ok: true,
+                        visible: await writeSiteOverlayVisible(message.payload.url, message.payload.visible),
+                    };
                 }
                 case 'REGISTER_CONTENT_OVERLAY': {
                     registerContentOverlay(sender);

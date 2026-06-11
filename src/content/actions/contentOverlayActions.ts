@@ -2,13 +2,32 @@ import type { RuntimeMessage, RuntimeResponse, RuntimeSettingsPatch } from "@/sh
 import { sendRuntimeMessage } from "@/shared/messages";
 import { getPageOverlayState } from "@/content/selectors/contentOverlaySelectors";
 import { useContentLiveDataStore } from "@/content/stores/contentLiveDataStore";
+import { useContentOverlayViewStore } from "@/content/stores/contentOverlayViewStore";
 import { useContentPageOverlayStore } from "@/content/stores/contentPageOverlayStore";
 import { useContentSettingsStore } from "@/content/stores/contentSettingsStore";
+import type { OverlayDrawerSide } from "@/content/stores/contentOverlayViewStore";
 
 export async function loadInitialContentOverlayState(): Promise<void> {
   const settingsResponse = await sendRuntimeMessage({ type: "GET_SETTINGS" });
   if (settingsResponse.ok && "settings" in settingsResponse) {
     useContentSettingsStore.getState().setSettings(settingsResponse.settings);
+  }
+
+  const pageUrl = useContentPageOverlayStore.getState().pageUrl;
+  const siteVisibilityResponse = await sendRuntimeMessage({
+    type: "GET_SITE_OVERLAY_VISIBILITY",
+    payload: { url: pageUrl }
+  });
+  if (siteVisibilityResponse.ok && "visible" in siteVisibilityResponse) {
+    useContentPageOverlayStore.getState().setManualVisible(siteVisibilityResponse.visible);
+  }
+
+  const siteDrawerResponse = await sendRuntimeMessage({
+    type: "GET_SITE_OVERLAY_DRAWER",
+    payload: { url: pageUrl }
+  });
+  if (siteDrawerResponse.ok && "drawerSide" in siteDrawerResponse) {
+    useContentOverlayViewStore.getState().restoreDrawerSide(siteDrawerResponse.drawerSide);
   }
 
   await refreshLatestMatchData();
@@ -44,7 +63,9 @@ export function handleContentRuntimeMessage(message: RuntimeMessage): RuntimeRes
   }
 
   if (message.type === "SHOW_PAGE_OVERLAY") {
-    useContentPageOverlayStore.getState().setManualVisible(true);
+    const pageOverlayStore = useContentPageOverlayStore.getState();
+    pageOverlayStore.setManualVisible(true);
+    persistCurrentSiteOverlayVisibility(true);
     return {
       ok: true,
       pageOverlayState: getCurrentPageOverlayState()
@@ -52,7 +73,11 @@ export function handleContentRuntimeMessage(message: RuntimeMessage): RuntimeRes
   }
 
   if (message.type === "HIDE_PAGE_OVERLAY") {
-    useContentPageOverlayStore.getState().setManualVisible(false);
+    const pageOverlayStore = useContentPageOverlayStore.getState();
+    pageOverlayStore.setManualVisible(false);
+    useContentOverlayViewStore.getState().closeDrawer();
+    persistCurrentSiteOverlayVisibility(false);
+    persistCurrentSiteOverlayDrawerSide(undefined);
     return {
       ok: true,
       pageOverlayState: getCurrentPageOverlayState()
@@ -62,9 +87,39 @@ export function handleContentRuntimeMessage(message: RuntimeMessage): RuntimeRes
   return undefined;
 }
 
+export function persistCurrentSiteOverlayDrawerSide(drawerSide?: OverlayDrawerSide): void {
+  const pageUrl = useContentPageOverlayStore.getState().pageUrl;
+  try {
+    void sendRuntimeMessage({
+      type: "SET_SITE_OVERLAY_DRAWER",
+      payload: {
+        url: pageUrl,
+        drawerSide
+      }
+    }).catch(() => undefined);
+  } catch {
+    // Runtime messaging is unavailable in unit tests and non-extension previews.
+  }
+}
+
 function getCurrentPageOverlayState(): ReturnType<typeof getPageOverlayState> {
   return getPageOverlayState(
     useContentSettingsStore.getState().settings,
     useContentPageOverlayStore.getState()
   );
+}
+
+function persistCurrentSiteOverlayVisibility(visible: boolean): void {
+  const pageUrl = useContentPageOverlayStore.getState().pageUrl;
+  try {
+    void sendRuntimeMessage({
+      type: "SET_SITE_OVERLAY_VISIBILITY",
+      payload: {
+        url: pageUrl,
+        visible
+      }
+    }).catch(() => undefined);
+  } catch {
+    // Runtime messaging is unavailable in unit tests and non-extension previews.
+  }
 }

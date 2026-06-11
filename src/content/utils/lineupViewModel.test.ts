@@ -36,12 +36,12 @@ const data: LiveMatchOverlayData = {
   },
   events: [
     {
-      assistMatchPlayerUid: "sub-1",
-      assistName: "Sub",
+      assistMatchPlayerUid: "starter-1",
+      assistName: "Starter",
       detail: "Substitution 1",
       elapsed: 60,
-      playerMatchPlayerUid: "starter-1",
-      playerName: "Starter",
+      playerMatchPlayerUid: "sub-1",
+      playerName: "Sub",
       sequence: 1,
       teamName: "Home",
       type: "subst"

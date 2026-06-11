@@ -29,8 +29,8 @@ export function selectShouldRenderOverlayControl(pageOverlay: PageOverlaySnapsho
 }
 
 export function selectShouldRegisterContentOverlay(
-  settings: ExtensionSettings,
+  _settings: ExtensionSettings,
   pageOverlay: PageOverlaySnapshot
 ): boolean {
-  return selectShouldRenderOverlayControl(pageOverlay) && settings.overlayEnabled;
+  return selectShouldRenderOverlayControl(pageOverlay);
 }

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import "./styles/base.css";
 import { CompactOverlay } from "./components/CompactOverlay";
 import { OverlayEdgeHandle } from "./components/OverlayEdgeHandle";
@@ -8,6 +8,7 @@ import { useContentOverlayRegistration } from "./hooks/useContentOverlayRegistra
 import { useContentOverlayRuntime } from "./hooks/useContentOverlayRuntime";
 import { useContentOverlayShortcuts } from "./hooks/useContentOverlayShortcuts";
 import { updateContentOverlaySettings } from "@/content/actions/contentOverlayActions";
+import { persistCurrentSiteOverlayDrawerSide } from "@/content/actions/contentOverlayActions";
 import { selectShouldRenderOverlayControl } from "@/content/selectors/contentOverlaySelectors";
 import { useContentLiveDataStore } from "@/content/stores/contentLiveDataStore";
 import { useContentOverlayViewStore } from "@/content/stores/contentOverlayViewStore";
@@ -37,6 +38,14 @@ export function ContentOverlayApp() {
   useContentOverlayRuntime();
   useContentOverlayRegistration();
   useContentOverlayShortcuts(shouldRenderControl && settings.overlayEnabled && !settings.overlayCollapsed);
+
+  useEffect(() => {
+    return useContentOverlayViewStore.subscribe((state, previousState) => {
+      if (state.drawerSide !== previousState.drawerSide) {
+        persistCurrentSiteOverlayDrawerSide(state.drawerSide);
+      }
+    });
+  }, []);
 
   const shellClassName = useMemo(
     () => `footballay-overlay-shell ${getOverlayPositionClass(settings.overlayPosition)}`,
