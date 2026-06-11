@@ -20,8 +20,8 @@ export function ContentOverlayApp() {
   const data = useContentLiveDataStore((state) => state.data);
   const settings = useContentSettingsStore((state) => state.settings);
   const isSupportedPage = useContentPageOverlayStore((state) => state.isSupportedPage);
-  const manualVisible = useContentPageOverlayStore((state) => state.manualVisible);
   const pageUrl = useContentPageOverlayStore((state) => state.pageUrl);
+  const siteOverlayVisible = useContentPageOverlayStore((state) => state.siteOverlayVisible);
   const drawerSide = useContentOverlayViewStore((state) => state.drawerSide);
   const selectedPlayerUid = useContentOverlayViewStore((state) => state.selectedPlayerUid);
   const clearSelectedPlayer = useContentOverlayViewStore((state) => state.clearSelectedPlayer);
@@ -31,13 +31,13 @@ export function ContentOverlayApp() {
   const selectPlayer = useContentOverlayViewStore((state) => state.selectPlayer);
   const shouldRenderControl = selectShouldRenderOverlayControl({
     isSupportedPage,
-    manualVisible,
-    pageUrl
+    pageUrl,
+    siteOverlayVisible
   });
 
   useContentOverlayRuntime();
   useContentOverlayRegistration();
-  useContentOverlayShortcuts(shouldRenderControl && settings.overlayEnabled && !settings.overlayCollapsed);
+  useContentOverlayShortcuts(shouldRenderControl && settings.extensionEnabled && !settings.overlayCollapsed);
 
   useEffect(() => {
     return useContentOverlayViewStore.subscribe((state, previousState) => {
@@ -52,18 +52,16 @@ export function ContentOverlayApp() {
     [settings.overlayPosition]
   );
 
-  if (!shouldRenderControl) {
+  if (!shouldRenderControl || !settings.extensionEnabled) {
     return null;
   }
 
-  const shouldRenderDrawerHandles = settings.overlayEnabled && !settings.overlayCollapsed;
+  const shouldRenderDrawerHandles = settings.extensionEnabled && !settings.overlayCollapsed;
 
   return (
     <>
       <div className={shellClassName}>
-        {!settings.overlayEnabled ? (
-          <OverlayButton muted onClick={() => void updateContentOverlaySettings({ overlayEnabled: true })} />
-        ) : settings.overlayCollapsed ? (
+        {settings.overlayCollapsed ? (
           <OverlayButton onClick={() => void updateContentOverlaySettings({ overlayCollapsed: false })} />
         ) : (
           <CompactOverlay

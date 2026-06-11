@@ -10,12 +10,12 @@ export type OverlayLanguage = "auto" | "ko" | "en";
 export type OverlayTickerStatKey = "possession" | "shotsOnGoal" | "shotsTotal" | "cards";
 
 export type ExtensionSettings = {
+  extensionEnabled: boolean;
   selectedLeagueUid?: string;
   selectedFixtureUid?: string;
   selectedFixtureDate?: string;
   fixtureDate?: string;
   fixtureLookupMode: "previous" | "exact" | "nearest";
-  overlayEnabled: boolean;
   overlayCollapsed: boolean;
   overlayLanguage: OverlayLanguage;
   overlayPosition: OverlayPosition;

@@ -3,12 +3,12 @@ import { create } from "zustand";
 
 type ContentPageOverlayState = {
   isSupportedPage: boolean;
-  manualVisible: boolean;
   pageUrl: string;
+  siteOverlayVisible: boolean;
 };
 
 type ContentPageOverlayActions = {
-  setManualVisible: (manualVisible: boolean) => void;
+  setSiteOverlayVisible: (siteOverlayVisible: boolean) => void;
 };
 
 export type ContentPageOverlayStore = ContentPageOverlayState & ContentPageOverlayActions;
@@ -17,10 +17,10 @@ const initialPageUrl = typeof window === "undefined" ? "" : window.location.href
 
 export const useContentPageOverlayStore = create<ContentPageOverlayStore>((set) => ({
   isSupportedPage: initialPageUrl ? isSupportedStreamingUrl(initialPageUrl) : false,
-  manualVisible: false,
   pageUrl: initialPageUrl,
+  siteOverlayVisible: initialPageUrl ? isSupportedStreamingUrl(initialPageUrl) : false,
 
-  setManualVisible(manualVisible) {
-    set({ manualVisible });
+  setSiteOverlayVisible(siteOverlayVisible) {
+    set({ siteOverlayVisible });
   }
 }));

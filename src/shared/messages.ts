@@ -12,7 +12,7 @@ export type RuntimeSettingsPatch = Partial<
 
 export type PageOverlayState = {
   isSupportedPage: boolean;
-  manualVisible: boolean;
+  siteOverlayVisible: boolean;
   visible: boolean;
   url: string;
 };

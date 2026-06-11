@@ -3,8 +3,8 @@ import type { ExtensionSettings } from "@/shared/overlay/types";
 
 type PageOverlaySnapshot = {
   isSupportedPage: boolean;
-  manualVisible: boolean;
   pageUrl: string;
+  siteOverlayVisible: boolean;
 };
 
 export function getPageOverlayState(
@@ -12,12 +12,12 @@ export function getPageOverlayState(
   pageOverlay: PageOverlaySnapshot,
   override?: Partial<PageOverlayState>
 ): PageOverlayState {
-  const nextManualVisible = override?.manualVisible ?? pageOverlay.manualVisible;
-  const nextVisible = settings.overlayEnabled && (pageOverlay.isSupportedPage || nextManualVisible);
+  const nextSiteOverlayVisible = override?.siteOverlayVisible ?? pageOverlay.siteOverlayVisible;
+  const nextVisible = settings.extensionEnabled && nextSiteOverlayVisible;
 
   return {
     isSupportedPage: pageOverlay.isSupportedPage,
-    manualVisible: nextManualVisible,
+    siteOverlayVisible: nextSiteOverlayVisible,
     visible: nextVisible,
     url: pageOverlay.pageUrl,
     ...override
@@ -25,7 +25,7 @@ export function getPageOverlayState(
 }
 
 export function selectShouldRenderOverlayControl(pageOverlay: PageOverlaySnapshot): boolean {
-  return pageOverlay.isSupportedPage || pageOverlay.manualVisible;
+  return pageOverlay.isSupportedPage || pageOverlay.siteOverlayVisible;
 }
 
 export function selectShouldRegisterContentOverlay(

@@ -8,8 +8,8 @@ export const defaultOverlayTickerStatKeys: OverlayTickerStatKey[] = [
 ];
 
 export const defaultSettings: ExtensionSettings = {
+  extensionEnabled: true,
   fixtureLookupMode: "nearest",
-  overlayEnabled: true,
   overlayCollapsed: true,
   overlayLanguage: "auto",
   overlayPosition: "bottom-right",

@@ -30,7 +30,7 @@ describe("content overlay stores", () => {
     useContentSettingsStore.setState({ settings: defaultSettings });
     useContentPageOverlayStore.setState({
       isSupportedPage: false,
-      manualVisible: false,
+      siteOverlayVisible: false,
       pageUrl: "https://example.com/watch"
     });
     useContentOverlayViewStore.setState({
@@ -69,7 +69,7 @@ describe("content overlay stores", () => {
   it("returns page overlay state responses for popup messages", () => {
     useContentPageOverlayStore.setState({
       isSupportedPage: false,
-      manualVisible: false
+      siteOverlayVisible: false
     });
 
     const showResponse = handleContentRuntimeMessage({
@@ -80,7 +80,7 @@ describe("content overlay stores", () => {
       ok: true,
       pageOverlayState: {
         isSupportedPage: false,
-        manualVisible: true,
+        siteOverlayVisible: true,
         url: "https://example.com/watch",
         visible: true
       }
@@ -101,7 +101,7 @@ describe("content overlay stores", () => {
       ok: true,
       pageOverlayState: {
         isSupportedPage: false,
-        manualVisible: false,
+        siteOverlayVisible: false,
         url: "https://example.com/watch",
         visible: false
       }
@@ -125,12 +125,12 @@ describe("content overlay stores", () => {
   it("selects render and registry states", () => {
     useContentPageOverlayStore.setState({
       isSupportedPage: false,
-      manualVisible: false
+      siteOverlayVisible: false
     });
     useContentSettingsStore.setState({
       settings: {
         ...defaultSettings,
-        overlayEnabled: true
+        extensionEnabled: true
       }
     });
 
@@ -141,7 +141,7 @@ describe("content overlay stores", () => {
       selectShouldRegisterContentOverlay(useContentSettingsStore.getState().settings, useContentPageOverlayStore.getState())
     ).toBe(false);
 
-    useContentPageOverlayStore.setState({ manualVisible: true });
+    useContentPageOverlayStore.setState({ siteOverlayVisible: true });
 
     expect(
       selectShouldRenderOverlayControl(useContentPageOverlayStore.getState())
@@ -153,7 +153,7 @@ describe("content overlay stores", () => {
     useContentSettingsStore.setState({
       settings: {
         ...defaultSettings,
-        overlayEnabled: false
+        extensionEnabled: false
       }
     });
 

@@ -33,11 +33,15 @@ describe("site overlay storage", () => {
     await expect(readSiteOverlayVisible("https://other.example/watch")).resolves.toBe(false);
   });
 
-  it("removes host visibility when hidden", async () => {
+  it("stores hidden host visibility override", async () => {
     await writeSiteOverlayVisible("https://example.com/watch", true);
     await expect(writeSiteOverlayVisible("https://example.com/watch", false)).resolves.toBe(false);
 
     await expect(readSiteOverlayVisible("https://example.com/watch")).resolves.toBe(false);
+  });
+
+  it("shows supported streaming hosts by default", async () => {
+    await expect(readSiteOverlayVisible("https://www.coupangplay.com/live")).resolves.toBe(true);
   });
 
   it("ignores invalid urls", async () => {

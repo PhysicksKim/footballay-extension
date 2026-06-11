@@ -19,7 +19,7 @@ export async function loadInitialContentOverlayState(): Promise<void> {
     payload: { url: pageUrl }
   });
   if (siteVisibilityResponse.ok && "visible" in siteVisibilityResponse) {
-    useContentPageOverlayStore.getState().setManualVisible(siteVisibilityResponse.visible);
+    useContentPageOverlayStore.getState().setSiteOverlayVisible(siteVisibilityResponse.visible);
   }
 
   const siteDrawerResponse = await sendRuntimeMessage({
@@ -64,7 +64,7 @@ export function handleContentRuntimeMessage(message: RuntimeMessage): RuntimeRes
 
   if (message.type === "SHOW_PAGE_OVERLAY") {
     const pageOverlayStore = useContentPageOverlayStore.getState();
-    pageOverlayStore.setManualVisible(true);
+    pageOverlayStore.setSiteOverlayVisible(true);
     persistCurrentSiteOverlayVisibility(true);
     return {
       ok: true,
@@ -74,7 +74,7 @@ export function handleContentRuntimeMessage(message: RuntimeMessage): RuntimeRes
 
   if (message.type === "HIDE_PAGE_OVERLAY") {
     const pageOverlayStore = useContentPageOverlayStore.getState();
-    pageOverlayStore.setManualVisible(false);
+    pageOverlayStore.setSiteOverlayVisible(false);
     useContentOverlayViewStore.getState().closeDrawer();
     persistCurrentSiteOverlayVisibility(false);
     persistCurrentSiteOverlayDrawerSide(undefined);

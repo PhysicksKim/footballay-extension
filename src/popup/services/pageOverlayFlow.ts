@@ -1,5 +1,4 @@
 import type { PageOverlayState } from "@/shared/messages";
-import type { ExtensionSettings } from "@/shared/overlay/types";
 import { isSupportedStreamingUrl } from "@/shared/url";
 import { getActiveTab, sendActiveTabMessage } from "./runtimeClient";
 
@@ -24,17 +23,8 @@ export async function resolveCurrentPageOverlayState(): Promise<PageOverlayState
 export function getFallbackPageOverlayState(url: string): PageOverlayState {
   return {
     isSupportedPage: isSupportedStreamingUrl(url),
-    manualVisible: false,
+    siteOverlayVisible: isSupportedStreamingUrl(url),
     visible: false,
     url
   };
-}
-
-// On supported pages, hiding means disabling the global overlay setting.
-// On manual pages, hiding means only hiding the overlay in that tab.
-export function shouldDisableGlobalOverlayForSupportedPage(
-  pageOverlayState: PageOverlayState | null,
-  settings: ExtensionSettings
-): boolean {
-  return Boolean(pageOverlayState?.isSupportedPage && settings.overlayEnabled);
 }

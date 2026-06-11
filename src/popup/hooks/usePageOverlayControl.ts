@@ -4,6 +4,7 @@ import {
   showOverlayOnCurrentPage
 } from "../actions/popupPageOverlayActions";
 import { usePopupPageOverlayStore } from "../stores/popupPageOverlayStore";
+import { usePopupSettingsStore } from "../stores/popupSettingsStore";
 
 export function usePageOverlayControl() {
   const { pageOverlayState, pageOverlayStateLoading } = usePopupPageOverlayStore(
@@ -12,9 +13,10 @@ export function usePageOverlayControl() {
       pageOverlayStateLoading: state.pageOverlayStateLoading
     }))
   );
+  const extensionEnabled = usePopupSettingsStore((state) => state.settings.extensionEnabled);
 
   return {
-    canControl: pageOverlayState?.url.startsWith("http") ?? false,
+    canControl: extensionEnabled && (pageOverlayState?.url.startsWith("http") ?? false),
     onToggle: (visible: boolean) =>
       visible ? void showOverlayOnCurrentPage() : void hideOverlayOnCurrentPage(),
     pending: pageOverlayStateLoading,

@@ -44,6 +44,7 @@ export type PageOverlayViewModel = {
 };
 
 export type OverlaySettingsViewModel = {
+  extensionEnabled: ExtensionSettings["extensionEnabled"];
   overlayPosition: ExtensionSettings["overlayPosition"];
   onChangeSettings: (patch: Partial<ExtensionSettings>) => void;
 };
@@ -103,6 +104,7 @@ export function PopupView({
         </section>
       ) : (
         <OverlaySettingsSection
+          extensionEnabled={overlaySettings.extensionEnabled}
           overlayPosition={overlaySettings.overlayPosition}
           onChangeSettings={overlaySettings.onChangeSettings}
         />

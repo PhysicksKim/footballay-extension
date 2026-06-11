@@ -8,12 +8,12 @@ import { useContentSettingsStore } from "@/content/stores/contentSettingsStore";
 export function useContentOverlayRegistration(): void {
   const settings = useContentSettingsStore((state) => state.settings);
   const isSupportedPage = useContentPageOverlayStore((state) => state.isSupportedPage);
-  const manualVisible = useContentPageOverlayStore((state) => state.manualVisible);
   const pageUrl = useContentPageOverlayStore((state) => state.pageUrl);
+  const siteOverlayVisible = useContentPageOverlayStore((state) => state.siteOverlayVisible);
   const shouldRegisterOverlay = selectShouldRegisterContentOverlay(settings, {
     isSupportedPage,
-    manualVisible,
-    pageUrl
+    pageUrl,
+    siteOverlayVisible
   });
 
   useEffect(() => {

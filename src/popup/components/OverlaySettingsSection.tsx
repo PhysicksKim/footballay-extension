@@ -4,6 +4,7 @@ import type { ExtensionSettings, OverlayPosition } from "@/shared/overlay/types"
 import { overlayPositions } from "@/shared/overlay/position";
 
 type OverlaySettingsSectionProps = {
+  extensionEnabled: boolean;
   overlayPosition: OverlayPosition;
   onChangeSettings: (patch: Partial<ExtensionSettings>) => void;
 };
@@ -22,11 +23,23 @@ const contactLinks = {
 };
 
 export function OverlaySettingsSection({
+  extensionEnabled,
   overlayPosition,
   onChangeSettings
 }: OverlaySettingsSectionProps) {
   return (
     <section className="footballay-settings">
+      <label className="footballay-settings-row">
+        <span>{t("popup.settings.extensionEnabled")}</span>
+        <input
+          checked={extensionEnabled}
+          type="checkbox"
+          onChange={(event) =>
+            onChangeSettings({ extensionEnabled: event.currentTarget.checked })
+          }
+        />
+      </label>
+
       <label className="footballay-settings-row footballay-settings-row--select">
         <span>{t("popup.settings.overlayPosition")}</span>
         <select

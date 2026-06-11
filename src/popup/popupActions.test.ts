@@ -224,7 +224,7 @@ describe("popup split store actions", () => {
     expect(usePopupPageOverlayStore.getState()).toMatchObject({
       pageOverlayState: {
         isSupportedPage: false,
-        manualVisible: false,
+        siteOverlayVisible: false,
         url: "https://example.com/watch",
         visible: false
       },
@@ -287,7 +287,7 @@ describe("popup split store actions", () => {
     handlePopupRuntimeMessage({
       payload: {
         ...defaultSettings,
-        overlayEnabled: false
+        extensionEnabled: false
       },
       type: "SETTINGS_UPDATED"
     });
@@ -296,7 +296,7 @@ describe("popup split store actions", () => {
       type: "LIVE_MATCH_DATA_UPDATED"
     });
 
-    expect(usePopupSettingsStore.getState().settings.overlayEnabled).toBe(false);
+    expect(usePopupSettingsStore.getState().settings.extensionEnabled).toBe(false);
     expect(usePopupLiveDataStore.getState().data).toEqual(latestMatchData);
   });
 
@@ -306,9 +306,9 @@ describe("popup split store actions", () => {
       ok: false
     });
 
-    await updatePopupSettings({ overlayEnabled: false });
+    await updatePopupSettings({ extensionEnabled: false });
 
-    expect(usePopupSettingsStore.getState().settings.overlayEnabled).toBe(true);
+    expect(usePopupSettingsStore.getState().settings.extensionEnabled).toBe(true);
     expect(usePopupUiStore.getState().error).toBe("Settings failed");
   });
 
@@ -564,13 +564,13 @@ describe("popup split store actions", () => {
     });
   });
 
-  it("shows the page overlay and enables global overlay settings first when needed", async () => {
+  it("shows the current page overlay without changing global settings", async () => {
     mockRuntimeResponses();
     mockActiveTab("https://example.com/watch", {
       ok: true,
       pageOverlayState: {
         isSupportedPage: false,
-        manualVisible: true,
+        siteOverlayVisible: true,
         url: "https://example.com/watch",
         visible: true
       }
@@ -578,21 +578,18 @@ describe("popup split store actions", () => {
     usePopupSettingsStore.setState({
       settings: {
         ...defaultSettings,
-        overlayEnabled: false
+        extensionEnabled: true
       }
     });
 
     await showOverlayOnCurrentPage();
 
-    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({
-      type: "UPDATE_SETTINGS",
-      payload: { overlayEnabled: true }
-    });
+    expect(sendRuntimeMessageMock).not.toHaveBeenCalledWith(expect.objectContaining({ type: "UPDATE_SETTINGS" }));
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(1, { type: "SHOW_PAGE_OVERLAY" });
-    expect(usePopupSettingsStore.getState().settings.overlayEnabled).toBe(true);
+    expect(usePopupSettingsStore.getState().settings.extensionEnabled).toBe(true);
     expect(usePopupPageOverlayStore.getState().pageOverlayState).toEqual({
       isSupportedPage: false,
-      manualVisible: true,
+      siteOverlayVisible: true,
       url: "https://example.com/watch",
       visible: true
     });
@@ -607,7 +604,7 @@ describe("popup split store actions", () => {
     expect(usePopupPageOverlayStore.getState()).toMatchObject({
       pageOverlayState: {
         isSupportedPage: false,
-        manualVisible: false,
+        siteOverlayVisible: false,
         url: "https://example.com/watch",
         visible: false
       },
@@ -616,19 +613,27 @@ describe("popup split store actions", () => {
     expect(usePopupUiStore.getState().error).toBe(t("popup.error.pageOverlayUnavailable"));
   });
 
-  it("hides supported page overlays by disabling the global overlay setting", async () => {
+  it("hides supported page overlays through the content script without changing global settings", async () => {
     mockRuntimeResponses();
-    mockActiveTab("https://www.coupangplay.com/live");
+    mockActiveTab("https://www.coupangplay.com/live", {
+      ok: true,
+      pageOverlayState: {
+        isSupportedPage: true,
+        siteOverlayVisible: false,
+        url: "https://www.coupangplay.com/live",
+        visible: false
+      }
+    });
     usePopupSettingsStore.setState({
       settings: {
         ...defaultSettings,
-        overlayEnabled: true
+        extensionEnabled: true
       }
     });
     usePopupPageOverlayStore.setState({
       pageOverlayState: {
         isSupportedPage: true,
-        manualVisible: false,
+        siteOverlayVisible: true,
         url: "https://www.coupangplay.com/live",
         visible: true
       }
@@ -636,16 +641,13 @@ describe("popup split store actions", () => {
 
     await hideOverlayOnCurrentPage();
 
-    expect(sendRuntimeMessageMock).toHaveBeenCalledWith({
-      type: "UPDATE_SETTINGS",
-      payload: { overlayEnabled: false }
-    });
-    expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(1, { type: "GET_PAGE_OVERLAY_STATE" });
-    expect(usePopupSettingsStore.getState().settings.overlayEnabled).toBe(false);
+    expect(sendRuntimeMessageMock).not.toHaveBeenCalledWith(expect.objectContaining({ type: "UPDATE_SETTINGS" }));
+    expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(1, { type: "HIDE_PAGE_OVERLAY" });
+    expect(usePopupSettingsStore.getState().settings.extensionEnabled).toBe(true);
     expect(usePopupPageOverlayStore.getState()).toMatchObject({
       pageOverlayState: {
         isSupportedPage: true,
-        manualVisible: false,
+        siteOverlayVisible: false,
         url: "https://www.coupangplay.com/live",
         visible: false
       },
@@ -658,7 +660,7 @@ describe("popup split store actions", () => {
       ok: true,
       pageOverlayState: {
         isSupportedPage: false,
-        manualVisible: false,
+        siteOverlayVisible: false,
         url: "https://example.com/watch",
         visible: false
       }
@@ -666,7 +668,7 @@ describe("popup split store actions", () => {
     usePopupPageOverlayStore.setState({
       pageOverlayState: {
         isSupportedPage: false,
-        manualVisible: true,
+        siteOverlayVisible: true,
         url: "https://example.com/watch",
         visible: true
       }
@@ -678,7 +680,7 @@ describe("popup split store actions", () => {
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(1, { type: "HIDE_PAGE_OVERLAY" });
     expect(usePopupPageOverlayStore.getState().pageOverlayState).toEqual({
       isSupportedPage: false,
-      manualVisible: false,
+      siteOverlayVisible: false,
       url: "https://example.com/watch",
       visible: false
     });

@@ -144,7 +144,7 @@ export function createLiveMatchPollingService({
   async function startMatchPollingIfNeeded(existingSettings?: ExtensionSettings): Promise<void> {
     const settings = existingSettings ?? (await readSettings());
 
-    if (!settings.overlayEnabled || !settings.selectedFixtureUid) {
+    if (!settings.extensionEnabled || !settings.selectedFixtureUid) {
       stop();
       return;
     }

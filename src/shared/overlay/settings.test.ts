@@ -6,11 +6,11 @@ describe("overlay settings normalization", () => {
   it("fills missing fields with defaults", () => {
     expect(
       normalizeExtensionSettings({
-        overlayEnabled: false
+        extensionEnabled: false
       })
     ).toEqual({
       ...defaultSettings,
-      overlayEnabled: false
+      extensionEnabled: false
     });
   });
 

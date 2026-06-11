@@ -20,11 +20,11 @@ export function normalizeExtensionSettings(
 ): ExtensionSettings {
   const raw = rawSettings ?? {};
   const nextSettings: ExtensionSettings = {
+    extensionEnabled: getBoolean(raw.extensionEnabled, defaultSettings.extensionEnabled),
     fixtureLookupMode: fixtureLookupModes.includes(raw.fixtureLookupMode as ExtensionSettings["fixtureLookupMode"])
       ? (raw.fixtureLookupMode as ExtensionSettings["fixtureLookupMode"])
       : defaultSettings.fixtureLookupMode,
     overlayCollapsed: getBoolean(raw.overlayCollapsed, defaultSettings.overlayCollapsed),
-    overlayEnabled: getBoolean(raw.overlayEnabled, defaultSettings.overlayEnabled),
     overlayLanguage: overlayLanguages.includes(raw.overlayLanguage as OverlayLanguage)
       ? (raw.overlayLanguage as OverlayLanguage)
       : defaultSettings.overlayLanguage,

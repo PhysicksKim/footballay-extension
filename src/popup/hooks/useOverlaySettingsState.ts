@@ -5,13 +5,15 @@ import { updatePopupSettings } from "../actions/popupSettingsActions";
 import { usePopupSettingsStore } from "../stores/popupSettingsStore";
 
 export function useOverlaySettingsState() {
-  const { overlayPosition } = usePopupSettingsStore(
+  const { extensionEnabled, overlayPosition } = usePopupSettingsStore(
     useShallow((state) => ({
+      extensionEnabled: state.settings.extensionEnabled,
       overlayPosition: state.settings.overlayPosition
     }))
   );
 
   return {
+    extensionEnabled,
     onChangeSettings: (patch: Partial<ExtensionSettings>) =>
       void updatePopupSettings(patch as RuntimeSettingsPatch),
     overlayPosition

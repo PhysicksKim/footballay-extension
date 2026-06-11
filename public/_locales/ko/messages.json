@@ -164,6 +164,9 @@
   "popup_settings_close": {
     "message": "설정 닫기"
   },
+  "popup_settings_extensionEnabled": {
+    "message": "확장 기능 전체 사용"
+  },
   "popup_settings_open": {
     "message": "설정 열기"
   },

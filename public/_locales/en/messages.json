@@ -164,6 +164,9 @@
   "popup_settings_close": {
     "message": "Close settings"
   },
+  "popup_settings_extensionEnabled": {
+    "message": "Enable extension"
+  },
   "popup_settings_open": {
     "message": "Open settings"
   },

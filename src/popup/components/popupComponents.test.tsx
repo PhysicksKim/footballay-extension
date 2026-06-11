@@ -105,6 +105,7 @@ describe("popup components", () => {
           selectedLeagueUid: "league-1"
         }}
         overlaySettings={{
+          extensionEnabled: defaultSettings.extensionEnabled,
           onChangeSettings: vi.fn(),
           overlayPosition: defaultSettings.overlayPosition
         }}
@@ -172,6 +173,7 @@ describe("popup components", () => {
           selectedLeagueUid: undefined
         }}
         overlaySettings={{
+          extensionEnabled: true,
           onChangeSettings: onUpdateSettings,
           overlayPosition: "bottom-right"
         }}
@@ -351,6 +353,7 @@ describe("popup components", () => {
 
     render(
       <OverlaySettingsSection
+        extensionEnabled
         overlayPosition="bottom-right"
         onChangeSettings={onChangeSettings}
       />

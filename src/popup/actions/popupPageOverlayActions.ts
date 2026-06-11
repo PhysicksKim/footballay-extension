@@ -1,13 +1,10 @@
 import { sendActiveTabMessage } from "../services/runtimeClient";
 import { t } from "@/shared/i18n/locale";
 import {
-  resolveCurrentPageOverlayState,
-  shouldDisableGlobalOverlayForSupportedPage
+  resolveCurrentPageOverlayState
 } from "../services/pageOverlayFlow";
 import { usePopupPageOverlayStore } from "../stores/popupPageOverlayStore";
-import { usePopupSettingsStore } from "../stores/popupSettingsStore";
 import { usePopupUiStore } from "../stores/popupUiStore";
-import { updatePopupSettings } from "./popupSettingsActions";
 
 export async function refreshPageOverlayState(): Promise<void> {
   const pageOverlayStore = usePopupPageOverlayStore.getState();
@@ -22,14 +19,13 @@ export async function refreshPageOverlayState(): Promise<void> {
 
 export async function showOverlayOnCurrentPage(): Promise<void> {
   usePopupUiStore.getState().clearError();
-
-  if (!usePopupSettingsStore.getState().settings.overlayEnabled) {
-    await updatePopupSettings({ overlayEnabled: true });
-  }
+  usePopupPageOverlayStore.getState().setPageOverlayStateLoading(true);
 
   const response = await sendActiveTabMessage({ type: "SHOW_PAGE_OVERLAY" });
   if (response?.ok && "pageOverlayState" in response) {
-    usePopupPageOverlayStore.getState().setPageOverlayState(response.pageOverlayState);
+    const pageOverlayStore = usePopupPageOverlayStore.getState();
+    pageOverlayStore.setPageOverlayState(response.pageOverlayState);
+    pageOverlayStore.setPageOverlayStateLoading(false);
     return;
   }
 
@@ -39,17 +35,15 @@ export async function showOverlayOnCurrentPage(): Promise<void> {
 
 export async function hideOverlayOnCurrentPage(): Promise<void> {
   usePopupUiStore.getState().clearError();
-
-  const { pageOverlayState } = usePopupPageOverlayStore.getState();
-  const { settings } = usePopupSettingsStore.getState();
-  if (shouldDisableGlobalOverlayForSupportedPage(pageOverlayState, settings)) {
-    await updatePopupSettings({ overlayEnabled: false });
-    await refreshPageOverlayState();
-    return;
-  }
+  usePopupPageOverlayStore.getState().setPageOverlayStateLoading(true);
 
   const response = await sendActiveTabMessage({ type: "HIDE_PAGE_OVERLAY" });
   if (response?.ok && "pageOverlayState" in response) {
-    usePopupPageOverlayStore.getState().setPageOverlayState(response.pageOverlayState);
+    const pageOverlayStore = usePopupPageOverlayStore.getState();
+    pageOverlayStore.setPageOverlayState(response.pageOverlayState);
+    pageOverlayStore.setPageOverlayStateLoading(false);
+    return;
   }
+
+  usePopupPageOverlayStore.getState().setPageOverlayStateLoading(false);
 }

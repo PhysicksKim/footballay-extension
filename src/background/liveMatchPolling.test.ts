@@ -88,12 +88,12 @@ describe("createLiveMatchPollingService", () => {
     vi.useRealTimers();
   });
 
-  it("does not start polling when overlay is disabled", async () => {
+  it("does not start polling when extension is disabled", async () => {
     const service = createLiveMatchPollingService({ broadcast: vi.fn() });
 
     await service.startMatchPollingIfNeeded({
       ...baseSettings,
-      overlayEnabled: false
+      extensionEnabled: false
     });
 
     expect(fetchFixtureInfo).not.toHaveBeenCalled();
@@ -199,7 +199,7 @@ describe("createLiveMatchPollingService", () => {
     await service.startMatchPollingIfNeeded(baseSettings);
     await service.startMatchPollingIfNeeded({
       ...baseSettings,
-      overlayEnabled: false
+      extensionEnabled: false
     });
     await vi.advanceTimersByTimeAsync(baseSettings.pollingIntervalMs);
 

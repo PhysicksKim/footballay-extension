@@ -1,7 +1,7 @@
 import { storage } from "wxt/utils/storage";
 import type { ExtensionSettings } from "@/shared/overlay/types";
 import { normalizeExtensionSettings } from "@/shared/overlay/settings";
-import { getHostname } from "@/shared/url";
+import { getHostname, isSupportedStreamingUrl } from "@/shared/url";
 
 const SETTINGS_KEY = "local:footballay-settings";
 const SITE_OVERLAY_DRAWERS_KEY = "local:footballay-site-overlay-drawers";
@@ -10,7 +10,7 @@ const SITE_OVERLAYS_KEY = "local:footballay-site-overlays";
 export type SiteOverlayDrawerSide = "left" | "right";
 
 type SiteOverlayDrawerMap = Record<string, SiteOverlayDrawerSide>;
-type SiteOverlayVisibilityMap = Record<string, true>;
+type SiteOverlayVisibilityMap = Record<string, boolean>;
 
 export async function readSettings(): Promise<ExtensionSettings> {
   const storedSettings = await storage.getItem<Partial<ExtensionSettings>>(SETTINGS_KEY);
@@ -36,7 +36,7 @@ export async function readSiteOverlayVisible(url: string): Promise<boolean> {
   }
 
   const siteOverlays = await readSiteOverlayVisibilityMap();
-  return siteOverlays[hostname] === true;
+  return siteOverlays[hostname] ?? isSupportedStreamingUrl(url);
 }
 
 export async function writeSiteOverlayVisible(url: string, visible: boolean): Promise<boolean> {
@@ -46,14 +46,10 @@ export async function writeSiteOverlayVisible(url: string, visible: boolean): Pr
   }
 
   const siteOverlays = await readSiteOverlayVisibilityMap();
-  if (visible) {
-    siteOverlays[hostname] = true;
-  } else {
-    delete siteOverlays[hostname];
-  }
+  siteOverlays[hostname] = visible;
 
   await storage.setItem(SITE_OVERLAYS_KEY, siteOverlays);
-  return siteOverlays[hostname] === true;
+  return siteOverlays[hostname];
 }
 
 export async function readSiteOverlayDrawerSide(url: string): Promise<SiteOverlayDrawerSide | undefined> {
@@ -93,7 +89,7 @@ async function readSiteOverlayVisibilityMap(): Promise<SiteOverlayVisibilityMap>
   }
 
   return Object.fromEntries(
-    Object.entries(storedSiteOverlays).filter((entry): entry is [string, true] => entry[1] === true)
+    Object.entries(storedSiteOverlays).filter((entry): entry is [string, boolean] => typeof entry[1] === "boolean")
   );
 }
 
