@@ -7,6 +7,7 @@ import { defaultSettings } from '@/shared/constants';
 import { t } from '@/shared/i18n/locale';
 import type { MessageKey } from '@/shared/i18n/messages';
 import type { ExtensionSettings, OverlayTickerStatKey } from '@/shared/overlay/types';
+import { resolveOverlayTickerStatKeys } from '@/shared/overlay/tickerStats';
 import footballayIconSmallUrl from '../../../assets/footballay_icon_small.png';
 
 type CompactOverlayProps = {
@@ -33,9 +34,13 @@ const tickerSizeBase = {
 };
 
 export function CompactOverlay({ data, onCollapse, settings = defaultSettings }: CompactOverlayProps) {
+    const statKeys = useMemo(
+        () => resolveOverlayTickerStatKeys(settings),
+        [settings.overlayTickerCustomStatKeys, settings.overlayTickerStatsMode],
+    );
     const stats = useMemo(
-        () => getAmbientStats(data, settings.overlayTickerStatKeys),
-        [data, settings.overlayTickerStatKeys],
+        () => getAmbientStats(data, statKeys),
+        [data, statKeys],
     );
     const [activeIndex, setActiveIndex] = useState(0);
     const activeStat = stats[activeIndex % stats.length];

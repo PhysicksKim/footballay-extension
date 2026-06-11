@@ -1,37 +1,28 @@
-import { defaultOverlayTickerStatKeys, defaultSettings } from "@/shared/constants";
+import { defaultSettings, overlayTickerStatCatalog } from "@/shared/constants";
 import { overlayPositions } from "@/shared/overlay/position";
+import { mergeNewDefaultTickerStatKeys, normalizeOverlayTickerStatKeys } from "@/shared/overlay/tickerStats";
 import type {
   ExtensionSettings,
-  OverlayLanguage,
-  OverlayTickerStatKey
+  OverlayLanguage
 } from "@/shared/overlay/types";
 
 const fixtureLookupModes: ExtensionSettings["fixtureLookupMode"][] = ["previous", "exact", "nearest"];
 const overlayLanguages: OverlayLanguage[] = ["auto", "ko", "en"];
-const overlayTickerStatKeys: OverlayTickerStatKey[] = [
-  "expectedGoals",
-  "possession",
-  "shotsOnGoal",
-  "shotsTotal",
-  "shotsInsideBox",
-  "cornerKicks",
-  "passesAccuracy",
-  "fouls",
-  "offsides",
-  "goalkeeperSaves",
-  "cards"
-];
-const previousDefaultOverlayTickerStatKeys: OverlayTickerStatKey[] = [
-  "possession",
-  "shotsOnGoal",
-  "shotsTotal",
-  "cards"
-];
+const overlayTickerStatsModes: ExtensionSettings["overlayTickerStatsMode"][] = ["default", "custom"];
 
 export function normalizeExtensionSettings(
   rawSettings: Partial<ExtensionSettings> | null | undefined
 ): ExtensionSettings {
   const raw = rawSettings ?? {};
+  const overlayTickerStatsMode = overlayTickerStatsModes.includes(raw.overlayTickerStatsMode as ExtensionSettings["overlayTickerStatsMode"])
+    ? (raw.overlayTickerStatsMode as ExtensionSettings["overlayTickerStatsMode"])
+    : defaultSettings.overlayTickerStatsMode;
+  const overlayTickerKnownStatKeys = normalizeOverlayTickerStatKeys(raw.overlayTickerKnownStatKeys);
+  const normalizedCustomStatKeys = normalizeOverlayTickerStatKeys(raw.overlayTickerCustomStatKeys);
+  const overlayTickerCustomStatKeys =
+    overlayTickerStatsMode === "custom"
+      ? mergeNewDefaultTickerStatKeys(normalizedCustomStatKeys, overlayTickerKnownStatKeys)
+      : normalizedCustomStatKeys;
   const nextSettings: ExtensionSettings = {
     extensionEnabled: getBoolean(raw.extensionEnabled, defaultSettings.extensionEnabled),
     fixtureLookupMode: fixtureLookupModes.includes(raw.fixtureLookupMode as ExtensionSettings["fixtureLookupMode"])
@@ -51,7 +42,9 @@ export function normalizeExtensionSettings(
       60000
     ),
     overlayTickerScale: clampNumber(raw.overlayTickerScale, defaultSettings.overlayTickerScale, 0.75, 2.5),
-    overlayTickerStatKeys: normalizeOverlayTickerStatKeys(raw.overlayTickerStatKeys),
+    overlayTickerStatsMode,
+    overlayTickerCustomStatKeys,
+    overlayTickerKnownStatKeys: [...overlayTickerStatCatalog],
     pollingIntervalMs: clampNumber(raw.pollingIntervalMs, defaultSettings.pollingIntervalMs, 5000, 300000)
   };
 
@@ -97,25 +90,4 @@ function clampNumber(value: unknown, fallback: number, min: number, max: number)
   }
 
   return Math.min(Math.max(value, min), max);
-}
-
-function normalizeOverlayTickerStatKeys(value: unknown): OverlayTickerStatKey[] {
-  if (!Array.isArray(value)) {
-    return [...defaultOverlayTickerStatKeys];
-  }
-
-  const validKeys = value.filter((key): key is OverlayTickerStatKey =>
-    overlayTickerStatKeys.includes(key as OverlayTickerStatKey)
-  );
-  const uniqueKeys = [...new Set(validKeys)];
-
-  if (matchesTickerStatKeys(uniqueKeys, previousDefaultOverlayTickerStatKeys)) {
-    return [...defaultOverlayTickerStatKeys];
-  }
-
-  return uniqueKeys.length ? uniqueKeys : [...defaultOverlayTickerStatKeys];
-}
-
-function matchesTickerStatKeys(left: OverlayTickerStatKey[], right: OverlayTickerStatKey[]): boolean {
-  return left.length === right.length && left.every((key, index) => key === right[index]);
 }

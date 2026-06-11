@@ -14,7 +14,13 @@ type SiteOverlayVisibilityMap = Record<string, boolean>;
 
 export async function readSettings(): Promise<ExtensionSettings> {
   const storedSettings = await storage.getItem<Partial<ExtensionSettings>>(SETTINGS_KEY);
-  return normalizeExtensionSettings(storedSettings);
+  const normalizedSettings = normalizeExtensionSettings(storedSettings);
+
+  if (!areSettingsEqual(storedSettings, normalizedSettings)) {
+    await storage.setItem(SETTINGS_KEY, normalizedSettings);
+  }
+
+  return normalizedSettings;
 }
 
 export async function writeSettings(
@@ -91,6 +97,13 @@ async function readSiteOverlayVisibilityMap(): Promise<SiteOverlayVisibilityMap>
   return Object.fromEntries(
     Object.entries(storedSiteOverlays).filter((entry): entry is [string, boolean] => typeof entry[1] === "boolean")
   );
+}
+
+function areSettingsEqual(
+  storedSettings: Partial<ExtensionSettings> | null | undefined,
+  normalizedSettings: ExtensionSettings
+): boolean {
+  return JSON.stringify(storedSettings ?? {}) === JSON.stringify(normalizedSettings);
 }
 
 async function readSiteOverlayDrawerMap(): Promise<SiteOverlayDrawerMap> {

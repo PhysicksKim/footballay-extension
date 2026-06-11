@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defaultOverlayTickerStatKeys, defaultSettings } from "@/shared/constants";
+import { defaultOverlayTickerStatKeys, defaultSettings, overlayTickerStatCatalog } from "@/shared/constants";
 import { normalizeExtensionSettings, normalizeSettingsPatch } from "./settings";
 
 describe("overlay settings normalization", () => {
@@ -21,31 +21,105 @@ describe("overlay settings normalization", () => {
         overlayPosition: "center" as never,
         overlayTickerIntervalMs: 100,
         overlayTickerScale: Number.NaN,
-        overlayTickerStatKeys: ["shotsOnGoal", "invalid", "shotsOnGoal"] as never
+        overlayTickerStatsMode: "unknown" as never,
+        overlayTickerCustomStatKeys: ["shotsOnGoal", "invalid", "shotsOnGoal"] as never
       })
     ).toMatchObject({
       overlayLanguage: defaultSettings.overlayLanguage,
       overlayPosition: defaultSettings.overlayPosition,
       overlayTickerIntervalMs: 1000,
       overlayTickerScale: defaultSettings.overlayTickerScale,
-      overlayTickerStatKeys: ["shotsOnGoal"]
+      overlayTickerStatsMode: "default",
+      overlayTickerCustomStatKeys: ["shotsOnGoal"]
     });
   });
 
-  it("falls back to default ticker stat keys when no valid stat key remains", () => {
+  it("pushes current default ticker stats into custom settings when no known stat list exists", () => {
     expect(
       normalizeExtensionSettings({
-        overlayTickerStatKeys: ["invalid"] as never
-      }).overlayTickerStatKeys
-    ).toEqual(defaultOverlayTickerStatKeys);
+        overlayTickerStatsMode: "custom",
+        overlayTickerCustomStatKeys: ["shotsTotal", "invalid"] as never
+      }).overlayTickerCustomStatKeys
+    ).toEqual([...defaultOverlayTickerStatKeys, "shotsTotal"]);
   });
 
-  it("upgrades the previous default ticker stat keys to the current defaults", () => {
+  it("stores the latest stat catalog after normalization", () => {
+    const settings = normalizeExtensionSettings({
+      overlayTickerKnownStatKeys: ["possession"]
+    });
+
+    expect(settings.overlayTickerKnownStatKeys).toEqual(overlayTickerStatCatalog);
+    expect(settings.overlayTickerKnownStatKeys).not.toBe(overlayTickerStatCatalog);
+  });
+
+  it("keeps default ticker stat mode independent from custom keys", () => {
+    const settings = normalizeExtensionSettings({
+      overlayTickerStatsMode: "default",
+      overlayTickerCustomStatKeys: ["possession", "shotsOnGoal", "shotsTotal", "cards"]
+    });
+
+    expect(settings.overlayTickerStatsMode).toBe("default");
+    expect(settings.overlayTickerCustomStatKeys).toEqual(["possession", "shotsOnGoal", "shotsTotal", "cards"]);
+    expect(defaultOverlayTickerStatKeys).toEqual([
+      "expectedGoals",
+      "shotsOnGoal",
+      "possession",
+      "cornerKicks",
+      "passesAccuracy",
+      "cards"
+    ]);
+  });
+
+  it("normalizes custom ticker stat keys and pushes newly discovered default stats", () => {
     expect(
       normalizeExtensionSettings({
-        overlayTickerStatKeys: ["possession", "shotsOnGoal", "shotsTotal", "cards"]
-      }).overlayTickerStatKeys
-    ).toEqual(defaultOverlayTickerStatKeys);
+        overlayTickerStatsMode: "custom",
+        overlayTickerKnownStatKeys: ["possession", "shotsOnGoal", "cards"],
+        overlayTickerCustomStatKeys: ["shotsTotal", "invalid", "possession", "shotsTotal"] as never
+      }).overlayTickerCustomStatKeys
+    ).toEqual(["expectedGoals", "cornerKicks", "passesAccuracy", "shotsTotal", "possession"]);
+  });
+
+  it("avoids duplicating newly discovered default stats already selected by the user", () => {
+    expect(
+      normalizeExtensionSettings({
+        overlayTickerStatsMode: "custom",
+        overlayTickerKnownStatKeys: ["possession", "shotsOnGoal", "cards"],
+        overlayTickerCustomStatKeys: ["expectedGoals", "shotsTotal"]
+      }).overlayTickerCustomStatKeys
+    ).toEqual(["expectedGoals", "cornerKicks", "passesAccuracy", "shotsTotal"]);
+  });
+
+  it("does not re-add known default stats removed by the user", () => {
+    expect(
+      normalizeExtensionSettings({
+        overlayTickerStatsMode: "custom",
+        overlayTickerKnownStatKeys: [
+          "expectedGoals",
+          "possession",
+          "shotsOnGoal",
+          "shotsTotal",
+          "shotsInsideBox",
+          "cornerKicks",
+          "passesAccuracy",
+          "fouls",
+          "offsides",
+          "goalkeeperSaves",
+          "cards"
+        ],
+        overlayTickerCustomStatKeys: ["shotsTotal", "possession"]
+      }).overlayTickerCustomStatKeys
+    ).toEqual(["shotsTotal", "possession"]);
+  });
+
+  it("falls back to an empty custom list when every custom key is invalid and all defaults are already known", () => {
+    expect(
+      normalizeExtensionSettings({
+        overlayTickerStatsMode: "custom",
+        overlayTickerKnownStatKeys: overlayTickerStatCatalog,
+        overlayTickerCustomStatKeys: ["unknown", "bad"] as never
+      }).overlayTickerCustomStatKeys
+    ).toEqual([]);
   });
 
   it("converts nullable patch values to undefined", () => {

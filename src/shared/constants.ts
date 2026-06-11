@@ -9,6 +9,20 @@ export const defaultOverlayTickerStatKeys: OverlayTickerStatKey[] = [
   "cards"
 ];
 
+export const overlayTickerStatCatalog: OverlayTickerStatKey[] = [
+  "expectedGoals",
+  "possession",
+  "shotsOnGoal",
+  "shotsTotal",
+  "shotsInsideBox",
+  "cornerKicks",
+  "passesAccuracy",
+  "fouls",
+  "offsides",
+  "goalkeeperSaves",
+  "cards"
+];
+
 export const defaultSettings: ExtensionSettings = {
   extensionEnabled: true,
   fixtureLookupMode: "nearest",
@@ -17,7 +31,9 @@ export const defaultSettings: ExtensionSettings = {
   overlayPosition: "bottom-right",
   overlayTickerIntervalMs: 7000,
   overlayTickerScale: 1,
-  overlayTickerStatKeys: defaultOverlayTickerStatKeys,
+  overlayTickerStatsMode: "default",
+  overlayTickerCustomStatKeys: [],
+  overlayTickerKnownStatKeys: overlayTickerStatCatalog,
   pollingIntervalMs: 30000
 };
 

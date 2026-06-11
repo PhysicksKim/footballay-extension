@@ -68,7 +68,8 @@ describe("CompactOverlay", () => {
         settings={{
           ...defaultSettings,
           overlayTickerIntervalMs: 1200,
-          overlayTickerStatKeys: ["shotsTotal", "possession"]
+          overlayTickerStatsMode: "custom",
+          overlayTickerCustomStatKeys: ["shotsTotal", "possession"]
         }}
         onCollapse={vi.fn()}
       />

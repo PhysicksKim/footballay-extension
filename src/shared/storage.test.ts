@@ -1,5 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { storage } from "wxt/utils/storage";
+import { defaultSettings, overlayTickerStatCatalog } from "@/shared/constants";
 import {
+  readSettings,
   readSiteOverlayDrawerSide,
   readSiteOverlayVisible,
   writeSiteOverlayDrawerSide,
@@ -22,6 +25,7 @@ vi.mock("wxt/utils/storage", () => ({
 describe("site overlay storage", () => {
   beforeEach(() => {
     storageItems.clear();
+    vi.mocked(storage.setItem).mockClear();
   });
 
   it("stores manual overlay visibility by hostname", async () => {
@@ -63,5 +67,56 @@ describe("site overlay storage", () => {
     await expect(writeSiteOverlayDrawerSide("https://example.com/watch", undefined)).resolves.toBeUndefined();
 
     await expect(readSiteOverlayDrawerSide("https://example.com/watch")).resolves.toBeUndefined();
+  });
+
+  it("persists normalized settings after ticker stat catalog migration", async () => {
+    storageItems.set("local:footballay-settings", {
+      overlayTickerStatsMode: "custom",
+      overlayTickerKnownStatKeys: ["possession", "shotsOnGoal", "cards"],
+      overlayTickerCustomStatKeys: ["possession"]
+    });
+
+    const settings = await readSettings();
+
+    expect(settings.overlayTickerCustomStatKeys).toEqual([
+      "expectedGoals",
+      "cornerKicks",
+      "passesAccuracy",
+      "possession"
+    ]);
+    expect(settings.overlayTickerKnownStatKeys).toContain("goalkeeperSaves");
+    expect(storageItems.get("local:footballay-settings")).toEqual(settings);
+  });
+
+  it("does not rewrite settings that are already normalized", async () => {
+    storageItems.set("local:footballay-settings", defaultSettings);
+
+    await expect(readSettings()).resolves.toEqual(defaultSettings);
+
+    expect(storage.setItem).not.toHaveBeenCalled();
+  });
+
+  it("persists recovered defaults when stored ticker settings are invalid", async () => {
+    storageItems.set("local:footballay-settings", {
+      overlayTickerStatsMode: "custom",
+      overlayTickerKnownStatKeys: ["bad", "possession", "possession"],
+      overlayTickerCustomStatKeys: ["bad", "cards", "cards"],
+      overlayTickerIntervalMs: Number.POSITIVE_INFINITY,
+      overlayTickerScale: -1
+    });
+
+    const settings = await readSettings();
+
+    expect(settings.overlayTickerCustomStatKeys).toEqual([
+      "expectedGoals",
+      "shotsOnGoal",
+      "cornerKicks",
+      "passesAccuracy",
+      "cards"
+    ]);
+    expect(settings.overlayTickerKnownStatKeys).toEqual(overlayTickerStatCatalog);
+    expect(settings.overlayTickerIntervalMs).toBe(defaultSettings.overlayTickerIntervalMs);
+    expect(settings.overlayTickerScale).toBe(0.75);
+    expect(storageItems.get("local:footballay-settings")).toEqual(settings);
   });
 });
