@@ -8,7 +8,7 @@ import { t } from '@/shared/i18n/locale';
 import type { MessageKey } from '@/shared/i18n/messages';
 import type { ExtensionSettings, OverlayTickerStatKey } from '@/shared/overlay/types';
 import { resolveOverlayTickerStatKeys } from '@/shared/overlay/tickerStats';
-import footballayIconSmallUrl from '../../../assets/footballay_icon_small.png';
+import footballayIconSmallUrl from '../../../../assets/footballay_icon_small.png';
 
 type CompactOverlayProps = {
     data: LiveMatchOverlayData | null;

@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import type { LiveMatchOverlayData } from "@/domain/live-match/types";
 import { t } from "@/shared/i18n/locale";
-import { OverlayDivider } from "./OverlayDivider";
+import { OverlayDivider } from "../overlayControls/OverlayDivider";
 
 type MatchStatsPanelProps = {
   data: LiveMatchOverlayData | null;

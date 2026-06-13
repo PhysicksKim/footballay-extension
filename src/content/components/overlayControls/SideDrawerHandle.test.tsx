@@ -3,18 +3,18 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { OverlayEdgeHandle } from "./OverlayEdgeHandle";
+import { SideDrawerHandle } from "./SideDrawerHandle";
 
 afterEach(() => {
   cleanup();
 });
 
-describe("OverlayEdgeHandle", () => {
+describe("SideDrawerHandle", () => {
   it("renders a left drawer handle", async () => {
     const user = userEvent.setup();
     const onClick = vi.fn();
 
-    render(<OverlayEdgeHandle side="left" onClick={onClick} />);
+    render(<SideDrawerHandle side="left" onClick={onClick} />);
 
     await user.click(screen.getByRole("button", { name: "Open match events and team stats" }));
 
@@ -22,7 +22,7 @@ describe("OverlayEdgeHandle", () => {
   });
 
   it("marks the active drawer handle", () => {
-    render(<OverlayEdgeHandle active side="right" onClick={vi.fn()} />);
+    render(<SideDrawerHandle active side="right" onClick={vi.fn()} />);
 
     expect(screen.getByRole("button", { name: "Open lineup and player stats" }).className).toContain(
       "footballay-edge-handle--active"

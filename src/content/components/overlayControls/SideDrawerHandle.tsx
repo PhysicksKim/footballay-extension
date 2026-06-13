@@ -2,7 +2,7 @@ import { ChartNoAxesColumn, UserRound, X } from "lucide-react";
 import "@/content/styles/edge-handle.css";
 import { t } from "@/shared/i18n/locale";
 
-type OverlayEdgeHandleProps = {
+type SideDrawerHandleProps = {
   active?: boolean;
   onClick: () => void;
   side: "left" | "right";
@@ -13,7 +13,7 @@ const labels = {
   right: "content.drawer.right.open"
 } as const;
 
-export function OverlayEdgeHandle({ active = false, onClick, side }: OverlayEdgeHandleProps) {
+export function SideDrawerHandle({ active = false, onClick, side }: SideDrawerHandleProps) {
   const Icon = active ? X : side === "left" ? ChartNoAxesColumn : UserRound;
 
   return (

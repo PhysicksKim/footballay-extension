@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from "react";
 import "./styles/base.css";
-import { CompactOverlay } from "./components/CompactOverlay";
-import { LeftMatchDrawer } from "./components/LeftMatchDrawer";
-import { OverlayEdgeHandle } from "./components/OverlayEdgeHandle";
-import { OverlayButton } from "./components/OverlayButton";
-import { RightLineupDrawer } from "./components/RightLineupDrawer";
+import { CompactOverlay } from "./components/compact/CompactOverlay";
+import { LeftMatchDrawer } from "./components/leftDrawer/LeftMatchDrawer";
+import { OverlayButton } from "./components/overlayControls/OverlayButton";
+import { SideDrawerHandle } from "./components/overlayControls/SideDrawerHandle";
+import { RightLineupDrawer } from "./components/rightDrawer/RightLineupDrawer";
 import { useContentOverlayRegistration } from "./hooks/useContentOverlayRegistration";
 import { useContentOverlayRuntime } from "./hooks/useContentOverlayRuntime";
 import { useContentOverlayShortcuts } from "./hooks/useContentOverlayShortcuts";
@@ -74,12 +74,12 @@ export function ContentOverlayApp() {
       </div>
       {shouldRenderDrawerHandles ? (
         <>
-          <OverlayEdgeHandle
+          <SideDrawerHandle
             active={drawerSide === "left"}
             side="left"
             onClick={drawerSide === "left" ? closeDrawer : openLeftDrawer}
           />
-          <OverlayEdgeHandle
+          <SideDrawerHandle
             active={drawerSide === "right"}
             side="right"
             onClick={drawerSide === "right" ? closeDrawer : openRightDrawer}
