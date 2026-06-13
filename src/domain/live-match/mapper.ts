@@ -18,6 +18,7 @@ import type {
   LiveMatchOverlayData,
   MatchEvent,
   MatchLineup,
+  TeamColor,
   TeamLineup,
   TopPlayer
 } from "./types";
@@ -56,7 +57,9 @@ export function mapFixtureLiveData(
   return {
     fixtureUid: info.fixtureUid,
     homeTeamName: getDisplayName(info.home),
+    homeTeamColor: mapTeamColor(info.home?.playerColor),
     awayTeamName: getDisplayName(info.away),
+    awayTeamColor: mapTeamColor(info.away?.playerColor),
     homeScore: status.liveStatus.score.home ?? 0,
     awayScore: status.liveStatus.score.away ?? 0,
     elapsed: status.liveStatus.elapsed ?? statistics.fixture.elapsed ?? undefined,
@@ -228,6 +231,23 @@ function mapTopPlayer(player: PlayerWithStatistics, teamName: string): TopPlayer
         ? `${player.statistics.passesAccuracy}/${player.statistics.passesTotal}`
         : undefined
   };
+}
+
+function mapTeamColor(color?: { border?: string | null; number?: string | null; primary?: string | null } | null): TeamColor | undefined {
+  const primary = normalizeHexColor(color?.primary);
+  const number = normalizeHexColor(color?.number);
+  const border = normalizeHexColor(color?.border);
+
+  return primary || number || border ? { border, number, primary } : undefined;
+}
+
+function normalizeHexColor(color?: string | null): string | undefined {
+  if (!color) {
+    return undefined;
+  }
+
+  const normalizedColor = color.trim().replace(/^#/, "");
+  return /^[0-9a-fA-F]{6}$/.test(normalizedColor) ? `#${normalizedColor}` : undefined;
 }
 
 function getDisplayName(team?: { name: string; nameKo?: string | null; koreanName?: string | null } | null): string {

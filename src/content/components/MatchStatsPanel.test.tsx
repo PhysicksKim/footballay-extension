@@ -21,6 +21,9 @@ const matchData: LiveMatchOverlayData = {
     yellowCards: 2
   },
   awayTeamName: "Away",
+  awayTeamColor: {
+    primary: "#3050b8"
+  },
   fixtureUid: "fixture-1",
   homeScore: 2,
   homeStats: {
@@ -38,6 +41,9 @@ const matchData: LiveMatchOverlayData = {
     yellowCards: 1
   },
   homeTeamName: "Home",
+  homeTeamColor: {
+    primary: "#74112e"
+  },
   updatedAt: "2026-06-05T00:00:00.000Z"
 };
 
@@ -46,17 +52,22 @@ afterEach(() => {
 });
 
 describe("MatchStatsPanel", () => {
-  it("renders expanded team stats from live match data", () => {
-    render(<MatchStatsPanel data={matchData} />);
+  it("renders pass accuracy donuts and ratio bars from live match data", () => {
+    const { container } = render(<MatchStatsPanel data={matchData} />);
 
-    expect(screen.getByText("xG")).toBeTruthy();
-    expect(screen.getByText("1.7 - 0.8")).toBeTruthy();
-    expect(screen.getByText("Corners")).toBeTruthy();
-    expect(screen.getByText("6 - 2")).toBeTruthy();
     expect(screen.getByText("Pass %")).toBeTruthy();
-    expect(screen.getByText("86% - 79%")).toBeTruthy();
-    expect(screen.getByText("Cards")).toBeTruthy();
-    expect(screen.getByText("1Y 1R - 2")).toBeTruthy();
+    expect(screen.getByText("86%")).toBeTruthy();
+    expect(screen.getByText("79%")).toBeTruthy();
+    expect(screen.getByText("Key stats")).toBeTruthy();
+    expect(screen.getByText("xG")).toBeTruthy();
+    expect(screen.getByText("1.7")).toBeTruthy();
+    expect(screen.getByText("0.8")).toBeTruthy();
+    expect(screen.getByText("Corners")).toBeTruthy();
+    expect(screen.getAllByText("6")).toBeTruthy();
+    expect(screen.getByText("Yellow cards")).toBeTruthy();
+    expect(screen.getByText("Red cards")).toBeTruthy();
+    expect((container.querySelector(".footballay-visual-stats") as HTMLElement).style.getPropertyValue("--footballay-home-color")).toBe("#74112e");
+    expect((container.querySelector(".footballay-visual-stats") as HTMLElement).style.getPropertyValue("--footballay-away-color")).toBe("#3050b8");
   });
 
   it("renders an empty state when no stats are available", () => {

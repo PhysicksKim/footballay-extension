@@ -25,6 +25,12 @@ export type TeamExpectedGoal = {
   xg: string;
 };
 
+export type TeamColor = {
+  border?: string;
+  number?: string;
+  primary?: string;
+};
+
 export type TopPlayer = {
   name: string;
   teamName: string;
@@ -120,7 +126,9 @@ export type LineupPlayer = {
 export type LiveMatchOverlayData = {
   fixtureUid: string;
   homeTeamName: string;
+  homeTeamColor?: TeamColor;
   awayTeamName: string;
+  awayTeamColor?: TeamColor;
   homeScore: number;
   awayScore: number;
   elapsed?: number;

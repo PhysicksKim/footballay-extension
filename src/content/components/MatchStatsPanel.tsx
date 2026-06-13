@@ -1,37 +1,132 @@
+import type { CSSProperties } from "react";
 import type { LiveMatchOverlayData } from "@/domain/live-match/types";
 import { t } from "@/shared/i18n/locale";
-import { StatLine } from "./StatLine";
+import { OverlayDivider } from "./OverlayDivider";
 
 type MatchStatsPanelProps = {
   data: LiveMatchOverlayData | null;
 };
 
+type RatioStatRow = {
+  away?: number;
+  home?: number;
+  label: string;
+  valueFormatter?: (value: number) => string;
+};
+
+type StatStyle = CSSProperties & Record<"--footballay-away-color" | "--footballay-home-color", string>;
+type DonutStyle = CSSProperties & Record<"--footballay-donut-color" | "--footballay-donut-percent", string>;
+type BarStyle = CSSProperties & Record<"--footballay-away-percent" | "--footballay-home-percent", string>;
+
+const fallbackHomeColor = "#b91c2f";
+const fallbackAwayColor = "#1d4ed8";
+
 export function MatchStatsPanel({ data }: MatchStatsPanelProps) {
   if (!data) {
-    return <p className="footballay-empty">No stats</p>;
+    return <p className="footballay-empty">{t("content.drawer.empty.stats")}</p>;
   }
 
-  const statRows = getStatRows(data);
+  const rows = getRatioStatRows(data);
+  const hasPassAccuracy =
+    data.homeStats?.passesAccuracyPercentage !== undefined ||
+    data.awayStats?.passesAccuracyPercentage !== undefined;
 
-  if (!statRows.length) {
-    return <p className="footballay-empty">No stats</p>;
+  if (!rows.length && !hasPassAccuracy) {
+    return <p className="footballay-empty">{t("content.drawer.empty.stats")}</p>;
   }
+
+  const homeColor = data.homeTeamColor?.primary ?? fallbackHomeColor;
+  const awayColor = data.awayTeamColor?.primary ?? fallbackAwayColor;
+  const style: StatStyle = {
+    "--footballay-away-color": awayColor,
+    "--footballay-home-color": homeColor
+  };
 
   return (
-    <div className="footballay-stats">
-      {statRows.map((row) => (
-        <StatLine key={row.label} label={row.label} home={row.home} away={row.away} />
-      ))}
+    <div className="footballay-visual-stats" style={style}>
+      {hasPassAccuracy ? (
+        <section className="footballay-visual-stats__pass">
+          <h3>{t("overlay.stat.passesAccuracy")}</h3>
+          <div className="footballay-visual-stats__donuts">
+            <PassAccuracyDonut color={homeColor} value={data.homeStats?.passesAccuracyPercentage} />
+            <PassAccuracyDonut color={awayColor} value={data.awayStats?.passesAccuracyPercentage} />
+          </div>
+        </section>
+      ) : null}
+
+      {rows.length ? (
+        <>
+          <OverlayDivider />
+          <section className="footballay-visual-stats__main">
+            <h3>{t("content.drawer.stats.major")}</h3>
+            <div className="footballay-visual-stats__bars">
+              {rows.map((row) => (
+                <RatioStatBar key={row.label} row={row} />
+              ))}
+            </div>
+          </section>
+        </>
+      ) : null}
     </div>
   );
 }
 
-function getStatRows(data: LiveMatchOverlayData): Array<{ label: string; home?: string | number; away?: string | number }> {
+function PassAccuracyDonut({ color, value }: { color: string; value?: number }) {
+  const percent = clampPercent(value ?? 0);
+  const style: DonutStyle = {
+    "--footballay-donut-color": color,
+    "--footballay-donut-percent": `${percent}%`
+  };
+
+  return (
+    <div className="footballay-pass-donut" style={style}>
+      <span>{value === undefined ? "-" : `${Math.round(percent)}%`}</span>
+    </div>
+  );
+}
+
+function RatioStatBar({ row }: { row: RatioStatRow }) {
+  const homeValue = row.home ?? 0;
+  const awayValue = row.away ?? 0;
+  const homePercent = getHomeRatioPercent(homeValue, awayValue);
+  const awayPercent = 100 - homePercent;
+  const style: BarStyle = {
+    "--footballay-away-percent": `${awayPercent}%`,
+    "--footballay-home-percent": `${homePercent}%`
+  };
+  const formatValue = row.valueFormatter ?? formatNumber;
+
+  return (
+    <div className="footballay-stat-ratio">
+      <span className="footballay-stat-ratio__label">{row.label}</span>
+      <div className="footballay-stat-ratio__body">
+        <span className="footballay-stat-ratio__value">
+          {row.home === undefined ? "-" : formatValue(row.home)}
+        </span>
+        <div className="footballay-stat-ratio__bar" style={style} aria-hidden>
+          <span className="footballay-stat-ratio__bar-home" />
+          <span className="footballay-stat-ratio__bar-away" />
+        </div>
+        <span className="footballay-stat-ratio__value footballay-stat-ratio__value--away">
+          {row.away === undefined ? "-" : formatValue(row.away)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function getRatioStatRows(data: LiveMatchOverlayData): RatioStatRow[] {
   return [
     {
+      label: t("overlay.stat.possession"),
+      home: parsePercentage(data.homeStats?.possession),
+      away: parsePercentage(data.awayStats?.possession),
+      valueFormatter: (value: number) => `${formatNumber(value)}%`
+    },
+    {
       label: t("overlay.stat.expectedGoals"),
-      home: data.homeStats?.expectedGoals,
-      away: data.awayStats?.expectedGoals
+      home: parseNumber(data.homeStats?.expectedGoals),
+      away: parseNumber(data.awayStats?.expectedGoals)
     },
     {
       label: t("overlay.stat.shots"),
@@ -44,29 +139,9 @@ function getStatRows(data: LiveMatchOverlayData): Array<{ label: string; home?: 
       away: data.awayStats?.shotsOnGoal
     },
     {
-      label: t("overlay.stat.shotsInsideBox"),
-      home: data.homeStats?.shotsInsideBox,
-      away: data.awayStats?.shotsInsideBox
-    },
-    {
-      label: t("overlay.stat.possession"),
-      home: data.homeStats?.possession,
-      away: data.awayStats?.possession
-    },
-    {
       label: t("overlay.stat.cornerKicks"),
       home: data.homeStats?.cornerKicks,
       away: data.awayStats?.cornerKicks
-    },
-    {
-      label: t("overlay.stat.passesAccuracy"),
-      home: formatPercentage(data.homeStats?.passesAccuracyPercentage),
-      away: formatPercentage(data.awayStats?.passesAccuracyPercentage)
-    },
-    {
-      label: t("overlay.stat.fouls"),
-      home: data.homeStats?.fouls,
-      away: data.awayStats?.fouls
     },
     {
       label: t("overlay.stat.offsides"),
@@ -74,26 +149,50 @@ function getStatRows(data: LiveMatchOverlayData): Array<{ label: string; home?: 
       away: data.awayStats?.offsides
     },
     {
+      label: t("overlay.stat.fouls"),
+      home: data.homeStats?.fouls,
+      away: data.awayStats?.fouls
+    },
+    {
+      label: t("overlay.stat.yellowCards"),
+      home: data.homeStats?.yellowCards,
+      away: data.awayStats?.yellowCards
+    },
+    {
+      label: t("overlay.stat.redCards"),
+      home: data.homeStats?.redCards,
+      away: data.awayStats?.redCards
+    },
+    {
       label: t("overlay.stat.goalkeeperSaves"),
       home: data.homeStats?.goalkeeperSaves,
       away: data.awayStats?.goalkeeperSaves
-    },
-    {
-      label: t("overlay.stat.cards"),
-      home: formatCards(data.homeStats?.yellowCards, data.homeStats?.redCards),
-      away: formatCards(data.awayStats?.yellowCards, data.awayStats?.redCards)
     }
   ].filter((row) => row.home !== undefined || row.away !== undefined);
 }
 
-function formatPercentage(value?: number): string | undefined {
-  return value === undefined ? undefined : `${value}%`;
+function getHomeRatioPercent(homeValue: number, awayValue: number): number {
+  const total = homeValue + awayValue;
+  return total > 0 ? (homeValue / total) * 100 : 50;
 }
 
-function formatCards(yellowCards?: number, redCards?: number): string | undefined {
-  if (yellowCards === undefined && redCards === undefined) {
+function parsePercentage(value?: string): number | undefined {
+  return parseNumber(value?.replace("%", ""));
+}
+
+function parseNumber(value?: string | number): number | undefined {
+  if (value === undefined) {
     return undefined;
   }
 
-  return redCards && redCards > 0 ? `${yellowCards ?? 0}Y ${redCards}R` : `${yellowCards ?? 0}`;
+  const parsed = typeof value === "number" ? value : Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function clampPercent(value: number): number {
+  return Math.min(Math.max(value, 0), 100);
+}
+
+function formatNumber(value: number): string {
+  return Number.isInteger(value) ? value.toString() : value.toFixed(2).replace(/\.?0+$/, "");
 }

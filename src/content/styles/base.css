@@ -2,6 +2,18 @@
 
 #footballay-overlay-root {
   all: initial;
+  --footballay-overlay-bg: rgba(8, 10, 14, 0.84);
+  --footballay-overlay-border: rgba(255, 255, 255, 0.1);
+  --footballay-overlay-border-muted: rgba(255, 255, 255, 0.08);
+  --footballay-overlay-card-bg: rgba(12, 32, 61, 0.58);
+  --footballay-overlay-text: #f7fafc;
+  --footballay-overlay-text-muted: rgba(247, 250, 252, 0.62);
+  --footballay-overlay-text-soft: #cbd8e6;
+  --footballay-overlay-accent: #7de2c6;
+  --footballay-overlay-blue: #3b82f6;
+  --footballay-overlay-yellow: #facc15;
+  --footballay-overlay-red: #ef4444;
+  --footballay-overlay-shadow: 0 2px 12px rgba(0, 0, 0, 0.36);
 }
 
 #footballay-overlay-root *,

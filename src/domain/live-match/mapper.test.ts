@@ -67,10 +67,28 @@ describe("live match mapper", () => {
 
   it("maps live match snapshot including stats, top players, events, and lineup", () => {
     const info: FixtureInfoResponse = {
-      away: { teamUid: "away", name: "Away", koreanName: "어웨이" },
+      away: {
+        teamUid: "away",
+        name: "Away",
+        koreanName: "어웨이",
+        playerColor: {
+          border: "3050b8",
+          number: "ebcc2d",
+          primary: "3050b8"
+        }
+      },
       date: "2026-05-25T10:00:00Z",
       fixtureUid: "fixture-1",
-      home: { teamUid: "home", name: "Home", koreanName: "홈" },
+      home: {
+        teamUid: "home",
+        name: "Home",
+        koreanName: "홈",
+        playerColor: {
+          border: "74112e",
+          number: "ffffff",
+          primary: "74112e"
+        }
+      },
       league: { leagueUid: "league-1", name: "League" }
     };
     const status: FixtureLiveStatusResponse = {
@@ -138,7 +156,17 @@ describe("live match mapper", () => {
       elapsed: 68,
       fixtureUid: "fixture-1",
       homeScore: 2,
+      homeTeamColor: {
+        border: "#74112e",
+        number: "#ffffff",
+        primary: "#74112e"
+      },
       homeTeamName: "홈",
+      awayTeamColor: {
+        border: "#3050b8",
+        number: "#ebcc2d",
+        primary: "#3050b8"
+      },
       statusShort: "2H",
       updatedAt: "2026-06-05T00:00:00.000Z"
     });

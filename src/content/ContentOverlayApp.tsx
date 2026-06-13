@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import "./styles/base.css";
 import { CompactOverlay } from "./components/CompactOverlay";
+import { LeftMatchDrawer } from "./components/LeftMatchDrawer";
 import { OverlayEdgeHandle } from "./components/OverlayEdgeHandle";
 import { OverlayButton } from "./components/OverlayButton";
 import { RightLineupDrawer } from "./components/RightLineupDrawer";
@@ -92,6 +93,9 @@ export function ContentOverlayApp() {
           onClearSelectedPlayer={clearSelectedPlayer}
           onSelectPlayer={selectPlayer}
         />
+      ) : null}
+      {drawerSide === "left" && shouldRenderDrawerHandles ? (
+        <LeftMatchDrawer data={data} />
       ) : null}
     </>
   );

@@ -26,11 +26,38 @@
   "content_drawer_left_open": {
     "message": "경기 이벤트와 팀 통계 열기"
   },
+  "content_drawer_left_title": {
+    "message": "경기 이벤트와 팀 통계"
+  },
   "content_drawer_close": {
     "message": "드로어 닫기"
   },
+  "content_drawer_empty_events": {
+    "message": "이벤트가 없습니다"
+  },
   "content_drawer_empty_lineup": {
     "message": "라인업이 없습니다"
+  },
+  "content_drawer_empty_stats": {
+    "message": "통계가 없습니다"
+  },
+  "content_drawer_event_goal": {
+    "message": "득점"
+  },
+  "content_drawer_event_ownGoal": {
+    "message": "자책골"
+  },
+  "content_drawer_event_redCard": {
+    "message": "레드카드"
+  },
+  "content_drawer_event_substitution": {
+    "message": "교체"
+  },
+  "content_drawer_event_yellowCard": {
+    "message": "옐로카드"
+  },
+  "content_drawer_events_title": {
+    "message": "이벤트"
   },
   "content_drawer_player_assists": {
     "message": "도움"
@@ -98,6 +125,12 @@
   "content_drawer_right_title": {
     "message": "라인업"
   },
+  "content_drawer_stats_title": {
+    "message": "팀 통계"
+  },
+  "content_drawer_stats_major": {
+    "message": "주요 스탯"
+  },
   "extension_description": {
     "message": "스트리밍 페이지에 표시되는 컴팩트한 실시간 축구 통계 오버레이입니다."
   },
@@ -128,6 +161,9 @@
   "overlay_stat_possession": {
     "message": "점유율"
   },
+  "overlay_stat_redCards": {
+    "message": "레드카드"
+  },
   "overlay_stat_shots": {
     "message": "슈팅"
   },
@@ -136,6 +172,9 @@
   },
   "overlay_stat_shotsOnGoal": {
     "message": "유효슛"
+  },
+  "overlay_stat_yellowCards": {
+    "message": "옐로카드"
   },
   "overlayPosition_bottomCenter": {
     "message": "하단 중앙"

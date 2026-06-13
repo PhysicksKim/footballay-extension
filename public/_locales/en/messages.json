@@ -26,11 +26,38 @@
   "content_drawer_left_open": {
     "message": "Open match events and team stats"
   },
+  "content_drawer_left_title": {
+    "message": "Match events and team stats"
+  },
   "content_drawer_close": {
     "message": "Close drawer"
   },
+  "content_drawer_empty_events": {
+    "message": "No events"
+  },
   "content_drawer_empty_lineup": {
     "message": "No lineup"
+  },
+  "content_drawer_empty_stats": {
+    "message": "No stats"
+  },
+  "content_drawer_event_goal": {
+    "message": "Goal"
+  },
+  "content_drawer_event_ownGoal": {
+    "message": "Own goal"
+  },
+  "content_drawer_event_redCard": {
+    "message": "Red card"
+  },
+  "content_drawer_event_substitution": {
+    "message": "Substitution"
+  },
+  "content_drawer_event_yellowCard": {
+    "message": "Yellow card"
+  },
+  "content_drawer_events_title": {
+    "message": "Events"
   },
   "content_drawer_player_assists": {
     "message": "Assists"
@@ -98,6 +125,12 @@
   "content_drawer_right_title": {
     "message": "Lineup"
   },
+  "content_drawer_stats_title": {
+    "message": "Team stats"
+  },
+  "content_drawer_stats_major": {
+    "message": "Key stats"
+  },
   "extension_description": {
     "message": "Compact live football stats overlay for streaming pages."
   },
@@ -128,6 +161,9 @@
   "overlay_stat_possession": {
     "message": "Possession"
   },
+  "overlay_stat_redCards": {
+    "message": "Red cards"
+  },
   "overlay_stat_shots": {
     "message": "Shots"
   },
@@ -136,6 +172,9 @@
   },
   "overlay_stat_shotsOnGoal": {
     "message": "SOT"
+  },
+  "overlay_stat_yellowCards": {
+    "message": "Yellow cards"
   },
   "overlayPosition_bottomCenter": {
     "message": "Bottom center"
